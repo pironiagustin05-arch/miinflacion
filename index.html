@@ -1,0 +1,3971 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi Inflación — Calculadora Personal Argentina</title>
+<!-- Supabase SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,900;1,400&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0B0B0B; --surf:#141414; --surf2:#1C1C1C; --surf3:#222222;
+  --b1:#242424; --b2:#2E2E2E; --b3:#3A3A3A;
+  --t1:#F0F0F0; --t2:#A0A0A0; --t3:#606060;
+  --accent:#C8F135; --accent2:#96BE1E; --accent-bg:rgba(200,241,53,.08);
+  --red:#FF5555; --red-bg:rgba(255,85,85,.08);
+  --amber:#F5A623; --amber-bg:rgba(245,166,35,.08);
+  --green:#3DDC84; --green-bg:rgba(61,220,132,.08);
+  --purple:#B39DFF; --purple-bg:rgba(179,157,255,.08);
+  --mono:'Space Grotesk',sans-serif;
+  --sans:'Inter',sans-serif;
+  --r:10px; --rl:16px; --rxl:20px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;scroll-behavior:smooth}
+body{background:var(--bg);color:var(--t1);font-family:var(--sans);min-height:100vh;-webkit-font-smoothing:antialiased}
+
+/* ── SCREENS ── */
+.screen{display:none;min-height:100vh}
+.screen.active{display:flex;flex-direction:column}
+
+/* ══════════════ AUTH SCREEN ══════════════ */
+#screen-auth{align-items:center;justify-content:center;padding:2rem}
+.auth-box{width:100%;max-width:400px}
+.auth-logo{text-align:center;margin-bottom:2.5rem}
+.auth-logo-mark{font-family:var(--mono);font-size:28px;font-weight:700;color:var(--accent);letter-spacing:-.02em}
+.auth-logo-mark span{color:var(--t2);font-weight:300}
+.auth-logo-sub{font-size:12px;color:var(--t3);margin-top:4px;letter-spacing:.04em}
+.auth-card{background:var(--surf);border:1px solid var(--b1);border-radius:var(--rl);padding:28px 28px 24px;margin-bottom:16px}
+.auth-tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--surf2);border-radius:8px;padding:4px;margin-bottom:22px}
+.auth-tab{font-size:13px;font-weight:500;padding:8px;text-align:center;border-radius:6px;cursor:pointer;color:var(--t3);border:none;background:transparent;transition:all .15s}
+.auth-tab.active{background:var(--surf3);color:var(--t1)}
+.auth-form{display:flex;flex-direction:column;gap:14px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-label{font-size:12px;color:var(--t2)}
+.form-input{background:var(--surf2);border:1px solid var(--b2);border-radius:8px;padding:10px 14px;font-size:14px;font-family:var(--sans);color:var(--t1);outline:none;transition:border-color .15s}
+.form-input:focus{border-color:var(--accent)}
+.form-input::placeholder{color:var(--t3)}
+.btn-primary{background:var(--accent);color:#000;font-size:14px;font-weight:700;padding:12px;border-radius:8px;border:none;cursor:pointer;font-family:var(--sans);transition:opacity .15s;margin-top:4px}
+.btn-primary:hover{opacity:.88}
+.auth-error{font-size:12px;color:var(--red);text-align:center;display:none}
+.auth-error.show{display:block}
+.auth-footer{text-align:center;font-size:12px;color:var(--t3)}
+.auth-footer a{color:var(--t2);cursor:pointer;text-decoration:underline}
+.auth-meta{text-align:center;font-size:11px;color:var(--t3);line-height:1.6;margin-top:8px}
+.auth-slogan{text-align:center;margin-bottom:1.6rem}
+.auth-slogan-line1{font-size:16px;font-weight:700;color:var(--t1);line-height:1.35;letter-spacing:-.01em}
+.auth-slogan-line1 em{color:var(--accent);font-style:normal}
+.auth-slogan-line2{font-size:14px;font-weight:400;color:var(--t2);margin-top:6px;line-height:1.4}
+.auth-slogan-line2 strong{color:var(--accent);font-weight:700}
+.auth-slogan-sep{display:block;width:32px;height:2px;background:var(--accent);margin:14px auto 0;border-radius:1px}
+/* Slogan banner inside app */
+.slogan-banner{background:var(--surf);border:1px solid var(--b1);border-left:3px solid var(--accent);border-radius:var(--r);padding:14px 20px;margin-bottom:1.8rem;display:flex;align-items:center;gap:16px}
+.slogan-banner-text{}
+.slogan-banner-q{font-size:14px;font-weight:700;color:var(--t1);line-height:1.35}
+.slogan-banner-q em{color:var(--accent);font-style:normal}
+.slogan-banner-a{font-size:12px;color:var(--t2);margin-top:3px}
+.slogan-banner-a strong{color:var(--accent);font-weight:700}
+
+/* ══════════════ APP SCREEN ══════════════ */
+#screen-app{flex-direction:column}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(11,11,11,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--b1);height:54px;display:flex;align-items:center;padding:0 2rem;gap:0}
+.nav-brand{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--accent);text-decoration:none;margin-right:auto;letter-spacing:.01em;display:flex;align-items:center;gap:6px}
+.nav-brand span{color:var(--t2);font-weight:300}
+.nav-tabs{display:flex;height:100%;gap:0}
+.nav-tab{font-size:13px;color:var(--t3);background:none;border:none;border-bottom:2px solid transparent;height:100%;padding:0 16px;cursor:pointer;font-family:var(--sans);transition:color .15s,border-color .15s;display:flex;align-items:center;gap:6px}
+.nav-tab:hover{color:var(--t2)}
+.nav-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.nav-badge{font-size:9px;background:var(--accent);color:#000;font-weight:800;padding:2px 5px;border-radius:4px;letter-spacing:.03em}
+.nav-right{display:flex;align-items:center;gap:12px;margin-left:24px}
+.nav-user{font-size:12px;color:var(--t2)}
+.nav-user b{color:var(--t1)}
+.btn-logout{font-size:11px;color:var(--t3);background:none;border:1px solid var(--b2);border-radius:6px;padding:4px 10px;cursor:pointer;font-family:var(--sans);transition:all .15s}
+.btn-logout:hover{border-color:var(--b3);color:var(--t2)}
+.ipc-ticker{font-family:var(--mono);font-size:11px;color:var(--t3);display:flex;align-items:center;gap:6px;padding:0 14px;border-left:1px solid var(--b1)}
+.ipc-ticker .live-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* PANELS */
+.container{max-width:1060px;margin:0 auto;padding:0 2rem}
+.panel{display:none;padding:2.5rem 0 5rem}
+.panel.active{display:block}
+
+/* HERO */
+.hero{display:grid;grid-template-columns:1fr 1fr;gap:1.6rem;align-items:start;margin-bottom:2rem}
+.hero-eyebrow{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.hero-eyebrow::before{content:'';width:18px;height:1px;background:var(--accent)}
+.hero-label{font-size:12px;color:var(--t3);margin-bottom:4px}
+.hero-num{font-family:var(--mono);font-size:80px;font-weight:700;line-height:1;letter-spacing:-.03em;color:var(--accent);transition:color .3s}
+.hero-num.empty{color:var(--b3)}
+.hero-unit{font-size:20px;font-weight:300;color:var(--t2);margin-left:2px;vertical-align:super}
+.hero-caption{font-size:12px;color:var(--t3);margin-top:8px}
+.hero-caption em{color:var(--t2);font-style:normal}
+.hero-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding-top:4px}
+.stat-c{background:var(--surf);border:1px solid var(--b1);border-radius:var(--r);padding:14px 16px}
+.stat-c.hi{border-color:rgba(200,241,53,.2);background:var(--accent-bg)}
+.slabel{font-size:10px;color:var(--t3);letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px}
+.sval{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--t1);line-height:1}
+.sval.accent{color:var(--accent)}
+.sval.red{color:var(--red)}
+.sval.green{color:var(--green)}
+.ssub{font-size:10px;color:var(--t3);margin-top:4px}
+.sdelta{display:inline-flex;align-items:center;font-family:var(--mono);font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;margin-top:5px}
+.sdelta.up{background:var(--red-bg);color:var(--red)}
+.sdelta.dn{background:var(--green-bg);color:var(--green)}
+.sdelta.eq{background:var(--amber-bg);color:var(--amber)}
+
+/* STATUS BAR */
+.status-bar{background:var(--surf);border:1px solid var(--b1);border-radius:var(--r);padding:14px 18px;margin-bottom:1.6rem;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.status-bar-left{display:flex;align-items:center;gap:12px;flex:1}
+.prog-track{flex:1;height:4px;background:var(--b2);border-radius:2px;overflow:hidden;min-width:100px}
+.prog-fill{height:100%;border-radius:2px;background:var(--accent);transition:width .3s}
+.prog-fill.over{background:var(--red)}
+.prog-text{font-size:12px;font-family:var(--mono);color:var(--t2);white-space:nowrap}
+.prog-text b{color:var(--t1)}
+.status-bar-right{font-size:12px;color:var(--t3);font-family:var(--mono)}
+.status-bar-right b{color:var(--accent)}
+
+/* SECTION HEADERS */
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sec-title{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);display:flex;align-items:center;gap:10px}
+.sec-title::after{content:'';display:block;height:1px;background:var(--b1);width:40px}
+.sec-hint{font-size:11px;color:var(--t3)}
+
+/* REGION */
+.region-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:1.4rem}
+.region-lbl{font-size:11px;color:var(--t3)}
+.region-btns{display:flex;gap:5px;flex-wrap:wrap}
+.rbtn{font-size:11px;padding:4px 12px;border-radius:6px;cursor:pointer;border:1px solid var(--b2);background:transparent;color:var(--t2);transition:all .15s;font-family:var(--sans)}
+.rbtn:hover{border-color:var(--b3);color:var(--t1)}
+.rbtn.active{background:var(--accent);color:#000;border-color:var(--accent);font-weight:700}
+
+/* WARN */
+.warn{background:var(--amber-bg);border:1px solid rgba(245,166,35,.25);border-radius:var(--r);padding:9px 14px;margin-bottom:12px;font-size:12px;color:var(--amber);display:none;align-items:center;gap:8px}
+.warn.show{display:flex}
+
+/* CAT CARDS */
+.cat-grid{display:flex;flex-direction:column;gap:6px;margin-bottom:1.6rem}
+.cat-card{background:var(--surf);border:1px solid var(--b1);border-radius:var(--r);overflow:hidden;transition:border-color .2s}
+.cat-card.open{border-color:var(--b2)}
+.cat-head{display:grid;grid-template-columns:38px 1fr auto 60px 62px 26px;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;user-select:none;transition:background .15s}
+.cat-head:hover{background:var(--surf2)}
+.cat-ico{width:34px;height:34px;border-radius:8px;background:var(--surf2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.cat-info .cat-name{font-size:13px;font-weight:500;color:var(--t1)}
+.cat-info .cat-sub{font-size:10px;color:var(--t3);margin-top:1px}
+.cat-pill{font-size:10px;font-weight:700;font-family:var(--mono);padding:3px 8px;border-radius:5px;flex-shrink:0}
+.pill-r{background:var(--red-bg);color:var(--red)}
+.pill-a{background:var(--amber-bg);color:var(--amber)}
+.pill-g{background:var(--green-bg);color:var(--green)}
+.cat-weight{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--accent);text-align:right}
+.cat-contrib{font-family:var(--mono);font-size:11px;color:var(--t3);text-align:right}
+.cat-chev{font-size:12px;color:var(--t3);transition:transform .22s;text-align:center}
+.cat-chev.open{transform:rotate(180deg)}
+.cat-body{display:none;border-top:1px solid var(--b1);padding:18px 16px}
+.cat-body.open{display:block}
+
+/* MONEY ROW */
+.money-row{display:flex;align-items:stretch;gap:0;background:var(--surf2);border:1px solid var(--b2);border-radius:var(--r);overflow:hidden;margin-bottom:16px;transition:border-color .15s}
+.money-row:focus-within{border-color:var(--accent)}
+.money-prefix{padding:0 14px;background:var(--surf3);display:flex;align-items:center;font-size:14px;color:var(--t3);border-right:1px solid var(--b2);flex-shrink:0}
+.money-inner{flex:1;display:flex;flex-direction:column;padding:10px 14px}
+.money-label-sm{font-size:10px;color:var(--t3);margin-bottom:2px}
+.money-inp{background:transparent;border:none;outline:none;font-size:18px;font-family:var(--mono);font-weight:600;color:var(--t1);width:100%}
+.money-inp::placeholder{color:var(--b3)}
+.money-sep{width:1px;background:var(--b2);flex-shrink:0;margin:10px 0}
+.money-pct-box{padding:10px 16px;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:2px;flex-shrink:0;min-width:72px}
+.money-pct-v{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--accent)}
+.money-pct-l{font-size:10px;color:var(--t3)}
+
+/* SLIDER ROW */
+.slider-row{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.slider-lbl{font-size:11px;color:var(--t3);width:108px;flex-shrink:0}
+.slider-row input[type=range]{flex:1}
+.slider-val{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--accent);min-width:34px;text-align:right}
+
+/* SUB RUBROS */
+.sub-sect-title{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--t3);padding-bottom:8px;border-bottom:1px solid var(--b1);margin-bottom:12px}
+/* SUBRUBROS — nueva UI */
+.sub-list{display:flex;flex-direction:column;gap:6px}
+.sub-item{border:1px solid var(--b1);border-radius:8px;overflow:hidden;background:var(--surf2);transition:border-color .15s}
+.sub-item.active{border-color:var(--accent)}
+.sub-item-head{display:grid;grid-template-columns:1fr auto auto auto;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;user-select:none;transition:background .12s}
+.sub-item-head:hover{background:var(--surf3)}
+.sub-item-name{font-size:12px;color:var(--t2);font-weight:500}
+.sub-item.active .sub-item-name{color:var(--t1)}
+.sub-ipc-tag{font-size:10px;font-family:var(--mono);font-weight:700;padding:2px 7px;border-radius:4px}
+.sub-item-pct{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--accent);min-width:80px;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sub-item-pp{font-family:var(--mono);font-size:10px;color:var(--t3);min-width:46px;text-align:right}
+.sub-item-body{display:none;border-top:1px solid var(--b1);padding:12px}
+.sub-item-body.open{display:block}
+.sub-monto-row{display:flex;align-items:stretch;gap:0;background:var(--surf);border:1px solid var(--b2);border-radius:7px;overflow:hidden;margin-bottom:10px;transition:border-color .15s}
+.sub-monto-row:focus-within{border-color:var(--accent)}
+.sub-monto-prefix{padding:0 10px;background:var(--surf2);display:flex;align-items:center;font-size:13px;color:var(--t3);border-right:1px solid var(--b2)}
+.sub-monto-inp{background:transparent;border:none;outline:none;font-size:16px;font-family:var(--mono);font-weight:600;color:var(--t1);padding:8px 10px;width:100%}
+.sub-monto-inp::placeholder{color:var(--b3)}
+.sub-slider-row{display:flex;align-items:center;gap:10px}
+.sub-slider-lbl{font-size:10px;color:var(--t3);white-space:nowrap}
+.sub-slider-row input[type=range]{flex:1}
+.sub-slider-val{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--accent);min-width:30px;text-align:right}
+/* distrib bar */
+.sub-distrib-bar{margin-top:12px;padding-top:10px;border-top:1px solid var(--b1)}
+.sub-distrib-label{font-size:10px;color:var(--t3);margin-bottom:6px;display:flex;justify-content:space-between}
+.sub-distrib-track{height:6px;background:var(--b1);border-radius:3px;overflow:hidden;display:flex}
+.sub-distrib-seg{height:100%;transition:width .3s;position:relative}
+.sub-total-status{font-size:10px;font-family:var(--mono);margin-top:5px;text-align:right}
+
+/* CONTRIBUTION CHART */
+.contrib-box{background:var(--surf);border:1px solid var(--b1);border-radius:var(--rl);padding:22px;margin-bottom:1.6rem}
+.contrib-hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:20px}
+.contrib-title{font-size:13px;font-weight:500;color:var(--t1)}
+.contrib-sub{font-size:11px;color:var(--t3)}
+/* dos columnas: torta | barras */
+.contrib-layout{display:grid;grid-template-columns:260px 1fr;gap:28px;align-items:start}
+/* TORTA */
+.pie-wrap{display:flex;flex-direction:column;align-items:center;gap:16px}
+.pie-svg-wrap{position:relative;width:200px;height:200px;flex-shrink:0}
+.pie-svg-wrap svg{width:100%;height:100%;transform:rotate(-90deg)}
+.pie-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.pie-center-val{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--t1);line-height:1}
+.pie-center-lbl{font-size:10px;color:var(--t3);margin-top:3px;text-align:center;max-width:70px;line-height:1.3}
+.pie-legend{display:flex;flex-direction:column;gap:6px;width:100%}
+.pie-legend-item{display:flex;align-items:center;gap:7px;cursor:default}
+.pie-legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.pie-legend-name{font-size:11px;color:var(--t2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pie-legend-pct{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--t1);text-align:right}
+/* BARRAS */
+.contrib-rows{display:flex;flex-direction:column;gap:9px}
+.contrib-row{display:grid;grid-template-columns:130px 1fr 50px;gap:10px;align-items:center}
+.contrib-nm{font-size:12px;color:var(--t2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.contrib-track{height:18px;background:var(--b1);border-radius:4px;overflow:hidden}
+.contrib-fill{height:100%;transition:width .4s cubic-bezier(.4,0,.2,1)}
+.contrib-v{font-family:var(--mono);font-size:11px;font-weight:700;text-align:right}
+/* empty pie state */
+.pie-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;width:200px;height:200px;border:2px dashed var(--b2);border-radius:50%;color:var(--t3);font-size:11px;text-align:center;line-height:1.5;padding:20px}
+@media(max-width:768px){.contrib-layout{grid-template-columns:1fr}.pie-svg-wrap{width:180px;height:180px}}
+
+/* RANGE SLIDER STYLES */
+input[type=range]{-webkit-appearance:none;appearance:none;height:3px;background:var(--b2);border-radius:2px;outline:none;cursor:pointer;width:100%}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--accent);cursor:pointer;transition:transform .15s;box-shadow:0 0 0 3px rgba(200,241,53,.12)}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.25)}
+
+/* ══════════ HISTORIAL PANEL ══════════ */
+.hist-hero{display:grid;grid-template-columns:1fr 1fr 1fr;border:1px solid var(--b1);border-radius:var(--rl);overflow:hidden;margin-bottom:1.6rem;background:var(--surf)}
+.h-stat{padding:24px;border-right:1px solid var(--b1)}
+.h-stat:last-child{border-right:none}
+.h-stat-lbl{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--t3);margin-bottom:10px}
+.h-stat-v{font-family:var(--mono);font-size:38px;font-weight:700;line-height:1;color:var(--t1)}
+.h-stat-v.accent{color:var(--accent)}
+.h-stat-sub{font-size:11px;color:var(--t3);margin-top:6px}
+
+.loading-msg{text-align:center;padding:32px;font-size:13px;color:var(--t3)}
+.loading-msg .spinner{display:inline-block;width:18px;height:18px;border:2px solid var(--b2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin-right:8px;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.timeline-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:1.6rem}
+.t-card{background:var(--surf);border:1px solid var(--b1);border-radius:var(--r);padding:12px;transition:border-color .2s}
+.t-card.current{border-color:rgba(200,241,53,.3)}
+.t-month{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px}
+.t-val{font-family:var(--mono);font-size:20px;font-weight:700;color:var(--t1)}
+.t-val.accent{color:var(--accent)}
+.t-acum{font-size:9px;font-family:var(--mono);color:var(--t3);margin-top:3px}
+.t-bar{height:2px;border-radius:1px;background:var(--b2);margin-top:8px;overflow:hidden}
+.t-bar-fill{height:100%;border-radius:1px}
+
+.rubros-table{background:var(--surf);border:1px solid var(--b1);border-radius:var(--rl);overflow:hidden;margin-bottom:1.6rem}
+.rt-head{display:grid;grid-template-columns:1fr 90px 120px;padding:10px 18px;border-bottom:1px solid var(--b1);font-size:9px;letter-spacing:.07em;text-transform:uppercase;color:var(--t3)}
+.rt-row{display:grid;grid-template-columns:1fr 90px 120px;padding:12px 18px;border-bottom:1px solid var(--b1);align-items:center;transition:background .15s}
+.rt-row:last-child{border-bottom:none}
+.rt-row:hover{background:var(--surf2)}
+.rt-name{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--t1)}
+.rt-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.rt-val{font-family:var(--mono);font-size:13px;font-weight:700;text-align:right}
+.rt-bar{padding-left:8px}
+.rt-mini{height:4px;border-radius:2px}
+
+.context-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1.2rem}
+.cbt-card{background:var(--surf);border:1px solid rgba(200,241,53,.15);border-radius:var(--rl);padding:20px 22px;margin-bottom:1.6rem;display:flex;justify-content:space-between;align-items:center;gap:1rem}
+.cbt-left .cbt-lbl{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--t3);margin-bottom:5px}
+.cbt-left .cbt-desc{font-size:12px;color:var(--t2);line-height:1.5}
+.cbt-val{font-family:var(--mono);font-size:30px;font-weight:700;color:var(--accent);white-space:nowrap}
+
+/* ══════════ CÓMO FUNCIONA ══════════ */
+#panel-como{padding:2.5rem 0 5rem}
+.how-hero{background:var(--surf);border:1px solid var(--b1);border-radius:var(--rl);padding:28px;margin-bottom:1.6rem}
+.how-hero-title{font-size:22px;font-weight:700;color:var(--t1);margin-bottom:8px}
+.how-hero-sub{font-size:14px;color:var(--t2);line-height:1.7;max-width:640px}
+.how-steps{display:flex;flex-direction:column;gap:0;margin-bottom:1.6rem}
+.how-step{display:flex;gap:18px;padding:20px;background:var(--surf);border:1px solid var(--b1);border-top:none}
+.how-step:first-child{border-top:1px solid var(--b1);border-radius:var(--rl) var(--rl) 0 0}
+.how-step:last-child{border-radius:0 0 var(--rl) var(--rl)}
+.how-step-num{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--accent);background:var(--accent-bg);border-radius:6px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.how-step-title{font-size:14px;font-weight:600;color:var(--t1);margin-bottom:5px}
+.how-step-desc{font-size:13px;color:var(--t2);line-height:1.6}
+.how-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.how-tag{font-size:11px;background:var(--surf2);border:1px solid var(--b2);border-radius:5px;padding:3px 9px;color:var(--t2)}
+.how-formula{background:var(--surf2);border-radius:var(--r);padding:16px 20px;margin-bottom:1.6rem;border-left:3px solid var(--accent)}
+.how-formula p{font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:8px}
+.how-formula code{font-family:var(--mono);font-size:12px;color:var(--accent);background:var(--accent-bg);padding:2px 7px;border-radius:4px}
+.how-faq{display:flex;flex-direction:column;gap:6px;margin-bottom:1.6rem}
+.faq-item{background:var(--surf);border:1px solid var(--b1);border-radius:var(--r);padding:14px 18px}
+.faq-q{font-size:13px;font-weight:600;color:var(--t1);margin-bottom:5px}
+.faq-a{font-size:12px;color:var(--t2);line-height:1.6}
+
+/* ══════════ FUENTES PANEL ══════════ */
+.src-hero{background:var(--surf);border:1px solid var(--b1);border-radius:var(--rl);padding:24px;margin-bottom:1.6rem;display:flex;gap:18px;align-items:start}
+.src-icon{font-size:28px;color:var(--accent);flex-shrink:0}
+.src-intro h2{font-size:17px;font-weight:600;color:var(--t1);margin-bottom:6px}
+.src-intro p{font-size:13px;color:var(--t2);line-height:1.6}
+.src-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.6rem}
+.src-card{background:var(--surf);border:1px solid var(--b1);border-radius:var(--r);padding:16px 18px;text-decoration:none;display:block;transition:border-color .2s,background .2s;position:relative}
+.src-card:hover{border-color:var(--b3);background:var(--surf2)}
+.src-badge{font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:4px;display:inline-block;margin-bottom:9px}
+.badge-of{background:var(--accent-bg);color:var(--accent)}
+.badge-med{background:var(--green-bg);color:var(--green)}
+.badge-con{background:var(--amber-bg);color:var(--amber)}
+.badge-ver{background:var(--purple-bg);color:var(--purple)}
+.src-name{font-size:13px;font-weight:600;color:var(--t1);margin-bottom:4px}
+.src-desc{font-size:11px;color:var(--t2);line-height:1.5}
+.src-arrow{position:absolute;top:14px;right:14px;font-size:12px;color:var(--t3)}
+.meth-box{background:var(--surf2);border-radius:var(--r);border-left:3px solid var(--accent);padding:18px 20px;margin-bottom:1.2rem}
+.meth-box h3{font-size:13px;font-weight:600;color:var(--t1);margin-bottom:10px}
+.meth-box ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+.meth-box li{font-size:12px;color:var(--t2);display:flex;gap:8px;line-height:1.5}
+.meth-box li::before{content:'—';color:var(--accent);flex-shrink:0}
+.disclaimer{background:var(--red-bg);border:1px solid rgba(255,85,85,.15);border-radius:var(--r);padding:13px 16px}
+.disclaimer p{font-size:11px;color:var(--t2);line-height:1.6}
+.disclaimer strong{color:var(--t1)}
+
+/* FOOTER */
+footer{border-top:1px solid var(--b1);padding:18px 2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.footer-left{font-size:11px;color:var(--t3)}
+.footer-left span{color:var(--accent);font-weight:600;font-family:var(--mono)}
+.footer-center{font-size:10px;color:var(--t3);text-align:center}
+.footer-center a{color:var(--t3);text-decoration:none}
+.footer-center a:hover{color:var(--t2)}
+.footer-right{font-size:10px;color:var(--b3)}
+.footer-right a{color:var(--b3);text-decoration:none;transition:color .15s}
+.footer-right a:hover{color:var(--t3)}
+
+@media(max-width:768px){
+  nav{padding:0 1rem}
+  .ipc-ticker,.nav-user{display:none}
+  .container{padding:0 1rem}
+  .hero{grid-template-columns:1fr}
+  .hero-num{font-size:60px}
+  .hero-stats{grid-template-columns:1fr 1fr}
+  .hist-hero{grid-template-columns:1fr}
+  .h-stat{border-right:none;border-bottom:1px solid var(--b1)}
+  .h-stat:last-child{border-bottom:none}
+  .timeline-grid{grid-template-columns:repeat(3,1fr)}
+  .src-grid,.context-grid{grid-template-columns:1fr}
+  .cat-head{grid-template-columns:34px 1fr auto 52px 22px}
+  .cat-contrib{display:none}
+  .sub-item-head{grid-template-columns:1fr auto auto}
+  .contrib-row{grid-template-columns:100px 1fr 44px}
+  .rt-head,.rt-row{grid-template-columns:1fr 80px}
+  .rt-bar{display:none}
+  footer{flex-direction:column;text-align:center}
+}
+
+/* ══════════ MI HISTORIAL PERSONAL ══════════ */
+.premium-banner{background:linear-gradient(135deg,#1A1400,#1C1C14);border:1px solid rgba(179,157,255,.3);border-radius:var(--rl);padding:16px 20px;margin-bottom:1.6rem;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.premium-banner-left{display:flex;align-items:center;gap:14px}
+.premium-icon{font-size:22px;color:var(--purple)}
+.premium-title{font-size:13px;font-weight:600;color:var(--t1);margin-bottom:3px}
+.premium-desc{font-size:12px;color:var(--t2)}
+.premium-btn{background:var(--purple);color:#000;font-size:13px;font-weight:700;padding:10px 18px;border-radius:8px;border:none;cursor:pointer;font-family:var(--sans);white-space:nowrap;transition:opacity .15s}
+.premium-btn:hover{opacity:.85}
+
+.mh-hero{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;align-items:start;margin-bottom:1.6rem}
+.mh-hero-left{}
+.mh-title{font-size:26px;font-weight:700;color:var(--t1);line-height:1.2;margin-bottom:6px}
+.mh-title em{color:var(--accent);font-style:normal}
+.mh-sub{font-size:13px;color:var(--t2)}
+.mh-hero-right{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+.save-month-box{background:var(--surf);border:1px solid var(--b1);border-radius:var(--r);padding:16px 18px;margin-bottom:1.6rem;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.save-month-left{display:flex;align-items:center;gap:12px}
+.save-month-icon{font-size:22px}
+.save-month-title{font-size:13px;font-weight:600;color:var(--t1);margin-bottom:2px}
+.save-month-desc{font-size:11px;color:var(--t2)}
+.btn-save-month{background:var(--accent);color:#000;font-size:13px;font-weight:700;padding:10px 20px;border-radius:8px;border:none;cursor:pointer;font-family:var(--sans);transition:opacity .15s;white-space:nowrap}
+.btn-save-month:hover{opacity:.85}
+.btn-save-month:disabled{background:var(--b2);color:var(--t3);cursor:default}
+
+.mh-chart-box{background:var(--surf);border:1px solid var(--b1);border-radius:var(--rl);padding:20px;margin-bottom:1.6rem;min-height:180px;display:flex;flex-direction:column;gap:12px}
+.mh-chart-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--t3);font-size:13px;text-align:center;padding:20px}
+.mh-chart-legend{display:flex;gap:18px;justify-content:center;padding-top:4px}
+.mh-legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--t2)}
+.mh-legend-dot{width:10px;height:3px;border-radius:2px}
+
+.mh-table{display:flex;flex-direction:column;gap:0;margin-bottom:1.6rem;border:1px solid var(--b1);border-radius:var(--rl);overflow:hidden}
+.mh-table-empty{padding:32px;text-align:center;font-size:13px;color:var(--t3);line-height:1.7}
+.mh-row-head{display:grid;grid-template-columns:110px 100px 100px 100px 1fr 40px;gap:10px;padding:10px 18px;border-bottom:1px solid var(--b1);font-size:9px;letter-spacing:.07em;text-transform:uppercase;color:var(--t3);background:var(--surf2)}
+.mh-row{display:grid;grid-template-columns:110px 100px 100px 100px 1fr 40px;gap:10px;padding:13px 18px;border-bottom:1px solid var(--b1);align-items:center;transition:background .15s;background:var(--surf)}
+.mh-row:last-child{border-bottom:none}
+.mh-row:hover{background:var(--surf2)}
+.mh-row.locked{opacity:.5;filter:blur(2px);pointer-events:none;user-select:none}
+.mh-mes{font-size:12px;font-weight:600;color:var(--t1)}
+.mh-ipc-personal{font-family:var(--mono);font-size:14px;font-weight:700}
+.mh-ipc-indec{font-family:var(--mono);font-size:13px;color:var(--t2)}
+.mh-diff{font-family:var(--mono);font-size:13px;font-weight:600}
+.mh-diff.pos{color:var(--red)}
+.mh-diff.neg{color:var(--green)}
+.mh-diff.zero{color:var(--amber)}
+.mh-top-rubro{font-size:11px;color:var(--t2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mh-del{background:none;border:1px solid var(--b2);border-radius:5px;color:var(--t3);font-size:11px;padding:3px 6px;cursor:pointer;transition:all .15s}
+.mh-del:hover{border-color:var(--red);color:var(--red)}
+.mh-lock-row{display:flex;align-items:center;justify-content:center;padding:12px;background:var(--surf);border-top:1px dashed var(--b2);gap:8px;font-size:12px;color:var(--t3);cursor:pointer}
+.mh-lock-row:hover{background:var(--surf2)}
+
+/* MINI BAR CHART */
+.mini-bar-chart{display:flex;align-items:flex-end;gap:4px;height:180px;padding:0 4px}
+.mbc-group{display:flex;gap:2px;align-items:flex-end;flex:1}
+.mbc-bar{border-radius:3px 3px 0 0;min-width:12px;transition:height .4s cubic-bezier(.4,0,.2,1)}
+.mbc-labels{display:flex;gap:4px;margin-top:6px;padding:0 4px}
+.mbc-label{flex:1;text-align:center;font-size:9px;color:var(--t3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* UPGRADE MODAL */
+.upgrade-modal{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:999;display:flex;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(4px)}
+.upgrade-box{background:var(--surf);border:1px solid rgba(179,157,255,.3);border-radius:var(--rxl);padding:32px;max-width:380px;width:100%;position:relative}
+.upgrade-close{position:absolute;top:14px;right:14px;background:none;border:none;color:var(--t3);font-size:16px;cursor:pointer;transition:color .15s}
+.upgrade-close:hover{color:var(--t1)}
+.upgrade-badge{font-size:10px;font-weight:800;letter-spacing:.1em;color:var(--purple);margin-bottom:12px}
+.upgrade-title{font-size:20px;font-weight:700;color:var(--t1);margin-bottom:16px;line-height:1.2}
+.upgrade-price{font-family:var(--mono);font-size:42px;font-weight:700;color:var(--accent);line-height:1}
+.upgrade-price span{font-size:16px;color:var(--t2);font-weight:300}
+.upgrade-anual{font-size:12px;color:var(--t2);margin-top:4px;margin-bottom:20px}
+.upgrade-list{list-style:none;display:flex;flex-direction:column;gap:8px;margin-bottom:4px}
+.upgrade-list li{font-size:13px;color:var(--t2)}
+.upgrade-list li::first-letter{color:var(--accent)}
+
+@media(max-width:768px){
+  .mh-hero{grid-template-columns:1fr}
+  .mh-hero-right{grid-template-columns:1fr 1fr}
+  .mh-row-head,.mh-row{grid-template-columns:90px 80px 80px 1fr 36px}
+  .mh-ipc-indec,.mh-diff{display:none}
+}
+
+/* ══════════ PLANES ══════════ */
+.plans-hero{text-align:center;padding:2rem 0 2.4rem;margin-bottom:.5rem}
+.plans-eyebrow{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);margin-bottom:8px}
+.plans-title{font-size:28px;font-weight:700;color:var(--t1);margin-bottom:6px}
+.plans-sub{font-size:14px;color:var(--t2)}
+.plans-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:1.6rem;align-items:start}
+.plan-card{background:var(--surf);border:1px solid var(--b1);border-radius:var(--rl);padding:26px;position:relative}
+.plan-card-premium{border-color:rgba(200,241,53,.3);background:linear-gradient(160deg,#141914 0%,#141414 60%)}
+.plan-popular{position:absolute;top:-1px;left:50%;transform:translateX(-50%);background:var(--accent);color:#000;font-size:9px;font-weight:800;letter-spacing:.1em;padding:3px 12px;border-radius:0 0 6px 6px}
+.plan-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.plan-name{font-size:16px;font-weight:700;color:var(--t1)}
+.plan-badge{font-size:10px;font-weight:800;letter-spacing:.06em;padding:3px 8px;border-radius:5px}
+.plan-badge-free{background:var(--b2);color:var(--t2)}
+.plan-badge-pro{background:var(--accent-bg);color:var(--accent)}
+.plan-price{font-family:var(--mono);font-size:36px;font-weight:700;color:var(--t1);line-height:1;margin-bottom:4px}
+.plan-price span{font-size:14px;color:var(--t2);font-weight:300}
+.plan-card-premium .plan-price{color:var(--accent)}
+.plan-price-sub{font-size:11px;color:var(--t3);margin-bottom:20px}
+.plan-features{list-style:none;display:flex;flex-direction:column;gap:9px;margin-bottom:22px}
+.plan-features li{font-size:13px;display:flex;align-items:start;gap:8px;line-height:1.4}
+.feat-ok{color:var(--t2)}
+.feat-ok::before{content:"✓";color:var(--green);font-weight:700;flex-shrink:0}
+.feat-ok.feat-hl{color:var(--t1)}
+.feat-ok.feat-hl::before{color:var(--accent)}
+.feat-no{color:var(--t3)}
+.feat-no::before{content:"–";color:var(--b3);flex-shrink:0}
+.plan-btn{width:100%;padding:12px;border-radius:8px;border:none;font-size:14px;font-weight:700;font-family:var(--sans);cursor:pointer;transition:opacity .15s}
+.plan-btn-free{background:var(--b2);color:var(--t3);cursor:default}
+.plan-btn-pro{background:var(--accent);color:#000}
+.plan-btn-pro:hover{opacity:.88}
+.plan-guarantee{font-size:11px;color:var(--t3);text-align:center;margin-top:10px}
+
+/* IPC CALENDAR */
+.ipc-calendar-box{background:var(--surf);border:1px solid var(--b1);border-radius:var(--rl);padding:20px 24px;margin-bottom:1.6rem;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.ipc-cal-left{display:flex;align-items:center;gap:14px}
+.ipc-cal-icon{font-size:26px}
+.ipc-cal-title{font-size:14px;font-weight:600;color:var(--t1);margin-bottom:4px}
+.ipc-cal-desc{font-size:12px;color:var(--t2);line-height:1.5}
+.ipc-cal-right{text-align:center;flex-shrink:0}
+.ipc-cal-countdown{font-family:var(--mono);font-size:42px;font-weight:700;color:var(--accent);line-height:1}
+.ipc-cal-sub{font-size:11px;color:var(--t3);margin-top:3px}
+.ipc-cal-countdown.today{color:var(--red)}
+.ipc-cal-countdown.soon{color:var(--amber)}
+
+.plans-faq{display:flex;flex-direction:column;gap:6px;margin-bottom:2rem}
+
+/* BARRA DE ESTADO IPC en nav area */
+.ipc-status-bar{background:var(--surf2);border-bottom:1px solid var(--b1);padding:6px 2rem;display:flex;align-items:center;gap:20px;font-size:11px;color:var(--t3);flex-wrap:wrap}
+.ipc-status-item{display:flex;align-items:center;gap:6px}
+.ipc-status-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.ipc-status-dot.published{background:var(--green)}
+.ipc-status-dot.waiting{background:var(--amber);animation:pulse 2s infinite}
+.ipc-status-dot.expected{background:var(--t3)}
+.ipc-status-val{font-family:var(--mono);font-weight:600;color:var(--t1)}
+
+/* CALCULADORA SALARIAL */
+.salary-calc{background:var(--surf);border:1px solid var(--b1);border-radius:var(--rl);padding:22px;margin-bottom:1.6rem}
+.salary-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.salary-field label{display:block;font-size:11px;color:var(--t3);margin-bottom:5px}
+.salary-input{width:100%;background:var(--surf2);border:1px solid var(--b2);border-radius:8px;padding:10px 14px;font-size:16px;font-family:var(--mono);font-weight:600;color:var(--t1);outline:none;transition:border-color .15s}
+.salary-input:focus{border-color:var(--accent)}
+.salary-result{background:var(--surf2);border-radius:var(--r);padding:16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.salary-res-item .sr-label{font-size:10px;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
+.salary-res-item .sr-val{font-family:var(--mono);font-size:20px;font-weight:700;color:var(--t1)}
+.salary-res-item .sr-val.red{color:var(--red)}
+.salary-res-item .sr-val.green{color:var(--green)}
+.salary-res-item .sr-val.accent{color:var(--accent)}
+
+@media(max-width:768px){
+  .plans-grid{grid-template-columns:1fr}
+  .salary-grid{grid-template-columns:1fr}
+  .salary-result{grid-template-columns:1fr 1fr}
+  .ipc-status-bar{padding:6px 1rem}
+}
+
+/* MODAL DE PAGO */
+.pay-plan-opt{border:1px solid var(--b2);border-radius:var(--r);padding:14px;cursor:pointer;transition:all .15s;background:var(--surf2)}
+.pay-plan-opt:hover{border-color:var(--accent)}
+.pay-plan-name{font-size:12px;color:var(--t2);margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.pay-plan-price{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--t1)}
+.pay-plan-price span{font-size:12px;color:var(--t2);font-weight:300}
+.pay-plan-savings{font-size:9px;font-weight:700;background:var(--accent-bg);color:var(--accent);padding:2px 6px;border-radius:4px}
+.pay-methods{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.pay-method-btn{border:1px solid var(--b2);border-radius:8px;padding:10px;font-size:13px;font-family:var(--sans);background:var(--surf2);color:var(--t2);cursor:pointer;display:flex;align-items:center;gap:7px;justify-content:center;transition:all .15s}
+.pay-method-btn.active{border-color:var(--accent);color:var(--t1);background:var(--surf3)}
+.pay-info-box{background:var(--surf2);border-radius:var(--r);padding:16px;margin-bottom:12px}
+.pay-info-label{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--t3);margin-bottom:4px}
+.pay-info-value{font-family:var(--mono);font-size:16px;font-weight:600;color:var(--t1)}
+.pay-copyable{cursor:pointer;border-bottom:1px dashed var(--b3);display:inline-block;transition:color .15s}
+.pay-copyable:hover{color:var(--accent)}
+.pay-info-note{font-size:11px;color:var(--t3);margin-top:10px;line-height:1.5}
+.pay-info-note b{color:var(--t2)}
+.pay-amount-display{text-align:center;font-size:13px;color:var(--t2);margin-top:4px}
+.pay-amount-display b{color:var(--accent);font-family:var(--mono);font-size:16px}
+
+/* AUTH EXTRAS */
+.btn-google{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:11px;border-radius:8px;border:1px solid var(--b2);background:var(--surf2);color:var(--t1);font-size:14px;font-weight:500;font-family:var(--sans);cursor:pointer;transition:all .15s;margin-bottom:16px}
+.btn-google:hover{border-color:var(--b3);background:var(--surf3)}
+.btn-google svg{flex-shrink:0}
+.auth-divider{display:flex;align-items:center;gap:10px;margin-bottom:16px;color:var(--t3);font-size:12px}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--b1)}
+.auth-forgot{font-size:11px;color:var(--t3);text-align:right;margin-top:-8px;cursor:pointer}
+.auth-forgot:hover{color:var(--t2)}
+/* Loading overlay */
+.loading-overlay{position:fixed;inset:0;background:rgba(11,11,11,.85);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;backdrop-filter:blur(6px)}
+.loading-overlay-spinner{width:36px;height:36px;border:3px solid var(--b2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+.loading-overlay-txt{font-size:14px;color:var(--t2)}
+/* Auth message */
+.auth-success{font-size:12px;color:var(--green);text-align:center;display:none;margin-top:4px}
+.auth-success.show{display:block}
+
+/* ══════════ MULTI-CANASTA ══════════ */
+/* Selector en nav */
+.canasta-selector{display:flex;align-items:center;gap:0;background:var(--surf2);border:1px solid var(--b2);border-radius:8px;overflow:hidden;margin-right:12px}
+.canasta-active-btn{font-size:12px;font-weight:600;color:var(--accent);padding:5px 12px;background:none;border:none;cursor:pointer;font-family:var(--sans);display:flex;align-items:center;gap:6px;white-space:nowrap;max-width:120px;overflow:hidden;text-overflow:ellipsis}
+.canasta-active-btn:hover{background:var(--surf3)}
+.canasta-chevron{font-size:10px;color:var(--t3);flex-shrink:0}
+.canasta-sep{width:1px;background:var(--b2);height:28px}
+.canasta-add-btn{padding:5px 10px;background:none;border:none;color:var(--t3);cursor:pointer;font-size:14px;transition:color .15s;line-height:1}
+.canasta-add-btn:hover{color:var(--accent)}
+/* Dropdown */
+.canasta-dropdown{position:absolute;top:58px;left:50%;transform:translateX(-50%);background:var(--surf);border:1px solid var(--b2);border-radius:var(--r);z-index:200;min-width:200px;box-shadow:0 8px 32px rgba(0,0,0,.4);overflow:hidden}
+.canasta-dropdown-item{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;transition:background .12s;border-bottom:1px solid var(--b1)}
+.canasta-dropdown-item:last-child{border-bottom:none}
+.canasta-dropdown-item:hover{background:var(--surf2)}
+.canasta-dropdown-item.active-c{background:var(--accent-bg)}
+.cdi-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.cdi-name{font-size:13px;font-weight:500;color:var(--t1);flex:1}
+.cdi-ipc{font-family:var(--mono);font-size:11px;color:var(--t3)}
+.cdi-del{background:none;border:none;color:var(--t3);cursor:pointer;font-size:12px;padding:2px 4px;border-radius:3px;transition:color .15s}
+.cdi-del:hover{color:var(--red)}
+/* Add canasta form inside dropdown */
+.canasta-add-form{padding:10px 14px;border-top:1px solid var(--b1);display:flex;gap:6px}
+.canasta-name-inp{flex:1;background:var(--surf2);border:1px solid var(--b2);border-radius:6px;padding:6px 10px;font-size:13px;font-family:var(--sans);color:var(--t1);outline:none}
+.canasta-name-inp:focus{border-color:var(--accent)}
+.canasta-create-btn{background:var(--accent);color:#000;border:none;border-radius:6px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+/* Panel familiar */
+.family-hero{background:var(--surf);border:1px solid var(--b1);border-radius:var(--rl);padding:24px;margin-bottom:1.4rem}
+.family-hero-title{font-size:20px;font-weight:700;color:var(--t1);margin-bottom:4px}
+.family-hero-sub{font-size:13px;color:var(--t2)}
+.family-combined{display:flex;align-items:center;gap:20px;margin-top:16px;padding-top:16px;border-top:1px solid var(--b1)}
+.family-combined-lbl{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em}
+.family-combined-val{font-family:var(--mono);font-size:36px;font-weight:700;color:var(--accent);line-height:1}
+.family-combined-sub{font-size:11px;color:var(--t3);margin-top:3px}
+.family-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:1.4rem}
+.family-card{background:var(--surf);border:1px solid var(--b1);border-radius:var(--rl);padding:20px;cursor:pointer;transition:border-color .15s}
+.family-card:hover{border-color:var(--b2)}
+.family-card.fc-active{border-color:var(--accent)}
+.fc-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.fc-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.fc-name{font-size:15px;font-weight:600;color:var(--t1);flex:1}
+.fc-region{font-size:11px;color:var(--t3)}
+.fc-ipc{font-family:var(--mono);font-size:30px;font-weight:700;line-height:1;margin-bottom:4px}
+.fc-ipc-sub{font-size:11px;color:var(--t3);margin-bottom:12px}
+.fc-bar-wrap{height:3px;background:var(--b2);border-radius:2px;overflow:hidden;margin-bottom:10px}
+.fc-bar-fill{height:100%;border-radius:2px;transition:width .4s}
+.fc-rubros{display:flex;flex-direction:column;gap:4px}
+.fc-rubro-row{display:flex;align-items:center;gap:6px;font-size:11px}
+.fc-rubro-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.fc-rubro-nm{color:var(--t2);flex:1}
+.fc-rubro-pct{font-family:var(--mono);color:var(--t3)}
+.family-empty{background:var(--surf);border:1px dashed var(--b2);border-radius:var(--rl);padding:40px;text-align:center;color:var(--t3);font-size:13px;line-height:1.7;margin-bottom:1.4rem}
+.family-comparison{background:var(--surf);border:1px solid var(--b1);border-radius:var(--rl);padding:20px;margin-bottom:1.4rem}
+.fc-comp-row{display:grid;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--b1)}
+.fc-comp-row:last-child{border-bottom:none}
+.fc-comp-rubro{font-size:12px;color:var(--t2)}
+/* Colores de las canastas */
+.cc-0{background:#C8F135}.cc-1{background:#5BC8FF}.cc-2{background:#B39DFF}
+.ct-0{color:#C8F135}.ct-1{color:#5BC8FF}.ct-2{color:#B39DFF}
+@media(max-width:768px){.canasta-selector{display:none}.family-cards{grid-template-columns:1fr}}
+
+/* ══════════ DEMO MODE ══════════ */
+.demo-banner{
+  background:linear-gradient(90deg,rgba(200,241,53,.08),rgba(200,241,53,.04));
+  border-bottom:1px solid rgba(200,241,53,.15);
+  padding:9px 2rem;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  flex-wrap:wrap;
+}
+.demo-banner-left{display:flex;align-items:center;gap:10px;font-size:13px}
+.demo-banner-icon{font-size:16px}
+.demo-banner-txt{color:var(--t2)}
+.demo-banner-txt b{color:var(--accent)}
+.demo-banner-right{display:flex;gap:8px;flex-shrink:0}
+.demo-cta-primary{background:var(--accent);color:#000;font-size:12px;font-weight:700;
+  padding:7px 16px;border-radius:7px;border:none;cursor:pointer;font-family:var(--sans);
+  transition:opacity .15s;white-space:nowrap}
+.demo-cta-primary:hover{opacity:.88}
+.demo-cta-secondary{background:transparent;color:var(--t2);font-size:12px;
+  padding:7px 14px;border-radius:7px;border:1px solid var(--b2);cursor:pointer;
+  font-family:var(--sans);transition:all .15s;white-space:nowrap}
+.demo-cta-secondary:hover{border-color:var(--b3);color:var(--t1)}
+
+/* ══════════ CONTADOR SUBRUBROS ══════════ */
+.sub-acum-row{display:flex;align-items:center;gap:8px;background:var(--accent-bg);border-radius:6px;padding:7px 10px;margin-bottom:8px}
+.sub-acum-lbl{font-size:11px;color:var(--accent);flex:1}
+.sub-acum-val{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--accent)}
+.sub-acum-reset{background:none;border:none;color:var(--accent-dim);cursor:pointer;font-size:14px;padding:0 2px;transition:color .15s;line-height:1}
+.sub-acum-reset:hover{color:var(--red)}
+.sub-add-row{display:flex;gap:6px;align-items:center}
+.sub-quick-inp-wrap{flex:1;display:flex;align-items:center;background:var(--surf);border:1px solid var(--b2);border-radius:7px;overflow:hidden;transition:border-color .15s}
+.sub-quick-inp-wrap:focus-within{border-color:var(--accent)}
+.sub-quick-prefix{padding:0 10px;font-size:14px;color:var(--t3);font-family:var(--mono)}
+.sub-quick-inp{flex:1;background:transparent;border:none;outline:none;font-size:15px;font-family:var(--mono);font-weight:600;color:var(--t1);padding:8px 0}
+.sub-quick-inp::placeholder{color:var(--b3)}
+.sub-quick-btn{background:var(--accent);color:#000;border:none;border-radius:7px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sans);white-space:nowrap;transition:opacity .15s;flex-shrink:0}
+.sub-quick-btn:hover{opacity:.88}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     AUTH SCREEN
+═══════════════════════════════════════════ -->
+<div class="screen" id="screen-auth">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <div class="auth-logo-mark">MI<span>INFLACIÓN</span></div>
+      <div class="auth-logo-sub">Calculadora personal · Argentina</div>
+    </div>
+    <div class="auth-slogan">
+      <div class="auth-slogan-line1">¿La inflación <em>no coincide</em> con tus gastos?</div>
+      <div class="auth-slogan-line2"><strong>Ponele un número real a tus consumos.</strong></div>
+      <span class="auth-slogan-sep"></span>
+    </div>
+    <div class="auth-card">
+      <!-- Google OAuth -->
+      <button class="btn-google" onclick="doGoogleLogin()">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+        Continuar con Google
+      </button>
+      <div class="auth-divider">o con email</div>
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Ingresar</button>
+        <button class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">Registrarme</button>
+      </div>
+      <!-- LOGIN -->
+      <div id="form-login" class="auth-form">
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="form-input" type="email" id="l-email" placeholder="tu@email.com" autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contraseña</label>
+          <input class="form-input" type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password" />
+        </div>
+        <div class="auth-error" id="l-error"></div>
+        <button class="btn-primary" onclick="doLogin()">Ingresar</button>
+        <div class="auth-forgot" onclick="doForgotPassword()">¿Olvidaste tu contraseña?</div>
+        <div class="auth-success" id="l-success"></div>
+      </div>
+      <!-- REGISTER -->
+      <div id="form-register" class="auth-form" style="display:none">
+        <div class="form-group">
+          <label class="form-label">Nombre</label>
+          <input class="form-input" type="text" id="r-name" placeholder="Tu nombre" autocomplete="name" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="form-input" type="email" id="r-email" placeholder="tu@email.com" autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contraseña (mínimo 6 caracteres)</label>
+          <input class="form-input" type="password" id="r-pass" placeholder="••••••••" autocomplete="new-password" />
+        </div>
+        <div class="auth-error" id="r-error"></div>
+        <div class="auth-success" id="r-success"></div>
+        <button class="btn-primary" onclick="doRegister()">Crear cuenta gratis</button>
+      </div>
+    </div>
+    <div class="auth-meta">Tu progreso se sincroniza en todos tus dispositivos.<br>Tus datos son privados y seguros.</div>
+
+    <!-- Loading overlay (dentro del auth box, posición fixed) -->
+    <div class="loading-overlay" id="auth-loading" style="display:none">
+      <div class="loading-overlay-spinner"></div>
+      <div class="loading-overlay-txt" id="auth-loading-txt">Iniciando sesión…</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     APP SCREEN
+═══════════════════════════════════════════ -->
+<div class="screen active" id="screen-app">
+
+<nav>
+  <span class="nav-brand">MI<span>INFLACIÓN</span></span>
+  <div class="nav-tabs">
+    <button class="nav-tab active" data-panel="canasta">Mi canasta</button>
+    <button class="nav-tab" data-panel="familia">Familia <span class="nav-badge" style="background:var(--purple)">PRO</span></button>
+    <button class="nav-tab" data-panel="mi-historial">Mi historial</button>
+    <button class="nav-tab" data-panel="planes">Planes</button>
+    <button class="nav-tab" data-panel="historial">IPC mensual <span class="nav-badge" id="nav-badge-mes">—</span></button>
+    <button class="nav-tab" data-panel="como">Cómo funciona</button>
+    <button class="nav-tab" data-panel="fuentes">Fuentes</button>
+  </div>
+  <div class="nav-right">
+    <!-- Selector de canasta activa -->
+    <div class="canasta-selector" id="canasta-selector" style="position:relative">
+      <button class="canasta-active-btn" onclick="toggleCanastaDropdown(event)">
+        <span class="cdi-dot cc-0" id="nav-canasta-dot"></span>
+        <span id="nav-canasta-name">Mi canasta</span>
+        <span class="canasta-chevron">▾</span>
+      </button>
+      <div class="canasta-sep"></div>
+      <button class="canasta-add-btn" onclick="showAddCanasta(event)" title="Agregar canasta">+</button>
+      <!-- Dropdown -->
+      <div class="canasta-dropdown" id="canasta-dropdown" style="display:none">
+        <div id="canasta-list"></div>
+        <div class="canasta-add-form" id="canasta-add-form" style="display:none">
+          <input class="canasta-name-inp" id="canasta-name-inp" placeholder="Nombre (ej: Sofi)" maxlength="20" />
+          <button class="canasta-create-btn" onclick="createCanasta()">Crear</button>
+        </div>
+      </div>
+    </div>
+    <div class="ipc-ticker">
+      <span class="live-dot"></span>
+      IPC <span id="ticker-val">—</span>
+    </div>
+    <!-- Estado de sesión en nav -->
+    <div id="nav-guest" style="display:flex;align-items:center;gap:8px">
+      <button class="btn-logout" style="background:var(--accent);color:#000;font-weight:700;border-color:var(--accent)" onclick="showAuthModal()">Registrarse</button>
+      <button class="btn-logout" onclick="showAuthModal('login')">Ingresar</button>
+    </div>
+    <div id="nav-logged" style="display:none;align-items:center;gap:8px">
+      <div class="nav-user">Hola, <b id="nav-username">—</b></div>
+      <button class="btn-logout" onclick="doLogout()">Salir</button>
+    </div>
+  </div>
+</nav>
+
+<!-- BARRA DE ESTADO IPC -->
+<div class="ipc-status-bar" id="ipc-status-bar">
+  <div class="ipc-status-item">
+    <span class="ipc-status-dot" id="ipc-dot"></span>
+    <span id="ipc-status-txt">Verificando estado del IPC…</span>
+  </div>
+  <div class="ipc-status-item" id="ipc-status-next" style="display:none">
+    <span>·</span>
+    <span id="ipc-next-txt"></span>
+  </div>
+  <div class="ipc-status-item" id="ipc-status-hint" style="display:none">
+    <span>·</span>
+    <span id="ipc-hint-txt"></span>
+  </div>
+</div>
+
+<!-- BANNER DEMO — visible solo cuando no hay sesión -->
+<div class="demo-banner" id="demo-banner" style="display:none">
+  <div class="demo-banner-left">
+    <span class="demo-banner-icon">👋</span>
+    <span class="demo-banner-txt">Estás en <b>modo demo</b> — cargá tu canasta y cuando quieras guardarla <b>registrate gratis</b></span>
+  </div>
+  <div class="demo-banner-right">
+    <button class="demo-cta-primary" onclick="showAuthModal('register')">Guardar mi progreso →</button>
+    <button class="demo-cta-secondary" onclick="showAuthModal('login')">Ya tengo cuenta</button>
+  </div>
+</div>
+
+<!-- ── PANEL: CANASTA ── -->
+<div class="panel active container" id="panel-canasta">
+
+  <div class="slogan-banner">
+    <div class="slogan-banner-text">
+      <div class="slogan-banner-q">¿La inflación <em>no coincide</em> con tus gastos?</div>
+      <div class="slogan-banner-a"><strong>Ponele un número real a tus consumos.</strong> Calculá tu IPC personal según lo que vos gastás cada mes.</div>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div class="hero-left">
+      <div class="hero-eyebrow">Inflación personalizada</div>
+      <div class="hero-label">Tu inflación mensual estimada</div>
+      <div class="hero-num empty" id="hero-num">—</div>
+      <div class="hero-caption" id="hero-cap">Registrá tus gastos para calcular</div>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-c hi">
+        <div class="slabel">IPC oficial</div>
+        <div class="sval accent" id="ipc-oficial-val">—</div>
+        <div class="ssub" id="ipc-oficial-mes">Cargando…</div>
+      </div>
+      <div class="stat-c">
+        <div class="slabel">Diferencia</div>
+        <div class="sval" id="dif-val">—</div>
+        <div class="ssub">vs. canasta oficial</div>
+      </div>
+      <div class="stat-c">
+        <div class="slabel">Gasto total cargado</div>
+        <div class="sval" id="monto-total-val">$0</div>
+        <div class="ssub">En todos los rubros</div>
+      </div>
+      <div class="stat-c">
+        <div class="slabel">Rubros activos</div>
+        <div class="sval" id="cats-activas-val">0</div>
+        <div class="ssub" id="cats-activas-sub">de 10 categorías</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="status-bar">
+    <div class="status-bar-left">
+      <span style="font-size:11px;color:var(--t3);flex-shrink:0">Canasta asignada</span>
+      <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+      <span class="prog-text"><b id="prog-pct">0%</b></span>
+    </div>
+    <div class="status-bar-right">Monto total: <b id="prog-monto">$0</b></div>
+  </div>
+
+  <div class="warn" id="warn-bar">⚠ La suma supera 100%. Ajustá los valores para que el total sea ≤ 100%.</div>
+
+  <div class="region-bar">
+    <span class="region-lbl">Región estadística INDEC:</span>
+    <div class="region-btns">
+      <button class="rbtn active" data-r="nacional">Nacional</button>
+      <button class="rbtn" data-r="gba">GBA</button>
+      <button class="rbtn" data-r="pampeana">Pampeana</button>
+      <button class="rbtn" data-r="noa">NOA</button>
+      <button class="rbtn" data-r="nea">NEA</button>
+      <button class="rbtn" data-r="cuyo">Cuyo</button>
+      <button class="rbtn" data-r="patagonica">Patagónica</button>
+    </div>
+  </div>
+
+  <div class="sec-hd">
+    <div class="sec-title">Rubros de tu canasta</div>
+    <span class="sec-hint">Cargá montos en $ · Expandí para ver subrubros</span>
+  </div>
+
+  <div class="cat-grid" id="cat-grid"></div>
+
+  <!-- CALCULADORA AJUSTE SALARIAL -->
+  <div class="salary-calc">
+    <div class="contrib-hd" style="margin-bottom:14px">
+      <span class="contrib-title">Calculadora de ajuste salarial</span>
+      <span class="contrib-sub">¿Cuánto necesitás pedir para no perder poder adquisitivo?</span>
+    </div>
+    <div class="salary-grid">
+      <div class="salary-field">
+        <label>Sueldo actual (neto) $</label>
+        <input type="number" class="salary-input" id="sal-actual" placeholder="500.000" min="0" step="1000" oninput="calcSalary()" />
+      </div>
+      <div class="salary-field">
+        <label>Meses sin aumento</label>
+        <input type="number" class="salary-input" id="sal-meses" placeholder="3" min="1" max="24" value="3" oninput="calcSalary()" />
+      </div>
+    </div>
+    <div class="salary-result" id="salary-result">
+      <div class="salary-res-item"><div class="sr-label">Pérdida acumulada</div><div class="sr-val" id="sr-perdida">—</div></div>
+      <div class="salary-res-item"><div class="sr-label">Aumento necesario</div><div class="sr-val accent" id="sr-aumento">—</div></div>
+      <div class="salary-res-item"><div class="sr-label">Sueldo equivalente hoy</div><div class="sr-val" id="sr-equiv">—</div></div>
+    </div>
+  </div>
+
+  <!-- ACCESO RÁPIDO AL HISTORIAL -->
+  <div class="save-month-box" style="margin-bottom:1.4rem" id="quick-save-box">
+    <div class="save-month-left">
+      <div class="save-month-icon">📅</div>
+      <div>
+        <div class="save-month-title" id="quick-save-title">Guardar este mes en mi historial</div>
+        <div class="save-month-desc">Llevá un registro mensual de tu inflación personal</div>
+      </div>
+    </div>
+    <button class="btn-save-month" onclick="saveMonthSnapshot().then(()=>renderHistorial())">
+      Guardar mes
+    </button>
+  </div>
+
+  <div class="contrib-box">
+    <div class="contrib-hd">
+      <span class="contrib-title">Tu canasta personal</span>
+      <span class="contrib-sub">distribución del gasto · contribución al IPC</span>
+    </div>
+    <div class="contrib-layout">
+      <!-- TORTA -->
+      <div class="pie-wrap">
+        <div class="pie-svg-wrap" id="pie-wrap">
+          <div class="pie-empty" id="pie-empty">Cargá tus gastos para ver la distribución</div>
+        </div>
+        <div class="pie-legend" id="pie-legend"></div>
+      </div>
+      <!-- BARRAS -->
+      <div class="contrib-rows" id="contrib-rows"></div>
+    </div>
+  </div>
+
+</div><!-- /panel-canasta -->
+
+<!-- ── PANEL: FAMILIA ── -->
+<div class="panel container" id="panel-familia" style="padding-bottom:5rem">
+
+  <div class="family-hero">
+    <div style="display:flex;align-items:start;justify-content:space-between;flex-wrap:wrap;gap:12px">
+      <div>
+        <div class="hero-eyebrow">Modo familia</div>
+        <div class="family-hero-title">Inflación de tu grupo familiar</div>
+        <div class="family-hero-sub">Cada integrante con su propia canasta · IPC combinado ponderado por gasto real</div>
+      </div>
+      <button class="btn-save-month" onclick="showFamilyAddForm()" id="btn-add-canasta">+ Agregar canasta</button>
+    </div>
+    <div class="family-combined" id="family-combined" style="display:none">
+      <div>
+        <div class="family-combined-lbl">IPC familiar combinado</div>
+        <div class="family-combined-val" id="family-ipc-combined">—</div>
+        <div class="family-combined-sub" id="family-combined-sub">ponderado por gasto de cada canasta</div>
+      </div>
+      <div style="flex:1">
+        <div id="family-mini-bars"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cards de cada canasta -->
+  <div class="sec-hd"><div class="sec-title">Canastas activas</div></div>
+  <div class="family-cards" id="family-cards">
+    <div class="family-empty" id="family-empty">
+      <div style="font-size:28px;margin-bottom:8px">👨‍👩‍👧</div>
+      Creá una segunda canasta para comparar inflaciones.<br>
+      Útil para vos y tu pareja, o para comparar dos situaciones distintas.<br><br>
+      <button class="btn-save-month" onclick="showFamilyAddForm()">+ Crear segunda canasta</button>
+    </div>
+  </div>
+
+  <!-- Formulario agregar canasta (inline) -->
+  <div id="family-add-form" style="display:none;margin-bottom:1rem">
+    <div style="background:var(--surf);border:1px solid var(--accent);border-radius:var(--r);padding:16px 18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <span style="font-size:13px;color:var(--t2);flex-shrink:0">Nombre de la canasta:</span>
+      <input id="family-name-inp" class="form-input" type="text" placeholder="ej: Sofi, Familia..."
+        maxlength="20" style="flex:1;min-width:160px;padding:8px 12px;font-size:14px"
+        onkeydown="if(event.key==='Enter') submitFamilyAdd()" />
+      <button class="btn-save-month" onclick="submitFamilyAdd()" style="flex-shrink:0">Crear</button>
+      <button onclick="hideFamilyAddForm()" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:18px;padding:0 4px">✕</button>
+    </div>
+  </div>
+
+  <!-- Comparativa por rubro -->
+  <div id="family-comparison-wrap" style="display:none">
+    <div class="sec-hd"><div class="sec-title">Comparativa por rubro</div></div>
+    <div class="family-comparison">
+      <div id="family-comp-rows"></div>
+    </div>
+  </div>
+
+  <!-- Premium gate si tiene 1 canasta y quiere agregar más -->
+  <div id="family-premium-gate" style="display:none">
+    <div class="premium-banner">
+      <div class="premium-banner-left">
+        <div class="premium-icon">★</div>
+        <div>
+          <div class="premium-title">Hasta 3 canastas — Plan Premium</div>
+          <div class="premium-desc">El plan básico incluye 1 canasta. Premium permite hasta 3.</div>
+        </div>
+      </div>
+      <button class="premium-btn" onclick="showUpgrade()">Ver planes → $2.490/mes</button>
+    </div>
+  </div>
+
+</div><!-- /panel-familia -->
+
+<!-- ── PANEL: MI HISTORIAL PERSONAL ── -->
+<div class="panel container" id="panel-mi-historial">
+
+  <!-- FREEMIUM BANNER (se muestra/oculta via JS) -->
+  <div class="premium-banner" id="premium-banner" style="display:none">
+    <div class="premium-banner-left">
+      <div class="premium-icon">★</div>
+      <div>
+        <div class="premium-title">Historial completo — Plan Premium</div>
+        <div class="premium-desc">Accedé a todos tus meses guardados, comparativas anuales y exportación PDF.</div>
+      </div>
+    </div>
+    <button class="premium-btn" onclick="showUpgrade()">Ver planes → $2.490/mes</button>
+  </div>
+
+  <!-- HERO DEL HISTORIAL -->
+  <div class="mh-hero">
+    <div class="mh-hero-left">
+      <div class="hero-eyebrow">Historial personal</div>
+      <div class="mh-title">Tu inflación <em>real</em> en el tiempo</div>
+      <div class="mh-sub">Mes a mes, tu canasta vs. el IPC oficial del INDEC</div>
+    </div>
+    <div class="mh-hero-right">
+      <div class="stat-c">
+        <div class="slabel">Meses registrados</div>
+        <div class="sval accent" id="mh-count">0</div>
+        <div class="ssub" id="mh-count-sub">Guardá tu primer mes</div>
+      </div>
+      <div class="stat-c">
+        <div class="slabel">Inflación acumulada personal</div>
+        <div class="sval" id="mh-acum-personal">—</div>
+        <div class="ssub" id="mh-acum-sub">Desde primer registro</div>
+      </div>
+      <div class="stat-c">
+        <div class="slabel">Acumulada INDEC mismo período</div>
+        <div class="sval" id="mh-acum-indec">—</div>
+        <div class="ssub">Comparativa oficial</div>
+      </div>
+      <div class="stat-c">
+        <div class="slabel">Diferencia acumulada</div>
+        <div class="sval" id="mh-acum-diff">—</div>
+        <div class="ssub">tu canasta vs. promedio</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GUARDAR MES ACTUAL -->
+  <div class="save-month-box" id="save-month-box">
+    <div class="save-month-left">
+      <div class="save-month-icon">📅</div>
+      <div>
+        <div class="save-month-title" id="save-month-title">Guardar canasta de este mes</div>
+        <div class="save-month-desc" id="save-month-desc">Cargá tus gastos en "Mi canasta" y guardá el snapshot mensual</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-shrink:0">
+      <button class="btn-save-month" id="btn-save-month" onclick="saveMonthSnapshot()">Guardar mes</button>
+      <button class="btn-save-month" style="background:var(--surf2);color:var(--t2);border:1px solid var(--b2)" onclick="showUpgrade()" title="Disponible en Premium">★ PDF Premium</button>
+    </div>
+  </div>
+
+  <!-- GRÁFICO COMPARATIVO -->
+  <div class="sec-hd" style="margin-bottom:14px"><div class="sec-title">Comparativa mensual</div></div>
+  <div class="mh-chart-box" id="mh-chart-box">
+    <div class="mh-chart-empty" id="mh-chart-empty">
+      <span style="font-size:28px">📊</span>
+      <span>Guardá al menos 2 meses para ver la comparativa</span>
+    </div>
+    <canvas id="mh-chart" style="display:none;width:100%;height:220px"></canvas>
+    <div class="mh-chart-legend">
+      <span class="mh-legend-item"><span class="mh-legend-dot" style="background:var(--accent)"></span>Tu IPC personal</span>
+      <span class="mh-legend-item"><span class="mh-legend-dot" style="background:var(--t3)"></span>IPC INDEC oficial</span>
+    </div>
+  </div>
+
+  <!-- TABLA DE SNAPSHOTS -->
+  <div class="sec-hd"><div class="sec-title">Meses guardados</div></div>
+  <div class="mh-table" id="mh-table">
+    <div class="mh-table-empty" id="mh-table-empty">
+      <p>Todavía no guardaste ningún mes.<br>Completá tu canasta y hacé click en "Guardar mes actual".</p>
+    </div>
+  </div>
+
+  <!-- UPGRADE MODAL -->
+  <!-- MODAL UPGRADE — FLUJO DE PAGO -->
+  <div class="upgrade-modal" id="upgrade-modal" style="display:none">
+    <div class="upgrade-box" style="max-width:460px">
+      <button class="upgrade-close" onclick="hideUpgrade()">✕</button>
+
+      <!-- PASO 1: Elegir plan -->
+      <div id="pay-step-1">
+        <div class="upgrade-badge">★ PREMIUM</div>
+        <div class="upgrade-title">Desbloqueá Mi Inflación Premium</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
+          <div class="pay-plan-opt" id="opt-mensual" onclick="selectPlan('mensual')" style="border-color:var(--accent)">
+            <div class="pay-plan-name">Mensual</div>
+            <div class="pay-plan-price">$2.490<span>/mes</span></div>
+          </div>
+          <div class="pay-plan-opt" id="opt-anual" onclick="selectPlan('anual')">
+            <div class="pay-plan-name">Anual <span class="pay-plan-savings">2 meses gratis</span></div>
+            <div class="pay-plan-price">$19.900<span>/año</span></div>
+            <div style="font-size:10px;color:var(--t3)">= $1.658/mes</div>
+          </div>
+        </div>
+        <ul class="upgrade-list" style="margin-bottom:20px">
+          <li>✓ Historial ilimitado de meses</li>
+          <li>✓ Gráfico acumulado personal vs. INDEC</li>
+          <li>✓ Alerta cuando sale el IPC</li>
+          <li>✓ Modo familia (hasta 3 canastas)</li>
+        </ul>
+        <button class="btn-primary" style="width:100%" onclick="goPayStep2()">Continuar →</button>
+        <div style="font-size:11px;color:var(--t3);text-align:center;margin-top:10px">30 días de garantía · Cancelás cuando querés</div>
+      </div>
+
+      <!-- PASO 2: Redirige a MP -->
+      <div id="pay-step-2" style="display:none">
+        <button onclick="goPayStep1()" style="background:none;border:none;color:var(--t3);font-size:12px;cursor:pointer;margin-bottom:16px;padding:0">← Volver</button>
+        <div class="upgrade-badge">PAGO SEGURO VÍA MERCADO PAGO</div>
+        <div class="upgrade-title" id="pay-step2-title">Suscripción mensual · $2.490</div>
+        <div style="font-size:13px;color:var(--t2);margin-bottom:20px;line-height:1.5">
+          Al hacer click se abre Mercado Pago donde podés pagar con tarjeta, débito, saldo de MP o transferencia. Elegís vos el método.
+        </div>
+        <div class="pay-info-box" style="margin-bottom:16px">
+          <div class="pay-info-label">Destinatario</div>
+          <div class="pay-info-value">Agustín Pironi</div>
+          <div class="pay-info-label" style="margin-top:10px">Alias MP</div>
+          <div class="pay-info-value pay-copyable" onclick="copyText('agustinpironi.mp', this)">agustinpironi.mp</div>
+          <div class="pay-info-label" style="margin-top:10px">Importe</div>
+          <div class="pay-info-value accent" id="pay-amount-display" style="color:var(--accent)">$2.490</div>
+        </div>
+        <button class="btn-primary" style="width:100%;font-size:15px;padding:14px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="goToMercadoPago()" id="btn-go-mp">
+          🔵 Pagar con Mercado Pago →
+        </button>
+        <div style="font-size:11px;color:var(--t3);text-align:center;margin-top:10px;line-height:1.5">
+          Después del pago escribinos a <b style="color:var(--t2)">pironiagustin05@gmail.com</b> con el comprobante.<br>Activación en menos de 24hs hábiles.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /panel-mi-historial -->
+
+<!-- ── PANEL: HISTORIAL ── -->
+<div class="panel container" id="panel-historial">
+  <div class="hist-hero">
+    <div class="h-stat">
+      <div class="h-stat-lbl">IPC último mes</div>
+      <div class="h-stat-v accent" id="h-ipc-last">—</div>
+      <div class="h-stat-sub" id="h-ipc-last-sub">Cargando datos…</div>
+    </div>
+    <div class="h-stat">
+      <div class="h-stat-lbl">Acumulado anual</div>
+      <div class="h-stat-v" id="h-acum">—</div>
+      <div class="h-stat-sub" id="h-acum-sub">Ene → mes actual</div>
+    </div>
+    <div class="h-stat">
+      <div class="h-stat-lbl">Variación interanual</div>
+      <div class="h-stat-v" id="h-ia">33,2%</div>
+      <div class="h-stat-sub">May 2026 vs May 2025 · INDEC</div>
+    </div>
+  </div>
+
+  <div class="sec-hd"><div class="sec-title">Últimos 6 meses</div></div>
+  <div id="timeline-wrap">
+    <div class="loading-msg"><span class="spinner"></span>Cargando datos desde ArgentinaDatos API…</div>
+  </div>
+
+  <div class="sec-hd" style="margin-top:1.4rem"><div class="sec-title">Variación por división — último mes</div></div>
+  <div class="rubros-table">
+    <div class="rt-head">
+      <span>División</span>
+      <span style="text-align:right">Var. mensual</span>
+      <span>Barra</span>
+    </div>
+    <div id="rubros-hist-rows"></div>
+  </div>
+
+  <div class="sec-hd"><div class="sec-title">Categorías del IPC</div></div>
+  <div class="context-grid">
+    <div class="stat-c"><div class="slabel">IPC Núcleo</div><div class="sval" id="ctx-nucleo">1,9%</div><div class="ssub">Sin estacionales ni regulados</div></div>
+    <div class="stat-c"><div class="slabel">Precios regulados</div><div class="sval" style="color:var(--amber)" id="ctx-reg">2,4%</div><div class="ssub">Tarifas, combustibles</div></div>
+    <div class="stat-c"><div class="slabel">Precios estacionales</div><div class="sval" style="color:var(--red)" id="ctx-est">3,5%</div><div class="ssub">Verduras, frutas, turismo</div></div>
+    <div class="stat-c"><div class="slabel">Servicios</div><div class="sval">2,5%</div><div class="ssub">vs. Bienes: 2,0%</div></div>
+  </div>
+
+  <div class="cbt-card">
+    <div class="cbt-left">
+      <div class="cbt-lbl">Canasta Básica Total — Último mes disponible</div>
+      <div class="cbt-desc">Línea de pobreza para familia tipo de 4 integrantes (GBA) · Fuente: INDEC</div>
+    </div>
+    <div class="cbt-val">$1.498.741</div>
+  </div>
+</div><!-- /panel-historial -->
+
+<!-- ── PANEL: CÓMO FUNCIONA ── -->
+<div class="panel container" id="panel-como">
+  <div class="how-hero">
+    <div class="how-hero-title">¿Cómo funciona?</div>
+    <div class="how-hero-sub">La inflación oficial del INDEC mide el promedio de precios de una canasta representativa de todos los hogares argentinos. El problema: tu canasta no es la de todos. Esta herramienta te permite calcular <em>tu</em> inflación real, según lo que vos gastás cada mes.</div>
+  </div>
+
+  <div class="sec-hd"><div class="sec-title">Pasos para usarla</div></div>
+  <div class="how-steps">
+    <div class="how-step">
+      <div class="how-step-num">1</div>
+      <div>
+        <div class="how-step-title">Seleccioná tu región</div>
+        <div class="how-step-desc">El INDEC publica datos para 6 regiones estadísticas: Nacional, GBA, Pampeana, NOA, NEA, Cuyo y Patagónica. Elegí la que más se acerque a donde vivís. Los IPC de cada división se ajustan automáticamente al diferencial regional publicado.</div>
+        <div class="how-tags"><span class="how-tag">Nacional</span><span class="how-tag">GBA</span><span class="how-tag">Pampeana</span><span class="how-tag">NOA · NEA · Cuyo · Patagónica</span></div>
+      </div>
+    </div>
+    <div class="how-step">
+      <div class="how-step-num">2</div>
+      <div>
+        <div class="how-step-title">Cargá tus gastos mensuales</div>
+        <div class="how-step-desc">En cada rubro, ingresá el monto en pesos que gastás por mes. La ponderación (%) se calcula automáticamente: si gastás $50.000 en alimentos y $100.000 en total, alimentos tiene un peso del 50% en tu canasta. No hace falta sumar manualmente.</div>
+      </div>
+    </div>
+    <div class="how-step">
+      <div class="how-step-num">3</div>
+      <div>
+        <div class="how-step-title">Refiná con subrubros</div>
+        <div class="how-step-desc">Expandí cada rubro para ver su desglose interno. Por ejemplo, dentro de Alimentos podés ver Carnes, Pan y cereales, Lácteos, Verduras, etc., cada uno con su propio IPC mensual. Los subrubros tienen pesos por defecto que podés modificar según tus hábitos.</div>
+      </div>
+    </div>
+    <div class="how-step">
+      <div class="how-step-num">4</div>
+      <div>
+        <div class="how-step-title">Leé tu inflación personal</div>
+        <div class="how-step-desc">El número grande en la parte superior es tu IPC personal del mes: la suma ponderada de cada rubro por su variación de precios. Si es mayor al IPC oficial, tu canasta subió más que el promedio. Si es menor, te fue mejor que la media.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="how-formula">
+    <p>La fórmula que usa la calculadora es:</p>
+    <p><code>Tu IPC = Σ (peso_rubro% × IPC_rubro) / total_asignado</code></p>
+    <p style="margin-top:8px">Donde el <code>peso_rubro%</code> es la fracción de tu gasto mensual en ese rubro sobre el total, y el <code>IPC_rubro</code> es la variación mensual oficial del INDEC para esa división.</p>
+  </div>
+
+</div><!-- /panel-como -->
+
+<!-- ── PANEL: PLANES ── -->
+<div class="panel container" id="panel-planes">
+
+  <div class="plans-hero">
+    <div class="plans-eyebrow">Elegí tu plan</div>
+    <div class="plans-title">Inflación real, a tu ritmo</div>
+    <div class="plans-sub">Empezá gratis. Suscribite cuando quieras más.</div>
+  </div>
+
+  <div class="plans-grid">
+    <!-- BÁSICO -->
+    <div class="plan-card">
+      <div class="plan-header">
+        <div class="plan-name">Básico</div>
+        <div class="plan-badge plan-badge-free">Gratis</div>
+      </div>
+      <div class="plan-price">$0<span>/mes</span></div>
+      <div class="plan-price-sub">Sin tarjeta. Sin vencimiento.</div>
+      <ul class="plan-features">
+        <li class="feat-ok">Calculadora de inflación personal</li>
+        <li class="feat-ok">Todos los rubros y subrubros</li>
+        <li class="feat-ok">Gráfico de torta de tu canasta</li>
+        <li class="feat-ok">Datos IPC por región (7 regiones)</li>
+        <li class="feat-ok">Registro de cuenta personal</li>
+        <li class="feat-ok" style="border-top:1px solid var(--b1);padding-top:8px;margin-top:2px"><b>Historial: últimos 2 meses</b></li>
+      </ul>
+      <button class="plan-btn plan-btn-free" disabled>Plan actual</button>
+    </div>
+
+    <!-- PREMIUM -->
+    <div class="plan-card plan-card-premium">
+      <div class="plan-popular">MÁS ELEGIDO</div>
+      <div class="plan-header">
+        <div class="plan-name">Premium</div>
+        <div class="plan-badge plan-badge-pro">★ PRO</div>
+      </div>
+      <div class="plan-price">$2.490<span>/mes</span></div>
+      <div class="plan-price-sub">o <b>$19.900/año</b> — equivale a 2 meses gratis</div>
+      <ul class="plan-features">
+        <li class="feat-ok">Todo lo del plan Básico</li>
+        <li class="feat-ok feat-hl">Historial ilimitado de meses</li>
+        <li class="feat-ok feat-hl">Gráfico acumulado personal vs. INDEC</li>
+        <li class="feat-ok feat-hl">Calculadora de ajuste salarial</li>
+        <li class="feat-ok feat-hl">Exportar reporte PDF mensual</li>
+        <li class="feat-ok feat-hl">Modo familia (hasta 3 canastas)</li>
+        <li class="feat-ok feat-hl">Alerta cuando sale el IPC cada mes</li>
+      </ul>
+      <button class="plan-btn plan-btn-pro" onclick="showUpgrade()">Quiero Premium →</button>
+      <div class="plan-guarantee">30 días de garantía — si no te sirve, te devolvemos el dinero</div>
+    </div>
+  </div>
+
+  <!-- IPC CALENDAR BOX -->
+  <div class="ipc-calendar-box" id="ipc-calendar-box">
+    <div class="ipc-cal-left">
+      <div class="ipc-cal-icon" id="ipc-cal-icon">📅</div>
+      <div>
+        <div class="ipc-cal-title" id="ipc-cal-title">Próxima publicación del IPC</div>
+        <div class="ipc-cal-desc" id="ipc-cal-desc">El INDEC publica el IPC entre el 10 y 15 de cada mes</div>
+      </div>
+    </div>
+    <div class="ipc-cal-right">
+      <div class="ipc-cal-countdown" id="ipc-cal-countdown">—</div>
+      <div class="ipc-cal-sub" id="ipc-cal-sub">días estimados</div>
+    </div>
+  </div>
+
+  <div class="plans-faq">
+    <div class="faq-item"><div class="faq-q">¿Puedo cancelar cuando quiera?</div><div class="faq-a">Sí. Sin contratos ni permanencia. Cancelás desde tu cuenta y no se te cobra el siguiente período.</div></div>
+    <div class="faq-item"><div class="faq-q">¿Qué pasa con mis datos si paso a Básico?</div><div class="faq-a">Tu historial completo queda guardado. Solo dejás de ver los meses que superan el límite gratuito hasta que volvás a suscribirte.</div></div>
+    <div class="faq-item"><div class="faq-q">¿Cuándo sale el IPC del INDEC?</div><div class="faq-a">Entre el 10 y 15 de cada mes. El plan Premium te avisa el día exacto con un recordatorio para que guardes tu canasta antes de que salga el dato.</div></div>
+    <div class="faq-item"><div class="faq-q">¿Cómo funciona el modo familia?</div><div class="faq-a">Podés crear hasta 3 canastas distintas (ej: vos, tu pareja, o comparar dos situaciones). Cada canasta tiene su propio historial y su propio IPC calculado.</div></div>
+  </div>
+
+</div><!-- /panel-planes -->
+
+<!-- ── PANEL: FUENTES ── -->
+<div class="panel container" id="panel-fuentes">
+  <div class="src-hero">
+    <div class="src-icon">⊛</div>
+    <div class="src-intro">
+      <h2>Fuentes y metodología</h2>
+      <p>Base primaria: datos oficiales del INDEC. Los IPC de subrubros son estimaciones a partir de aperturas de grupos y clases del informe de prensa, complementadas con mediciones de consultoras privadas de reconocimiento técnico.</p>
+    </div>
+  </div>
+
+  <div class="sec-hd"><div class="sec-title">Fuentes oficiales</div></div>
+  <div class="src-grid">
+    <a href="https://www.indec.gob.ar/indec/web/Nivel4-Tema-3-5-31" target="_blank" class="src-card">
+      <span class="src-arrow">↗</span>
+      <span class="src-badge badge-of">Oficial</span>
+      <div class="src-name">INDEC — IPC Nacional</div>
+      <div class="src-desc">Índice de Precios al Consumidor. Variaciones por división, grupo y clase. Cobertura regional. Base dic. 2016 = 100.</div>
+    </a>
+    <a href="https://www.indec.gob.ar/uploads/informesdeprensa/ipc_06_26C132AEE4E9.pdf" target="_blank" class="src-card">
+      <span class="src-arrow">↗</span>
+      <span class="src-badge badge-of">Oficial</span>
+      <div class="src-name">IPC Mayo 2026 — Informe INDEC</div>
+      <div class="src-desc">Informe completo con variaciones mensuales, interanuales, incidencias regionales, CBA y CBT. Publicado 11/06/2026.</div>
+    </a>
+    <a href="https://www.indec.gob.ar/indec/web/Nivel4-Tema-3-5-33" target="_blank" class="src-card">
+      <span class="src-arrow">↗</span>
+      <span class="src-badge badge-of">Oficial</span>
+      <div class="src-name">INDEC — Canasta Básica</div>
+      <div class="src-desc">CBA y CBT mensuales. Líneas de indigencia y pobreza por regiones. Familia tipo de 4 integrantes.</div>
+    </a>
+    <a href="https://argentinadatos.com/docs/operations/get-finanzas-indices-inflacion.html" target="_blank" class="src-card">
+      <span class="src-arrow">↗</span>
+      <span class="src-badge badge-of">API Pública</span>
+      <div class="src-name">ArgentinaDatos — API IPC</div>
+      <div class="src-desc">API abierta que republica la serie histórica del IPC mensual del INDEC. Usada para actualización automática de datos en esta calculadora.</div>
+    </a>
+  </div>
+
+  <div class="sec-hd"><div class="sec-title">Instituciones académicas</div></div>
+  <div class="src-grid">
+    <a href="https://www.utdt.edu/ver_contenido.php?id_contenido=24042&id_item_menu=28690" target="_blank" class="src-card">
+      <span class="src-arrow">↗</span>
+      <span class="src-badge badge-ver">Académica</span>
+      <div class="src-name">Universidad Torcuato Di Tella (UTDT)</div>
+      <div class="src-desc">Encuesta mensual de Expectativas de Inflación (UTDT-CIF). Referencia clave para medir la brecha entre inflación oficial y la percibida por los hogares argentinos.</div>
+    </a>
+    <a href="https://datos.gob.ar/dataset/sspm-expectativas-inflacion" target="_blank" class="src-card">
+      <span class="src-arrow">↗</span>
+      <span class="src-badge badge-ver">Datos abiertos</span>
+      <div class="src-name">Expectativas Di Tella — Datos.gob.ar</div>
+      <div class="src-desc">Serie histórica de expectativas de inflación publicada por la Subsecretaría de Programación Macroeconómica. Fuente primaria: UTDT.</div>
+    </a>
+  </div>
+
+  <div class="sec-hd"><div class="sec-title">Medios y verificadores</div></div>
+  <div class="src-grid">
+    <a href="https://chequeado.com" target="_blank" class="src-card">
+      <span class="src-arrow">↗</span>
+      <span class="src-badge badge-ver">Verificador</span>
+      <div class="src-name">Chequeado</div>
+      <div class="src-desc">Análisis explicativos del IPC. Desglose por división, incidencias regionales y contexto histórico. Referencia para comunicación de los datos.</div>
+    </a>
+    <a href="https://www.cronista.com" target="_blank" class="src-card">
+      <span class="src-arrow">↗</span>
+      <span class="src-badge badge-med">Medio especializado</span>
+      <div class="src-name">El Cronista</div>
+      <div class="src-desc">Cobertura del IPC mensual con variaciones por rubro, estimaciones de consultoras y contexto de política económica.</div>
+    </a>
+  </div>
+
+  <div class="sec-hd"><div class="sec-title">Consultoras privadas</div></div>
+  <div class="src-grid">
+    <a href="https://equilibra.ar" target="_blank" class="src-card">
+      <span class="src-arrow">↗</span>
+      <span class="src-badge badge-con">Consultora</span>
+      <div class="src-name">Equilibra</div>
+      <div class="src-desc">IPC subyacente propio. Relevamientos de precios independientes. Análisis de componentes estacionales y regulados. Usada para estimación de subrubros.</div>
+    </a>
+    <a href="https://www.libertadyprogreso.org" target="_blank" class="src-card">
+      <span class="src-arrow">↗</span>
+      <span class="src-badge badge-con">Consultora</span>
+      <div class="src-name">Libertad y Progreso</div>
+      <div class="src-desc">Medición mensual independiente del IPC con apertura por componentes. Referencia cruzada para validar datos oficiales.</div>
+    </a>
+    <a href="https://ecogo.com.ar" target="_blank" class="src-card">
+      <span class="src-arrow">↗</span>
+      <span class="src-badge badge-con">Consultora</span>
+      <div class="src-name">EcoGo</div>
+      <div class="src-desc">Desglose detallado de Alimentos y bebidas. Estimaciones semanales de precios. Fuente para variaciones de carnes, verduras y canasta alimentaria.</div>
+    </a>
+    <a href="https://ojf.com.ar" target="_blank" class="src-card">
+      <span class="src-arrow">↗</span>
+      <span class="src-badge badge-con">Consultora</span>
+      <div class="src-name">Orlando J. Ferreres & Asociados</div>
+      <div class="src-desc">IPC-OJF mensual. Relevamiento diario de más de 15.000 precios en GBA. Contexto para variaciones regionales del área metropolitana.</div>
+    </a>
+  </div>
+
+  <div class="meth-box">
+    <h3>Metodología de la calculadora</h3>
+    <ul>
+      <li>El IPC general se obtiene automáticamente vía API de ArgentinaDatos, que republica la serie del INDEC.</li>
+      <li>Los IPC de cada división corresponden al dato oficial del INDEC del último mes publicado.</li>
+      <li>Los IPC de subrubros son estimaciones basadas en aperturas de grupos/clases del informe de prensa del INDEC y consultoras.</li>
+      <li>Las variaciones regionales ajustan el IPC nacional con el diferencial publicado por el INDEC para cada región estadística.</li>
+      <li>La inflación personal se normaliza sobre el total asignado, por lo que el cálculo es válido con ponderación parcial.</li>
+      <li>Los datos del usuario se guardan en la nube (Supabase) de forma segura y encriptada, accesibles desde cualquier dispositivo.</li>
+    </ul>
+  </div>
+
+</div><!-- /panel-fuentes -->
+
+<footer>
+  <div class="footer-left"><span>MIINFLACIÓN</span> · Calculadora personal Argentina · Datos: INDEC + ArgentinaDatos API</div>
+  <div class="footer-center">
+    <a href="https://www.indec.gob.ar" target="_blank">indec.gob.ar</a> ·
+    <a href="https://argentinadatos.com" target="_blank">argentinadatos.com</a> ·
+    <a href="https://www.utdt.edu" target="_blank">utdt.edu</a> ·
+    <a href="https://chequeado.com" target="_blank">chequeado.com</a>
+  </div>
+  <div class="footer-right"><a href="#" title="Creador">Agustín Pironi</a></div>
+</footer>
+
+
+  <!-- MODAL AUTH — aparece cuando se necesita cuenta -->
+  <div class="upgrade-modal" id="auth-modal" style="display:none">
+    <div class="upgrade-box" style="max-width:420px;padding:0;overflow:hidden">
+      <!-- Header del modal -->
+      <div style="background:linear-gradient(135deg,#141914,#141414);padding:24px 28px 20px;border-bottom:1px solid var(--b1)">
+        <button class="upgrade-close" onclick="hideAuthModal()" style="top:16px;right:16px">✕</button>
+        <div class="upgrade-badge" style="margin-bottom:8px">GUARDÁ TU PROGRESO</div>
+        <div style="font-size:18px;font-weight:700;color:var(--t1);margin-bottom:4px" id="auth-modal-title">Creá tu cuenta gratis</div>
+        <div style="font-size:13px;color:var(--t2)" id="auth-modal-sub">Tu canasta se guarda automáticamente y podés acceder desde cualquier dispositivo.</div>
+      </div>
+      <!-- Contenido -->
+      <div style="padding:22px 28px">
+        <!-- Google -->
+        <button class="btn-google" onclick="doGoogleLogin()" style="margin-bottom:14px">
+          <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+          Continuar con Google
+        </button>
+        <div class="auth-divider">o con email</div>
+        <!-- Tabs login/register -->
+        <div class="auth-tabs" style="margin-bottom:16px">
+          <button class="auth-tab" id="modal-tab-register" onclick="switchModalTab('register')">Registrarme</button>
+          <button class="auth-tab active" id="modal-tab-login" onclick="switchModalTab('login')">Ya tengo cuenta</button>
+        </div>
+        <!-- Register form -->
+        <div id="modal-form-register" style="display:none;flex-direction:column;gap:12px">
+          <div class="form-group">
+            <label class="form-label">Nombre</label>
+            <input class="form-input" type="text" id="mr-name" placeholder="Tu nombre" autocomplete="name" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input class="form-input" type="email" id="mr-email" placeholder="tu@email.com" autocomplete="email" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Contraseña</label>
+            <input class="form-input" type="password" id="mr-pass" placeholder="••••••••" autocomplete="new-password" />
+          </div>
+          <div class="auth-error" id="mr-error"></div>
+          <div class="auth-success" id="mr-success"></div>
+          <button class="btn-primary" onclick="doModalRegister()">Crear cuenta y guardar canasta →</button>
+        </div>
+        <!-- Login form -->
+        <div id="modal-form-login" style="display:flex;flex-direction:column;gap:12px">
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input class="form-input" type="email" id="ml-email" placeholder="tu@email.com" autocomplete="email" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Contraseña</label>
+            <input class="form-input" type="password" id="ml-pass" placeholder="••••••••" autocomplete="current-password" />
+          </div>
+          <div class="auth-error" id="ml-error"></div>
+          <button class="btn-primary" onclick="doModalLogin()">Ingresar y guardar canasta →</button>
+          <div class="auth-forgot" onclick="doModalForgot()" style="text-align:center">¿Olvidaste tu contraseña?</div>
+        </div>
+        <div style="font-size:11px;color:var(--t3);text-align:center;margin-top:14px">
+          Al registrarte, tu canasta actual se guarda automáticamente en tu cuenta.
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /screen-app -->
+
+<script>
+// ═══════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════
+const REGION_ADJ = {
+  nacional:{label:"Nacional",adj:0},
+  gba:{label:"GBA",adj:0.2},
+  pampeana:{label:"Pampeana",adj:-0.1},
+  noa:{label:"NOA",adj:0.1},
+  nea:{label:"NEA",adj:0.05},
+  cuyo:{label:"Cuyo",adj:-0.2},
+  patagonica:{label:"Patagónica",adj:-0.2}
+};
+
+// IPC por división — se actualiza mensualmente con cada publicación del INDEC
+// La clave es el mes al que corresponde el dato
+const IPC_DIVISIONES = {
+  mes: "Mayo 2026",
+  divisiones: [
+    {name:"Comunicación",           v:3.4},
+    {name:"Educación",              v:2.9},
+    {name:"Recreación y cultura",   v:2.8},
+    {name:"Salud",                  v:2.6},
+    {name:"Vivienda y servicios",   v:2.6},
+    {name:"Alimentos y bebidas",    v:2.5},
+    {name:"Transporte",             v:2.0},
+    {name:"Restaurantes y hoteles", v:1.8},
+    {name:"Equipam. del hogar",     v:1.4},
+    {name:"Bebidas alc./tabaco",    v:0.8},
+    {name:"Indumentaria/calzado",   v:0.3},
+  ],
+  nucleo:"1,9%", regulados:"2,4%", estacionales:"3,5%"
+};
+
+// Subrubros con IPC de mayo 2026 (actualizar mensualmente)
+const CATS = [
+  {id:"alimentos",name:"Alimentos y bebidas",icon:"🛒",ipc_base:2.5,
+    subs:[
+      {id:"carnes",name:"Carnes",ipc:2.8,w:22},
+      {id:"pan",name:"Pan y cereales",ipc:3.1,w:14},
+      {id:"lacteos",name:"Lácteos y huevos",ipc:5.5,w:14},
+      {id:"frutas",name:"Frutas",ipc:-1.7,w:8},
+      {id:"verduras",name:"Verduras",ipc:12.0,w:10},
+      {id:"aceites",name:"Aceites y grasas",ipc:2.0,w:5},
+      {id:"bebidas",name:"Bebidas no alc.",ipc:1.8,w:7},
+      {id:"otros_al",name:"Otros alimentos",ipc:2.1,w:20},
+    ]},
+  {id:"vivienda",name:"Vivienda y servicios",icon:"🏠",ipc_base:2.6,
+    subs:[
+      {id:"alquiler",name:"Alquiler",ipc:3.2,w:45},
+      {id:"gas",name:"Gas",ipc:2.8,w:20},
+      {id:"electricidad",name:"Electricidad",ipc:2.5,w:20},
+      {id:"agua",name:"Agua",ipc:1.8,w:15},
+    ]},
+  {id:"transporte",name:"Transporte",icon:"🚌",ipc_base:2.0,
+    subs:[
+      {id:"combustible",name:"Combustible",ipc:1.5,w:30},
+      {id:"colectivo",name:"Transporte público",ipc:2.2,w:35},
+      {id:"taxi",name:"Taxi / Remis",ipc:2.5,w:15},
+      {id:"auto",name:"Mant. vehículo",ipc:2.0,w:20},
+    ]},
+  {id:"salud",name:"Salud",icon:"💊",ipc_base:2.6,
+    subs:[
+      {id:"prepaga",name:"Prepaga / Obra social",ipc:3.5,w:50},
+      {id:"medicamentos",name:"Medicamentos",ipc:3.0,w:30},
+      {id:"consultas",name:"Consultas médicas",ipc:2.0,w:20},
+    ]},
+  {id:"educacion",name:"Educación",icon:"📚",ipc_base:2.9,
+    subs:[
+      {id:"cuotas",name:"Cuotas colegios",ipc:3.2,w:60},
+      {id:"universidad",name:"Univ. privada",ipc:2.5,w:20},
+      {id:"libros",name:"Libros y útiles",ipc:2.0,w:20},
+    ]},
+  {id:"indumentaria",name:"Indumentaria",icon:"👕",ipc_base:0.3,
+    subs:[
+      {id:"ropa",name:"Ropa",ipc:0.3,w:65},
+      {id:"calzado",name:"Calzado",ipc:0.2,w:35},
+    ]},
+  {id:"recreacion",name:"Recreación y cultura",icon:"🎬",ipc_base:2.8,
+    subs:[
+      {id:"streaming",name:"Streaming",ipc:3.5,w:25},
+      {id:"deporte",name:"Deporte / Gym",ipc:2.5,w:20},
+      {id:"turismo",name:"Turismo",ipc:2.8,w:30},
+      {id:"cultura",name:"Cine / Teatro",ipc:2.5,w:25},
+    ]},
+  {id:"restaurantes",name:"Restaurantes y delivery",icon:"🍕",ipc_base:1.8,
+    subs:[
+      {id:"resto",name:"Restaurantes",ipc:1.8,w:60},
+      {id:"delivery",name:"Delivery / Apps",ipc:2.0,w:30},
+      {id:"hotel",name:"Hoteles",ipc:1.5,w:10},
+    ]},
+  {id:"comunicaciones",name:"Comunicaciones",icon:"📱",ipc_base:3.4,
+    subs:[
+      {id:"celular",name:"Telefonía celular",ipc:4.0,w:50},
+      {id:"internet",name:"Internet",ipc:3.2,w:35},
+      {id:"tel_fija",name:"Telefonía fija",ipc:2.5,w:15},
+    ]},
+  {id:"hogar",name:"Equipamiento del hogar",icon:"🛋️",ipc_base:1.4,
+    subs:[
+      {id:"muebles",name:"Muebles",ipc:1.5,w:30},
+      {id:"electrodom",name:"Electrodomésticos",ipc:1.2,w:40},
+      {id:"limpieza",name:"Limpieza / Higiene",ipc:1.6,w:30},
+    ]},
+];
+
+// ═══════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════
+/*
+  ╔══════════════════════════════════════════════════════════════╗
+  ║  SUPABASE SETUP — ejecutar en el SQL Editor de Supabase    ║
+  ╠══════════════════════════════════════════════════════════════╣
+  ║                                                              ║
+  ║  1. Crear tablas:                                            ║
+  ║                                                              ║
+  ║  -- IMPORTANTE: agregar columnas para multi-canasta:          ║
+  ║  alter table public.user_state add column if not exists       ║
+  ║    canastas text;                                             ║
+  ║  alter table public.user_state add column if not exists       ║
+  ║    active_idx int default 0;                                  ║
+  ║                                                               ║
+  ║  create table public.user_state (                            ║
+  ║    user_id  uuid primary key references auth.users(id)       ║
+  ║              on delete cascade,                              ║
+  ║    state    text,                                            ║
+  ║    region   text default 'nacional',                         ║
+  ║    version  int  default 2,                                  ║
+  ║    updated_at timestamptz default now()                      ║
+  ║  );                                                          ║
+  ║                                                              ║
+  ║  create table public.user_historial (                        ║
+  ║    id       uuid primary key default gen_random_uuid(),      ║
+  ║    user_id  uuid references auth.users(id) on delete cascade,║
+  ║    mes_key  text not null,                                   ║
+  ║    snapshot text not null,                                   ║
+  ║    created_at timestamptz default now(),                     ║
+  ║    unique(user_id, mes_key)                                  ║
+  ║  );                                                          ║
+  ║                                                              ║
+  ║  2. Habilitar RLS (Row Level Security):                      ║
+  ║                                                              ║
+  ║  alter table public.user_state enable row level security;    ║
+  ║  alter table public.user_historial enable row level security;║
+  ║                                                              ║
+  ║  create policy "own state" on public.user_state              ║
+  ║    for all using (auth.uid() = user_id);                     ║
+  ║                                                              ║
+  ║  create policy "own historial" on public.user_historial      ║
+  ║    for all using (auth.uid() = user_id);                     ║
+  ║                                                              ║
+  ║  3. En Supabase → Authentication → Providers:               ║
+  ║     Activar Google, pegar Client ID y Secret de             ║
+  ║     Google Cloud Console (OAuth 2.0 credentials).            ║
+  ║                                                              ║
+  ║  4. En SUPABASE_URL y SUPABASE_KEY de este archivo,         ║
+  ║     pegar los valores de Project Settings → API.            ║
+  ║                                                              ║
+  ╚══════════════════════════════════════════════════════════════╝
+*/
+// ═══════════════════════════════════════════════════════════════
+// SUPABASE CONFIG — reemplazá con tus datos reales de Supabase
+// ═══════════════════════════════════════════════════════════════
+const SUPABASE_URL  = 'https://amkzcednpjkhnqejttio.supabase.co';
+const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFta3pjZWRucGpraG5xZWp0dGlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3MTY4NjQsImV4cCI6MjA5NzI5Mjg2NH0.P5_GMgGFCHIaZzPvLxszOfUTd1TxeQHLLGzaC3YJUiw';
+const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ── Auth state global ──
+let currentUser = null;  // { id, email, name }
+
+// ── UI helpers ──
+function showAuthLoading(txt) {
+  const el = document.getElementById('auth-loading');
+  const txtEl = document.getElementById('auth-loading-txt');
+  if (el) el.style.display = 'flex';
+  if (txtEl && txt) txtEl.textContent = txt;
+}
+function hideAuthLoading() {
+  const el = document.getElementById('auth-loading');
+  if (el) el.style.display = 'none';
+}
+function showError(id, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+}
+function hideErrors() {
+  ['l-error','r-error','l-success','r-success'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('show');
+  });
+}
+function showSuccess(id, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+}
+
+// ── Auth tab switch ──
+function switchAuthTab(tab) {
+  document.getElementById('tab-login').classList.toggle('active', tab==='login');
+  document.getElementById('tab-register').classList.toggle('active', tab==='register');
+  document.getElementById('form-login').style.display  = tab==='login'    ? 'flex' : 'none';
+  document.getElementById('form-register').style.display = tab==='register' ? 'flex' : 'none';
+  hideErrors();
+}
+
+// ── Google OAuth ──
+async function doGoogleLogin() {
+  hideErrors();
+  showAuthLoading('Conectando con Google…');
+  const { error } = await _sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.href }
+  });
+  if (error) { hideAuthLoading(); showError('l-error', error.message); }
+  // Si no hay error, Supabase redirige a Google — onAuthStateChange maneja el retorno
+}
+
+// ── Email / Password Login ──
+async function doLogin() {
+  hideErrors();
+  const email = document.getElementById('l-email').value.trim().toLowerCase();
+  const pass  = document.getElementById('l-pass').value;
+  if (!email || !pass) return showError('l-error', 'Completá todos los campos');
+  showAuthLoading('Iniciando sesión…');
+  const { data, error } = await _sb.auth.signInWithPassword({ email, password: pass });
+  hideAuthLoading();
+  if (error) return showError('l-error', error.message === 'Invalid login credentials' ? 'Email o contraseña incorrectos' : error.message);
+  // onAuthStateChange se encarga de loginSuccess
+}
+
+// ── Email / Password Register ──
+async function doRegister() {
+  hideErrors();
+  const name  = document.getElementById('r-name').value.trim();
+  const email = document.getElementById('r-email').value.trim().toLowerCase();
+  const pass  = document.getElementById('r-pass').value;
+  if (!name || !email || !pass) return showError('r-error', 'Completá todos los campos');
+  if (pass.length < 6) return showError('r-error', 'La contraseña debe tener al menos 6 caracteres');
+  showAuthLoading('Creando tu cuenta…');
+  const { data, error } = await _sb.auth.signUp({
+    email, password: pass,
+    options: { data: { full_name: name } }
+  });
+  hideAuthLoading();
+  if (error) return showError('r-error', error.message);
+  showSuccess('r-success', '¡Cuenta creada! Revisá tu email para confirmar (o ingresá directo si tenés confirmación automática activada).');
+}
+
+// ── Forgot Password ──
+async function doForgotPassword() {
+  const email = document.getElementById('l-email').value.trim().toLowerCase();
+  if (!email) return showError('l-error', 'Ingresá tu email primero');
+  const { error } = await _sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.href });
+  if (error) return showError('l-error', error.message);
+  showSuccess('l-success', 'Te enviamos un email para restablecer tu contraseña.');
+}
+
+// ── Logout ──
+async function doLogout() {
+  await saveCurrentState();
+  await _sb.auth.signOut();
+  currentUser = null;
+  // Reset a demo mode
+  canastas = [{ id: 'demo', name: 'Mi canasta', state: makeEmptyState(), region: 'nacional' }];
+  activeCanastaIdx = 0;
+  initState();
+  // Nav: volver a guest
+  document.getElementById('nav-guest').style.display = 'flex';
+  document.getElementById('nav-logged').style.display = 'none';
+  document.getElementById('canasta-selector').style.display = 'none';
+  document.getElementById('demo-banner').style.display = 'flex';
+  // Limpiar inputs de auth
+  ['l-email','l-pass','r-name','r-email','r-pass'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  buildCatGrid();
+  updateMain();
+  renderCanastaSelector();
+}
+
+// ── loginSuccess: entrada a la app (desde modal o desde pantalla de auth) ──
+async function loginSuccess(sbUser) {
+  const name = sbUser.user_metadata?.full_name || sbUser.email.split('@')[0];
+  // Capturar estado demo actual ANTES de sobrescribir
+  const demoCanastas = JSON.parse(JSON.stringify(canastas));
+  const demoHasData = CATS.some(c => (state[c.id]?.monto||0) > 0 || (state[c.id]?.w||0) > 0);
+
+  currentUser = { id: sbUser.id, email: sbUser.email, name };
+
+  // Nav: mostrar estado logueado
+  document.getElementById('nav-username').textContent = name.split(' ')[0];
+  document.getElementById('nav-guest').style.display = 'none';
+  document.getElementById('nav-logged').style.display = 'flex';
+  document.getElementById('canasta-selector').style.display = 'flex';
+  document.getElementById('demo-banner').style.display = 'none';
+
+  // Cerrar modal auth si estaba abierto
+  hideAuthModal();
+  hideAuthLoading();
+
+  // Screen: si venía de la pantalla de auth (no de la app), hacer swap
+  const authScreen = document.getElementById('screen-auth');
+  const appScreen = document.getElementById('screen-app');
+  if (authScreen.classList.contains('active')) {
+    authScreen.classList.remove('active');
+    appScreen.classList.add('active');
+  }
+
+  await loadUserState();
+
+  // Si el usuario tenía datos en demo y la cuenta está vacía, migrar
+  if (demoHasData) {
+    const acEmpty = !CATS.some(c => (state[c.id]?.monto||0) > 0 || (state[c.id]?.w||0) > 0);
+    if (acEmpty && canastas.length === 1 && !canastas[0].state) {
+      canastas[0].state = demoCanastas[0].state;
+      canastas[0].region = demoCanastas[0].region;
+      initState();
+      await saveCurrentState();
+    }
+  }
+
+  initApp();
+}
+
+// ── Supabase Auth state change: maneja login, logout, OAuth return ──
+_sb.auth.onAuthStateChange(async (event, session) => {
+  if (event === 'SIGNED_IN' && session?.user) {
+    if (!currentUser) await loginSuccess(session.user);
+  } else if (event === 'SIGNED_OUT') {
+    currentUser = null;
+  } else if (event === 'PASSWORD_RECOVERY') {
+    // Mostrar pantalla de cambio de contraseña si es necesario
+  }
+});
+
+// ── Check session al cargar ──
+async function checkSession() {
+  // Arrancar siempre en modo demo primero (app visible de inmediato)
+  enterDemoMode();
+
+  // Luego verificar si hay sesión activa
+  try {
+    const { data: { session } } = await _sb.auth.getSession();
+    if (session?.user) {
+      await loginSuccess(session.user);
+    }
+  } catch(e) {
+    console.warn('Supabase session check failed', e);
+    // Igual funciona en demo
+  }
+}
+
+function enterDemoMode() {
+  // Inicializar canasta demo con nombre genérico
+  if (!canastas.length) {
+    canastas = [{ id: 'demo', name: 'Mi canasta', state: makeEmptyState(), region: 'nacional' }];
+    activeCanastaIdx = 0;
+  }
+  initState();
+  // Nav: mostrar estado guest
+  document.getElementById('nav-guest').style.display = 'flex';
+  document.getElementById('nav-logged').style.display = 'none';
+  document.getElementById('canasta-selector').style.display = 'none';
+  document.getElementById('demo-banner').style.display = 'flex';
+  initApp();
+}
+
+// ── Key listeners ──
+document.getElementById('l-pass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+document.getElementById('r-pass').addEventListener('keydown', e => { if(e.key==='Enter') doRegister(); });
+
+// ═══════════════════════════════════════════════
+// STATE — Persistencia en Supabase (tablas: user_state, user_historial)
+// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
+// SISTEMA MULTI-CANASTA
+// ═══════════════════════════════════════════════
+const MAX_CANASTAS_FREE = 1;
+const MAX_CANASTAS_PRO  = 3;
+const CANASTA_COLORS    = ['#C8F135','#5BC8FF','#B39DFF'];
+
+// Canastas: array de { id, name, state, region }
+let canastas = [];
+let activeCanastaIdx = 0;
+
+// Accesos rápidos a la canasta activa
+function getActiveCanasta() { return canastas[activeCanastaIdx] || canastas[0]; }
+let region = 'nacional';  // alias de la canasta activa — se sincroniza
+const state = {};          // alias del state activo — se sincroniza
+
+function syncActiveAliases() {
+  const c = getActiveCanasta();
+  if (!c) return;
+  region = c.region || 'nacional';
+  // Copiar state de la canasta activa al state global (que usa toda la app)
+  CATS.forEach(cat => {
+    state[cat.id] = c.state[cat.id] || { w: 0, monto: 0 };
+    cat.subs.forEach(s => {
+      state[cat.id+'_'+s.id] = c.state[cat.id+'_'+s.id] || { w: 0, monto: 0 };
+    });
+  });
+}
+
+function pushStateToActive() {
+  const c = getActiveCanasta();
+  if (!c) return;
+  c.region = region;
+  CATS.forEach(cat => {
+    c.state[cat.id] = { ...state[cat.id] };
+    cat.subs.forEach(s => {
+      c.state[cat.id+'_'+s.id] = { ...state[cat.id+'_'+s.id] };
+    });
+  });
+}
+
+function makeEmptyState() {
+  const s = {};
+  CATS.forEach(c => {
+    s[c.id] = { w: 0, monto: 0 };
+    c.subs.forEach(sub => { s[c.id+'_'+sub.id] = { w: 0, monto: 0 }; });
+  });
+  return s;
+}
+
+function initState() {
+  // Inicializa la canasta activa con valores vacíos si faltan keys
+  const c = getActiveCanasta();
+  if (!c) return;
+  CATS.forEach(cat => {
+    if (!c.state[cat.id]) c.state[cat.id] = { w: 0, monto: 0 };
+    cat.subs.forEach(s => {
+      if (!c.state[cat.id+'_'+s.id]) c.state[cat.id+'_'+s.id] = { w: 0, monto: 0 };
+    });
+  });
+  syncActiveAliases();
+}
+
+// ── Guardar todas las canastas en Supabase ──
+async function saveCurrentState() {
+  if (!currentUser) return; // demo mode: no guardar
+  pushStateToActive();
+  const payload = {
+    canastas: JSON.stringify(canastas),
+    active_idx: activeCanastaIdx,
+    version: 3
+  };
+  await _sb.from('user_state').upsert({ user_id: currentUser.id, ...payload }, { onConflict: 'user_id' });
+}
+
+// ── Cargar canastas desde Supabase ──
+async function loadUserState() {
+  if (!currentUser) return;
+  const { data, error } = await _sb.from('user_state').select('*').eq('user_id', currentUser.id).single();
+
+  if (error || !data) {
+    // Primera vez — crear canasta por defecto con nombre del usuario
+    canastas = [{ id: 'c0', name: currentUser.name.split(' ')[0] || 'Mi canasta', state: makeEmptyState(), region: 'nacional' }];
+    activeCanastaIdx = 0;
+    initState();
+    return;
+  }
+
+  try {
+    if (data.version >= 3 && data.canastas) {
+      // Formato nuevo multi-canasta
+      canastas = JSON.parse(data.canastas);
+      activeCanastaIdx = data.active_idx || 0;
+    } else {
+      // Migrar formato viejo (single canasta) → multi-canasta
+      const saved = JSON.parse(data.state || '{}');
+      const migratedState = makeEmptyState();
+      CATS.forEach(c => {
+        if (saved[c.id]) migratedState[c.id] = { ...saved[c.id] };
+        c.subs.forEach(s => {
+          const k = c.id+'_'+s.id;
+          if (saved[k]) migratedState[k] = { ...saved[k] };
+        });
+      });
+      canastas = [{ id: 'c0', name: currentUser.name.split(' ')[0] || 'Mi canasta', state: migratedState, region: data.region || 'nacional' }];
+      activeCanastaIdx = 0;
+    }
+    if (!canastas.length) canastas = [{ id: 'c0', name: 'Mi canasta', state: makeEmptyState(), region: 'nacional' }];
+    initState();
+  } catch(e) {
+    console.warn('Error loading state', e);
+    canastas = [{ id: 'c0', name: 'Mi canasta', state: makeEmptyState(), region: 'nacional' }];
+    activeCanastaIdx = 0;
+    initState();
+  }
+}
+
+// ── Historial en Supabase ──
+async function getHistorial() {
+  if (!currentUser) return [];
+  const { data, error } = await _sb.from('user_historial')
+    .select('*').eq('user_id', currentUser.id)
+    .order('mes_key', { ascending: false });
+  if (error || !data) return [];
+  return data.map(row => JSON.parse(row.snapshot));
+}
+
+async function saveHistorial(hist) {
+  // No se usa directamente — se maneja por saveMonthSnapshot y deleteSnapshot
+}
+
+async function saveMonthSnapshotDB(snapshot) {
+  if (!currentUser) return;
+  await _sb.from('user_historial').upsert({
+    user_id: currentUser.id,
+    mes_key: snapshot.key,
+    snapshot: JSON.stringify(snapshot)
+  }, { onConflict: 'user_id,mes_key' });
+}
+
+async function deleteSnapshotDB(key) {
+  if (!currentUser) return;
+  await _sb.from('user_historial').delete()
+    .eq('user_id', currentUser.id).eq('mes_key', key);
+}
+
+// Auto-save cada 4 segundos
+setInterval(() => { if(currentUser) saveCurrentState(); }, 4000);
+
+// ═══════════════════════════════════════════════
+// LIVE IPC FROM API
+// ═══════════════════════════════════════════════
+let ipcLiveData = null;
+let ipcLastVal = null;
+let ipcLastMes = 'Mayo 2026';
+
+async function fetchIPC() {
+  try {
+    const r = await fetch('https://argentinadatos.com/api/v1/finanzas/indices/inflacion');
+    if (!r.ok) throw new Error('API error');
+    const data = await r.json();
+    if (!Array.isArray(data) || data.length === 0) throw new Error('empty');
+    ipcLiveData = data;
+    // Last entry
+    const last = data[data.length - 1];
+    ipcLastVal = last.valor;
+    // Parse date
+    const d = new Date(last.fecha);
+    const months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    ipcLastMes = months[d.getMonth()] + ' ' + d.getFullYear();
+    // Update UI
+    document.getElementById('ipc-oficial-val').textContent = ipcLastVal.toFixed(1).replace('.',',') + '%';
+    document.getElementById('ipc-oficial-mes').textContent = ipcLastMes + ' · INDEC';
+    document.getElementById('ticker-val').textContent = ipcLastVal.toFixed(1).replace('.',',') + '%';
+    const badge = document.getElementById('nav-badge-mes');
+    if(badge) badge.textContent = ipcLastMes.slice(0,3).toUpperCase() + ' ' + String(d.getFullYear()).slice(2);
+    updateMain();
+    buildTimeline(data);
+    return true;
+  } catch(e) {
+    // Fallback to hardcoded
+    ipcLastVal = 2.1;
+    ipcLastMes = 'Mayo 2026';
+    document.getElementById('ipc-oficial-val').textContent = '2,1%';
+    document.getElementById('ipc-oficial-mes').textContent = 'Mayo 2026 · INDEC (dato local)';
+    document.getElementById('ticker-val').textContent = '2,1%';
+    document.getElementById('nav-badge-mes').textContent = 'MAY 26';
+    updateMain();
+    buildTimelineFallback();
+    return false;
+  }
+}
+
+function buildTimeline(data) {
+  const last6 = data.slice(-6);
+  const max = Math.max(...last6.map(d=>d.valor));
+  const months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const acums = computeAcum(data);
+
+  let html = '<div class="timeline-grid">';
+  last6.forEach((entry, i) => {
+    const d = new Date(entry.fecha);
+    const mes = months[d.getMonth()] + ' ' + String(d.getFullYear()).slice(2);
+    const pct = Math.round((entry.valor/max)*100);
+    const isCurrent = i === last6.length - 1;
+    const acum = acums[data.length - 6 + i];
+    const barCol = entry.valor >= 3 ? 'var(--red)' : entry.valor >= 2 ? 'var(--amber)' : 'var(--green)';
+    html += `<div class="t-card${isCurrent?' current':''}">
+      <div class="t-month">${mes}</div>
+      <div class="t-val${isCurrent?' accent':''}">${entry.valor.toFixed(1).replace('.',',')}%</div>
+      <div class="t-acum">Acum: ${acum ? acum.toFixed(1).replace('.',',')+'%' : '—'}</div>
+      <div class="t-bar"><div class="t-bar-fill" style="width:${pct}%;background:${barCol}"></div></div>
+    </div>`;
+  });
+  html += '</div>';
+
+  document.getElementById('timeline-wrap').innerHTML = html;
+
+  // Update history hero
+  const last = last6[last6.length-1];
+  document.getElementById('h-ipc-last').textContent = last.valor.toFixed(1).replace('.',',') + '%';
+  document.getElementById('h-ipc-last-sub').textContent = ipcLastMes + ' · INDEC';
+  const lastAcum = acums[acums.length-1];
+  if (lastAcum) {
+    document.getElementById('h-acum').textContent = lastAcum.toFixed(1).replace('.',',') + '%';
+    document.getElementById('h-acum-sub').textContent = 'Acumulado a ' + ipcLastMes;
+  }
+}
+
+function computeAcum(data) {
+  const year = new Date(data[data.length-1].fecha).getFullYear();
+  let acum = 100;
+  const results = new Array(data.length).fill(null);
+  let started = false;
+  for (let i=0; i<data.length; i++) {
+    const d = new Date(data[i].fecha);
+    if (d.getFullYear() === year) {
+      if (!started) { acum = 100; started = true; }
+      acum = acum * (1 + data[i].valor/100);
+      results[i] = (acum - 100);
+    }
+  }
+  return results;
+}
+
+function buildTimelineFallback() {
+  const fallback = [
+    {mes:'Dic 25',v:2.7,acum:'117,8%',b:'var(--amber)'},
+    {mes:'Ene 26',v:2.3,acum:'2,3%',b:'var(--amber)'},
+    {mes:'Feb 26',v:2.9,acum:'5,3%',b:'var(--amber)'},
+    {mes:'Mar 26',v:3.4,acum:'8,8%',b:'var(--red)'},
+    {mes:'Abr 26',v:2.6,acum:'11,6%',b:'var(--amber)'},
+    {mes:'May 26',v:2.1,acum:'14,7%',b:'var(--accent)'},
+  ];
+  const max = Math.max(...fallback.map(d=>d.v));
+  let html = '<div class="timeline-grid">';
+  fallback.forEach((e,i) => {
+    const cur = i===fallback.length-1;
+    const pct = Math.round((e.v/max)*100);
+    html += `<div class="t-card${cur?' current':''}">
+      <div class="t-month">${e.mes}</div>
+      <div class="t-val${cur?' accent':''}">${e.v.toFixed(1).replace('.',',')}%</div>
+      <div class="t-acum">Acum: ${e.acum}</div>
+      <div class="t-bar"><div class="t-bar-fill" style="width:${pct}%;background:${e.b}"></div></div>
+    </div>`;
+  });
+  html += '</div>';
+  document.getElementById('timeline-wrap').innerHTML = html;
+  document.getElementById('h-ipc-last').textContent = '2,1%';
+  document.getElementById('h-ipc-last-sub').textContent = 'Mayo 2026 · INDEC';
+  document.getElementById('h-acum').textContent = '14,7%';
+}
+
+// ═══════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════
+const adj = v => parseFloat((v + REGION_ADJ[region].adj).toFixed(1));
+const pillCls = v => v >= 2.5 ? 'pill-r' : v >= 1.5 ? 'pill-a' : 'pill-g';
+const barCol = v => v >= 2.5 ? '#FF5555' : v >= 1.5 ? '#F5A623' : '#3DDC84';
+const fmtPeso = v => v > 0 ? '$'+Math.round(v).toLocaleString('es-AR') : '$0';
+const fmtPct = v => v.toFixed(2).replace('.',',') + '%';
+
+function catEffIpc(c) {
+  // Primero intentar calcular por montos de subrubros (más preciso)
+  const totalSubMonto = c.subs.reduce((a,s) => a+(state[c.id+'_'+s.id]?.monto||0), 0);
+  if (totalSubMonto > 0) {
+    // Promedio ponderado por monto real de cada subrubro
+    return c.subs.reduce((a,s) => {
+      const sm = state[c.id+'_'+s.id]?.monto || 0;
+      return a + (sm / totalSubMonto) * adj(s.ipc);
+    }, 0);
+  }
+  // Si no hay montos de subrubros, usar weights asignados manualmente
+  const totW = c.subs.reduce((a,s) => a+(state[c.id+'_'+s.id]?.w||0), 0);
+  if (totW === 0) return adj(c.ipc_base); // sin datos: usar IPC oficial del rubro
+  return c.subs.reduce((a,s) => a + ((state[c.id+'_'+s.id]?.w||0)/totW)*adj(s.ipc), 0);
+}
+
+// ═══════════════════════════════════════════════
+// BUILD CATEGORIES
+// ═══════════════════════════════════════════════
+function buildCatGrid() {
+  const grid = document.getElementById('cat-grid');
+  grid.innerHTML = '';
+
+  CATS.forEach(c => {
+    const catW = state[c.id]?.w || 0;
+    const monto = state[c.id]?.monto || 0;
+    const ipc = adj(c.ipc_base);
+    const contrib = ((catW/100)*catEffIpc(c)).toFixed(2);
+
+    const card = document.createElement('div');
+    card.className = 'cat-card';
+    card.id = 'card-'+c.id;
+
+    // Build sub items HTML
+    const subItemsHTML = buildSubItemsHTML(c);
+
+    card.innerHTML = `
+      <div class="cat-head" id="head-${c.id}">
+        <div class="cat-ico">${c.icon}</div>
+        <div class="cat-info">
+          <div class="cat-name">${c.name}</div>
+          <div class="cat-sub">IPC oficial: ${ipc.toFixed(1).replace('.',',')}%</div>
+        </div>
+        <span class="cat-pill ${pillCls(ipc)}">${ipc.toFixed(1).replace('.',',')}% mens.</span>
+        <span class="cat-weight" id="cw-${c.id}">${catW}%</span>
+        <span class="cat-contrib" id="cc-${c.id}">${contrib}pp</span>
+        <span class="cat-chev" id="chev-${c.id}">▾</span>
+      </div>
+      <div class="cat-body" id="body-${c.id}">
+        <!-- Monto total del rubro -->
+        <div class="money-row" id="mrow-${c.id}">
+          <div class="money-prefix">$</div>
+          <div class="money-inner">
+            <span class="money-label-sm">Total gastado en este rubro por mes</span>
+            <input type="number" class="money-inp" id="monto-${c.id}" placeholder="0" value="${monto||''}" min="0" step="100" />
+          </div>
+          <div class="money-sep"></div>
+          <div class="money-pct-box">
+            <span class="money-pct-v" id="mpct-${c.id}">${catW>0 ? catW+'%' : '—'}</span>
+            <span class="money-pct-l">del total</span>
+          </div>
+        </div>
+        <!-- Ajuste manual -->
+        <div class="slider-row">
+          <span class="slider-lbl">Ajuste manual:</span>
+          <input type="range" min="0" max="70" step="1" value="${catW}" id="ms-${c.id}" />
+          <span class="slider-val" id="msv-${c.id}">${catW}%</span>
+        </div>
+        <!-- Subrubros -->
+        <div class="sub-sect-title">Distribución interna — clickeá para expandir y asignar</div>
+        <div class="sub-list" id="sublist-${c.id}">${subItemsHTML}</div>
+        <!-- Barra distribución total -->
+        <div class="sub-distrib-bar">
+          <div class="sub-distrib-label">
+            <span>Distribución por subrubro</span>
+            <span id="sub-total-txt-${c.id}">0%</span>
+          </div>
+          <div class="sub-distrib-track" id="sub-distrib-track-${c.id}"></div>
+          <div class="sub-total-status" id="sub-total-status-${c.id}"></div>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+
+    // Toggle cat
+    card.querySelector('.cat-head').addEventListener('click', () => {
+      const body = document.getElementById('body-'+c.id);
+      const chev = document.getElementById('chev-'+c.id);
+      const open = body.classList.toggle('open');
+      chev.classList.toggle('open', open);
+      card.classList.toggle('open', open);
+    });
+
+    // Main slider
+    document.getElementById('ms-'+c.id).addEventListener('input', e => {
+      state[c.id].w = parseInt(e.target.value);
+      state[c.id].monto = 0;
+      document.getElementById('monto-'+c.id).value = '';
+      document.getElementById('msv-'+c.id).textContent = state[c.id].w+'%';
+      refreshCatHeader(c); updateMain();
+    });
+
+    // Money input on cat
+    document.getElementById('monto-'+c.id).addEventListener('input', e => {
+      state[c.id].monto = parseFloat(e.target.value)||0;
+      // Recalc sub montos into sub weights based on sub montos
+      recalcSubWeightsFromMoney(c);
+      recalcFromMoney();
+    });
+
+    attachSubListeners(c);
+    updateSubDistrib(c);
+  });
+}
+
+function buildSubItemsHTML(c) {
+  return c.subs.map(s => {
+    const sk = c.id+'_'+s.id;
+    const sw = state[sk]?.w || 0;
+    const sm = state[sk]?.monto || 0;
+    const sipc = adj(s.ipc);
+    const catW = state[c.id]?.w || 0;
+    const pp = ((catW/100)*(sw/100)*sipc).toFixed(2);
+    const isActive = sw > 0 || sm > 0;
+    const _subTotM = c.subs.reduce((a,sx) => a+(state[c.id+'_'+sx.id]?.monto||0), 0);
+    const _subPctInt = _subTotM > 0 && sm > 0 ? Math.round((sm/_subTotM)*100) : sw;
+    const pctTxt = _subPctInt > 0 ? _subPctInt+'%' : '—';
+    const ppTxt = isActive ? pp + 'pp' : '—';
+    return '<div class="sub-item' + (isActive ? ' active' : '') + '" id="sub-item-' + c.id + '-' + s.id + '">' +
+      '<div class="sub-item-head" id="sub-head-' + c.id + '-' + s.id + '">' +
+        '<span class="sub-item-name">' + s.name + '</span>' +
+        '<span class="sub-ipc-tag ' + pillCls(sipc) + '">' + sipc.toFixed(1).replace('.',',') + '%</span>' +
+        '<span class="sub-item-pct" id="sub-pct-' + c.id + '-' + s.id + '">' + pctTxt + '</span>' +
+        '<span class="sub-item-pp" id="sub-pp-' + c.id + '-' + s.id + '">' + ppTxt + '</span>' +
+      '</div>' +
+      '<div class="sub-item-body" id="sub-body-' + c.id + '-' + s.id + '">' +
+        '<div class="sub-acum-row" id="sub-acum-row-' + c.id + '-' + s.id + '" style="' + (sm>0?'':'display:none') + '">' +
+          '<span class="sub-acum-lbl">Acumulado:</span>' +
+          '<span class="sub-acum-val" id="sub-acum-val-' + c.id + '-' + s.id + '">$' + Math.round(sm).toLocaleString('es-AR') + '</span>' +
+          '<button class="sub-acum-reset" onclick="resetSubMonto(\''+c.id+'\',\''+s.id+'\');event.stopPropagation()" title="Reiniciar">↺</button>' +
+        '</div>' +
+        '<div class="sub-add-row">' +
+          '<div class="sub-quick-inp-wrap">' +
+            '<span class="sub-quick-prefix">$</span>' +
+            '<input type="number" class="sub-quick-inp" id="sub-quick-' + c.id + '-' + s.id + '" placeholder="Sumar gasto..." min="0" step="100" inputmode="numeric" />' +
+          '</div>' +
+          '<button class="sub-quick-btn" onclick="addSubMonto(\''+c.id+'\',\''+s.id+'\');event.stopPropagation()">+ Sumar</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+
+function attachSubListeners(c) {
+  c.subs.forEach(s => {
+    const sk = c.id+'_'+s.id;
+
+    // Toggle sub item
+    const head = document.getElementById('sub-head-'+c.id+'-'+s.id);
+    if (head) {
+      head.addEventListener('click', () => {
+        const body = document.getElementById('sub-body-'+c.id+'-'+s.id);
+        if (body) body.classList.toggle('open');
+      });
+    }
+
+    // Enter en input rápido de subrubro
+    const _qi2 = document.getElementById('sub-quick-'+c.id+'-'+s.id);
+    if (_qi2) { _qi2.addEventListener('keydown', e => { if(e.key==='Enter') addSubMonto(c.id,s.id); }); }
+  });
+}
+
+// Recalcula los % de cada subrubro a partir de sus montos $
+// Base = suma de todos los montos de subrubros (siempre relativo entre ellos)
+function recalcSubWeightsFromMoney(c) {
+  const subTotalMonto = c.subs.reduce((a,s) => a+(state[c.id+'_'+s.id]?.monto||0), 0);
+  if (subTotalMonto <= 0) {
+    c.subs.forEach(s => {
+      const sk = c.id+'_'+s.id;
+      if (!state[sk]) state[sk] = { w: 0, monto: 0 };
+      state[sk].w = 0;
+      const slEl = document.getElementById('sub-sl-'+c.id+'-'+s.id);
+      const slvEl = document.getElementById('sub-slv-'+c.id+'-'+s.id);
+      if(slEl) slEl.value = 0;
+      if(slvEl) slvEl.textContent = '0%';
+      refreshSubItem(c, s);
+    });
+    updateSubDistrib(c);
+    return;
+  }
+  c.subs.forEach(s => {
+    const sk = c.id+'_'+s.id;
+    const sm = state[sk]?.monto || 0;
+    if (!state[sk]) state[sk] = { w: 0, monto: 0 };
+    // % relativo dentro del rubro (suma de subrubros = 100%)
+    state[sk].w = Math.round((sm / subTotalMonto) * 100);
+    const slEl = document.getElementById('sub-sl-'+c.id+'-'+s.id);
+    const slvEl = document.getElementById('sub-slv-'+c.id+'-'+s.id);
+    if(slEl) slEl.value = state[sk].w;
+    if(slvEl) slvEl.textContent = state[sk].w+'%';
+    refreshSubItem(c, s);
+  });
+  updateSubDistrib(c);
+}
+
+function refreshSubItem(c, s) {
+  const sk = c.id+'_'+s.id;
+  const sw = state[sk]?.w || 0;
+  const sm = state[sk]?.monto || 0;
+  const catW = state[c.id]?.w || 0;
+  const sipc = adj(s.ipc);
+  const pp = ((catW/100)*(sw/100)*sipc).toFixed(2);
+  const isActive = sw > 0 || sm > 0;
+
+  const item = document.getElementById('sub-item-'+c.id+'-'+s.id);
+  if (item) item.classList.toggle('active', isActive);
+
+  const pctEl = document.getElementById('sub-pct-'+c.id+'-'+s.id);
+  if (pctEl) {
+    if (sm > 0) {
+      // Muestra el monto y el % entre paréntesis
+      pctEl.textContent = '$'+Math.round(sm).toLocaleString('es-AR');
+      pctEl.title = sw+'% del rubro';
+    } else {
+      pctEl.textContent = sw > 0 ? sw+'%' : '0%';
+      pctEl.title = '';
+    }
+  }
+
+  const ppEl = document.getElementById('sub-pp-'+c.id+'-'+s.id);
+  if (ppEl) ppEl.textContent = isActive ? pp+'pp' : '—';
+}
+
+function updateSubDistrib(c) {
+  const track = document.getElementById('sub-distrib-track-'+c.id);
+  const totTxt = document.getElementById('sub-total-txt-'+c.id);
+  const status = document.getElementById('sub-total-status-'+c.id);
+  if (!track) return;
+
+  const tot = c.subs.reduce((a,s) => a+(state[c.id+'_'+s.id]?.w||0), 0);
+  const colors = ['#C8F135','#3DDC84','#F5A623','#B39DFF','#FF9090','#5BC8FF','#FFD166','#A8E6CF'];
+
+  let segsHTML = '';
+  c.subs.forEach((s, i) => {
+    const sw = state[c.id+'_'+s.id]?.w || 0;
+    if (sw <= 0) return;
+    const pct = tot > 0 ? Math.min((sw/tot)*100, 100) : 0;
+    segsHTML += `<div class="sub-distrib-seg" style="width:${pct}%;background:${colors[i%colors.length]}" title="${s.name}: ${sw}%"></div>`;
+  });
+  track.innerHTML = segsHTML || `<div style="width:100%;height:100%;background:var(--b2);border-radius:3px"></div>`;
+
+  if (totTxt) totTxt.textContent = tot+'%';
+  if (status) {
+    if (tot === 0) { status.style.color='var(--t3)'; status.textContent='Sin asignar'; }
+    else if (tot === 100) { status.style.color='var(--green)'; status.textContent='✓ Distribuido al 100%'; }
+    else if (tot > 100) { status.style.color='var(--red)'; status.textContent='⚠ Supera 100% — ajustá los valores'; }
+    else { status.style.color='var(--amber)'; status.textContent=`Asignado ${tot}% — quedan ${100-tot}% sin distribuir`; }
+  }
+}
+
+function refreshCatHeader(c) {
+  const catW = state[c.id]?.w || 0;
+  const effIpc = catEffIpc(c);
+  const contrib = ((catW/100)*effIpc).toFixed(2);
+  const cw = document.getElementById('cw-'+c.id);
+  const cc = document.getElementById('cc-'+c.id);
+  const sl = document.getElementById('ms-'+c.id);
+  const sv = document.getElementById('msv-'+c.id);
+  const mp = document.getElementById('mpct-'+c.id);
+  if(cw) cw.textContent = catW+'%';
+  if(cc) cc.textContent = contrib+'pp';
+  if(sl) sl.value = catW;
+  if(sv) sv.textContent = catW+'%';
+  if(mp) mp.textContent = catW > 0 ? catW+'%' : '—';
+  // Refresh all sub items too (catW changed → pp changes)
+  c.subs.forEach(s => refreshSubItem(c, s));
+}
+
+// Monto efectivo de un rubro: suma de subrubros si existen, sino monto del padre
+function getCatMonto(c) {
+  const subSum = c.subs.reduce((a,s) => a+(state[c.id+'_'+s.id]?.monto||0), 0);
+  return subSum > 0 ? subSum : (state[c.id]?.monto || 0);
+}
+
+function getTotalMoney() {
+  return CATS.reduce((a,c) => a + getCatMonto(c), 0);
+}
+
+function recalcFromMoney() {
+  const tot = getTotalMoney();
+  CATS.forEach(c => {
+    const subSum = c.subs.reduce((a,s) => a+(state[c.id+'_'+s.id]?.monto||0), 0);
+    if (subSum > 0) {
+      state[c.id].monto = subSum;
+      const montoInp = document.getElementById('monto-'+c.id);
+      if (montoInp && montoInp !== document.activeElement) montoInp.value = subSum || '';
+    }
+    const m = getCatMonto(c);
+    // Siempre 100%: cada rubro es su proporción del total gastado
+    const pct = tot > 0 && m > 0 ? Math.round((m / tot) * 100) : 0;
+    state[c.id].w = pct;
+    const mpct = document.getElementById('mpct-'+c.id);
+    if (mpct) mpct.textContent = pct > 0 ? pct+'%' : '—';
+    refreshCatHeader(c);
+    updateSubDistrib(c);
+  });
+  updateMain();
+}
+
+// ═══════════════════════════════════════════════
+// MAIN UPDATE
+// ═══════════════════════════════════════════════
+function updateMain() {
+  pushStateToActive(); // sincronizar state global → canasta activa
+  let totW=0, miIpc=0, catsAct=0;
+  CATS.forEach(c => {
+    const w = state[c.id]?.w||0;
+    totW += w;
+    miIpc += (w/100)*catEffIpc(c);
+    if(w>0) catsAct++;
+  });
+
+  const pf = document.getElementById('prog-fill');
+  const _hasMontos = getTotalMoney() > 0;
+  const _progPct = _hasMontos ? 100 : Math.min(totW, 100);
+  if(pf){ pf.style.width = _progPct+'%'; pf.classList.remove('over'); }
+  const pp = document.getElementById('prog-pct');
+  if(pp) pp.textContent = _hasMontos ? '100%' : totW+'%';
+  const totMoney = getTotalMoney();
+  document.getElementById('prog-monto').textContent = fmtPeso(totMoney);
+  document.getElementById('monto-total-val').textContent = fmtPeso(totMoney);
+  document.getElementById('cats-activas-val').textContent = catsAct;
+  const _warnHasMontos = getTotalMoney() > 0;
+  document.getElementById('warn-bar').classList.toggle('show', !_warnHasMontos && totW>100);
+
+  const oficial = ipcLastVal ? parseFloat((ipcLastVal + REGION_ADJ[region].adj).toFixed(1)) : null;
+  if(oficial !== null) {
+    document.getElementById('ipc-oficial-val').textContent = oficial.toFixed(1).replace('.',',') + '%';
+    document.getElementById('ipc-oficial-mes').textContent = ipcLastMes + ' · INDEC';
+  }
+
+  const heroNum = document.getElementById('hero-num');
+  const heroCap = document.getElementById('hero-cap');
+  if(totW === 0) {
+    heroNum.textContent = '—';
+    heroNum.className = 'hero-num empty';
+    heroCap.textContent = 'Registrá tus gastos para calcular';
+    document.getElementById('dif-val').textContent = '—';
+    document.getElementById('dif-val').className = 'sval';
+  } else {
+    const normed = (miIpc*100/totW).toFixed(2);
+    heroNum.innerHTML = normed.replace('.',',')+`<span class="hero-unit">%</span>`;
+    heroNum.className = 'hero-num';
+    heroCap.innerHTML = totW===100
+      ? `Canasta completa · Región: ${REGION_ADJ[region].label}`
+      : `Calculado sobre <em>${totW}%</em> de canasta · ${REGION_ADJ[region].label}`;
+
+    if(oficial !== null) {
+      const diff = (parseFloat(normed)-oficial).toFixed(2);
+      const sign = parseFloat(diff)>0?'+':'';
+      const difEl = document.getElementById('dif-val');
+      difEl.textContent = sign+diff.replace('.',',')+' pp';
+      const cls = parseFloat(diff)>0?'red':parseFloat(diff)<0?'green':'';
+      difEl.className = 'sval'+( cls ? ' '+cls : '');
+    }
+  }
+  buildContrib(miIpc, totW);
+}
+
+// Paleta de colores para la torta (10 rubros)
+const PIE_COLORS = [
+  '#C8F135', // accent lima
+  '#3DDC84', // green
+  '#5BC8FF', // blue
+  '#F5A623', // amber
+  '#B39DFF', // purple
+  '#FF7070', // red suave
+  '#FFD166', // yellow
+  '#A8E6CF', // mint
+  '#FF9F9F', // salmon
+  '#9BB3FF', // indigo
+];
+
+function buildPieChart(items) {
+  const wrap = document.getElementById('pie-wrap');
+  const emptyEl = document.getElementById('pie-empty');
+  const legendEl = document.getElementById('pie-legend');
+  if (!wrap || !legendEl) return;
+
+  const total = items.reduce((a,i) => a+i.w, 0);
+
+  if (total === 0) {
+    // Estado vacío
+    if (!emptyEl) {
+      wrap.innerHTML = '<div class="pie-empty" id="pie-empty">Cargá tus gastos para ver la distribución</div>';
+    } else {
+      emptyEl.style.display = 'flex';
+    }
+    // Quitar SVG si existe
+    const oldSvg = wrap.querySelector('svg');
+    const oldCenter = wrap.querySelector('.pie-center');
+    if (oldSvg) oldSvg.remove();
+    if (oldCenter) oldCenter.remove();
+    legendEl.innerHTML = '';
+    return;
+  }
+
+  // Ocultar empty
+  const empty = wrap.querySelector('.pie-empty');
+  if (empty) empty.style.display = 'none';
+
+  const R = 90;       // radio exterior
+  const r = 54;       // radio interior (donut)
+  const cx = 100; const cy = 100;
+  const gap = 0.018;  // gap en radianes entre segmentos
+
+  // Calcular segmentos
+  const segments = [];
+  let angle = 0;
+  items.forEach((it, i) => {
+    if (it.w <= 0) return;
+    const frac = it.w / total;
+    const sweep = frac * 2 * Math.PI - (frac < 1 ? gap : 0);
+    segments.push({ ...it, startAngle: angle, sweep, color: PIE_COLORS[i % PIE_COLORS.length], frac });
+    angle += frac * 2 * Math.PI;
+  });
+
+  // Generar paths SVG
+  function polarToXY(cx, cy, r, angle) {
+    return { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) };
+  }
+  function describeArc(cx, cy, R, r, startAngle, sweep) {
+    const endAngle = startAngle + sweep;
+    const p1 = polarToXY(cx, cy, R, startAngle);
+    const p2 = polarToXY(cx, cy, R, endAngle);
+    const p3 = polarToXY(cx, cy, r, endAngle);
+    const p4 = polarToXY(cx, cy, r, startAngle);
+    const large = sweep > Math.PI ? 1 : 0;
+    return `M ${p1.x} ${p1.y} A ${R} ${R} 0 ${large} 1 ${p2.x} ${p2.y} L ${p3.x} ${p3.y} A ${r} ${r} 0 ${large} 0 ${p4.x} ${p4.y} Z`;
+  }
+
+  let pathsHTML = '';
+  segments.forEach(seg => {
+    const d = describeArc(cx, cy, R, r, seg.startAngle, seg.sweep);
+    pathsHTML += `<path d="${d}" fill="${seg.color}" opacity="0.92"
+      data-name="${seg.name}" data-w="${seg.w}" data-ipc="${seg.ipc.toFixed(1)}"
+      style="cursor:pointer;transition:opacity .15s"
+      onmouseenter="pieHover(this, '${seg.name}', ${seg.w}, ${seg.ipc.toFixed(2)}, '${seg.color}')"
+      onmouseleave="pieReset()" />`;
+  });
+
+  // SVG completo
+  const svgHTML = `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">${pathsHTML}
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="var(--surf)"/>
+  </svg>`;
+
+  // Centro label
+  const centerHTML = `<div class="pie-center" id="pie-center">
+    <div class="pie-center-val" id="pie-c-val">${total}%</div>
+    <div class="pie-center-lbl" id="pie-c-lbl">canasta asignada</div>
+  </div>`;
+
+  // Remover SVG y center anteriores
+  const oldSvg = wrap.querySelector('svg');
+  const oldCenter = wrap.querySelector('.pie-center');
+  if (oldSvg) oldSvg.remove();
+  if (oldCenter) oldCenter.remove();
+
+  wrap.insertAdjacentHTML('beforeend', svgHTML + centerHTML);
+
+  // Leyenda
+  legendEl.innerHTML = segments.map(seg => `
+    <div class="pie-legend-item">
+      <span class="pie-legend-dot" style="background:${seg.color}"></span>
+      <span class="pie-legend-name">${seg.name.split(' y ')[0].split(' y')[0]}</span>
+      <span class="pie-legend-pct">${seg.w}%</span>
+    </div>`).join('');
+}
+
+function pieHover(el, name, w, ipc, color) {
+  const cVal = document.getElementById('pie-c-val');
+  const cLbl = document.getElementById('pie-c-lbl');
+  if (cVal) { cVal.textContent = w+'%'; cVal.style.color = color; }
+  if (cLbl) cLbl.textContent = name.length > 16 ? name.split(' ')[0] : name;
+  // Dim otros
+  el.closest('svg')?.querySelectorAll('path').forEach(p => {
+    p.style.opacity = p === el ? '1' : '0.3';
+  });
+}
+function pieReset() {
+  const items = CATS.map(c => ({ w: state[c.id]?.w||0 }));
+  const total = items.reduce((a,i) => a+i.w, 0);
+  const cVal = document.getElementById('pie-c-val');
+  const cLbl = document.getElementById('pie-c-lbl');
+  if (cVal) { cVal.textContent = total+'%'; cVal.style.color = 'var(--t1)'; }
+  if (cLbl) cLbl.textContent = 'canasta asignada';
+  document.querySelectorAll('#pie-wrap path').forEach(p => p.style.opacity = '0.92');
+}
+
+function buildContrib(miIpc, totW) {
+  const cont = document.getElementById('contrib-rows');
+  if(!cont) return;
+
+  const items = CATS.map((c, i) => {
+    const w = state[c.id]?.w||0;
+    const ipc = catEffIpc(c);
+    return { name: c.name, w, contrib: (w/100)*ipc, ipc, color: PIE_COLORS[i % PIE_COLORS.length] };
+  }).sort((a,b) => b.contrib-a.contrib);
+
+  // Torta con items en orden original (sin sort) para que coincidan los colores
+  const itemsForPie = CATS.map((c, i) => ({
+    name: c.name, w: state[c.id]?.w||0, ipc: catEffIpc(c), color: PIE_COLORS[i % PIE_COLORS.length]
+  })).filter(it => it.w > 0);
+  buildPieChart(itemsForPie);
+
+  // Barras de contribución (ordenadas por contribución)
+  const mx = Math.max(...items.map(i=>i.contrib), 0.01);
+  cont.innerHTML = items.map(it => {
+    const pct = Math.max(Math.round((it.contrib/mx)*100), it.contrib>0?2:0);
+    const col = it.contrib > 0 ? it.color : 'var(--b2)';
+    return `<div class="contrib-row">
+      <span class="contrib-nm" style="display:flex;align-items:center;gap:6px">
+        <span style="width:7px;height:7px;border-radius:50%;background:${col};flex-shrink:0;display:inline-block"></span>
+        ${it.name.split(' y ')[0]}
+      </span>
+      <div class="contrib-track"><div class="contrib-fill" style="width:${pct}%;background:${col}30;border-right:2px solid ${col}"></div></div>
+      <span class="contrib-v" style="color:${it.contrib>0?col:'var(--t3)'}">${it.contrib.toFixed(2).replace('.',',')}pp</span>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+// BUILD HISTORIAL RUBROS
+// ═══════════════════════════════════════════════
+function buildRubrosHist() {
+  const cont = document.getElementById('rubros-hist-rows');
+  if(!cont) return;
+  const sorted = [...IPC_DIVISIONES.divisiones].sort((a,b)=>b.v-a.v);
+  const mx = sorted[0].v;
+  document.getElementById('ctx-nucleo').textContent = IPC_DIVISIONES.nucleo;
+  document.getElementById('ctx-reg').textContent = IPC_DIVISIONES.regulados;
+  document.getElementById('ctx-est').textContent = IPC_DIVISIONES.estacionales;
+  cont.innerHTML = sorted.map(r => {
+    const pct = Math.round((r.v/mx)*100);
+    const col = barCol(r.v);
+    return `<div class="rt-row">
+      <div class="rt-name"><span class="rt-dot" style="background:${col}"></span>${r.name}</div>
+      <span class="rt-val" style="color:${col}">${r.v.toFixed(1).replace('.',',')}%</span>
+      <div class="rt-bar"><div class="rt-mini" style="width:${pct}%;max-width:120px;background:${col}22;border-right:2px solid ${col}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+// NAV & TABS
+// ═══════════════════════════════════════════════
+document.querySelectorAll('.nav-tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.nav-tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    const pid = 'panel-'+(t.dataset.panel);
+    document.getElementById(pid).classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+    if (t.dataset.panel === 'mi-historial') {
+      renderHistorial();
+    }
+    if (t.dataset.panel === 'familia') {
+      renderFamilyPanel();
+    }
+  });
+});
+
+document.querySelectorAll('.rbtn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.rbtn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    region = btn.dataset.r;
+    const ac = getActiveCanasta();
+    if (ac) ac.region = region;
+    CATS.forEach(c => {
+      const ipc = adj(c.ipc_base);
+      const head = document.getElementById('head-'+c.id);
+      if(head) {
+        const sub = head.querySelector('.cat-sub');
+        if(sub) sub.textContent = 'IPC oficial: '+ipc.toFixed(1).replace('.',',')+"%";
+        const pill = head.querySelector('.cat-pill');
+        if(pill){ pill.textContent=ipc.toFixed(1).replace('.',',')+'% mens.'; pill.className='cat-pill '+pillCls(ipc); }
+      }
+      refreshCatHeader(c);
+      updateSubDistrib(c);
+    });
+    updateMain();
+    saveCurrentState();
+  });
+});
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+function initApp() {
+  renderCanastaSelector();
+  buildCatGrid();
+  buildRubrosHist();
+  updateMain();
+  fetchIPC();
+  renderHistorial();
+  renderIPCStatus();
+  renderFamilyPanel();
+}
+
+// ═══════════════════════════════════════════════
+// HISTORIAL PERSONAL — SNAPSHOTS MENSUALES
+// ═══════════════════════════════════════════════
+const FREE_MONTHS_LIMIT = 3;
+const MONTH_NAMES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+function getHistorial() {
+  if (!currentUser) return [];
+  const key = 'mi_inflation_hist_' + btoa(currentUser.email);
+  try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) { return []; }
+}
+
+function saveHistorial(hist) {
+  if (!currentUser) return;
+  const key = 'mi_inflation_hist_' + btoa(currentUser.email);
+  localStorage.setItem(key, JSON.stringify(hist));
+}
+
+function getCurrentMonthKey() {
+  const now = new Date();
+  return now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+}
+
+function getCurrentMonthLabel() {
+  const now = new Date();
+  return MONTH_NAMES[now.getMonth()] + ' ' + now.getFullYear();
+}
+
+function computeCurrentIPC() {
+  let totW = 0, miIpc = 0;
+  CATS.forEach(c => {
+    const w = state[c.id]?.w || 0;
+    totW += w;
+    miIpc += (w/100) * catEffIpc(c);
+  });
+  if (totW === 0) return null;
+  return parseFloat((miIpc * 100 / totW).toFixed(2));
+}
+
+async function saveMonthSnapshot() {
+  // Si no hay sesión, mostrar modal de registro
+  if (!currentUser) {
+    showAuthModal('register');
+    return;
+  }
+  const hist = getHistorial();
+  const key = getCurrentMonthKey();
+  const ipcPersonal = computeCurrentIPC();
+
+  if (ipcPersonal === null) {
+    alert('Cargá al menos un rubro antes de guardar el mes.');
+    return;
+  }
+
+  // Verificar si ya existe este mes
+  const existing = hist.findIndex(h => h.key === key);
+
+  const topRubro = CATS.map(c => ({
+    name: c.name, w: state[c.id]?.w||0, monto: getCatMonto(c)
+  })).sort((a,b) => b.monto-a.monto)[0];
+
+  const snapshot = {
+    key,
+    label: getCurrentMonthLabel(),
+    date: new Date().toISOString(),
+    ipcPersonal,
+    ipcOficial: ipcLastVal || 2.1,
+    region: REGION_ADJ[region].label,
+    totalGasto: getTotalMoney(),
+    topRubro: topRubro?.name || '—',
+    rubros: CATS.map(c => ({
+      id: c.id, name: c.name,
+      w: state[c.id]?.w||0,
+      monto: getCatMonto(c),
+      ipc: catEffIpc(c)
+    })).filter(r => r.w > 0)
+  };
+
+  if (existing >= 0) {
+    if (!confirm('Ya tenés un registro para ' + snapshot.label + '. ¿Reemplazarlo?')) return;
+    hist[existing] = snapshot;
+  } else {
+    hist.unshift(snapshot); // más reciente primero
+  }
+
+  await saveMonthSnapshotDB(snapshot);
+  renderHistorial();
+
+  // Feedback visual en el botón
+  const btn = document.getElementById('btn-save-month');
+  if (btn) {
+    btn.textContent = '✓ Guardado';
+    btn.disabled = true;
+    setTimeout(() => { btn.textContent = 'Guardar mes actual'; btn.disabled = false; }, 2500);
+  }
+}
+
+async function deleteSnapshot(key) {
+  if (!confirm('¿Eliminar el registro de este mes?')) return;
+  await deleteSnapshotDB(key);
+  renderHistorial();
+}
+
+async function renderHistorial() {
+  const hist = await getHistorial();
+  const isPremium = false; // futura integración de pago
+
+  // Stats hero
+  const countEl = document.getElementById('mh-count');
+  const countSubEl = document.getElementById('mh-count-sub');
+  const acumPersonalEl = document.getElementById('mh-acum-personal');
+  const acumIndecEl = document.getElementById('mh-acum-indec');
+  const acumDiffEl = document.getElementById('mh-acum-diff');
+  const acumSubEl = document.getElementById('mh-acum-sub');
+
+  if (countEl) countEl.textContent = hist.length;
+  if (countSubEl) countSubEl.textContent = hist.length === 0 ? 'Guardá tu primer mes' : hist.length === 1 ? '1 mes registrado' : hist.length + ' meses registrados';
+
+  if (hist.length > 0) {
+    // Acumulado compuesto personal
+    const acumP = hist.reduce((acc, h) => acc * (1 + h.ipcPersonal/100), 1);
+    const acumI = hist.reduce((acc, h) => acc * (1 + h.ipcOficial/100), 1);
+    const ap = ((acumP - 1)*100).toFixed(1);
+    const ai = ((acumI - 1)*100).toFixed(1);
+    const diff = (parseFloat(ap) - parseFloat(ai)).toFixed(1);
+
+    if (acumPersonalEl) acumPersonalEl.textContent = ap + '%';
+    if (acumIndecEl) acumIndecEl.textContent = ai + '%';
+    if (acumDiffEl) {
+      const sign = parseFloat(diff) > 0 ? '+' : '';
+      acumDiffEl.textContent = sign + diff + 'pp';
+      acumDiffEl.className = 'sval ' + (parseFloat(diff) > 0 ? 'red' : parseFloat(diff) < 0 ? 'green' : '');
+    }
+    if (acumSubEl) acumSubEl.textContent = hist[hist.length-1].label + ' → ' + hist[0].label;
+  } else {
+    if (acumPersonalEl) acumPersonalEl.textContent = '—';
+    if (acumIndecEl) acumIndecEl.textContent = '—';
+    if (acumDiffEl) acumDiffEl.textContent = '—';
+  }
+
+  // Botón guardar
+  const currentKey = getCurrentMonthKey();
+  const alreadySaved = hist.some(h => h.key === currentKey);
+  const btn = document.getElementById('btn-save-month');
+  const btnTitle = document.getElementById('save-month-title');
+  const btnDesc = document.getElementById('save-month-desc');
+  if (btn) btn.textContent = alreadySaved ? 'Actualizar mes actual' : 'Guardar mes actual';
+  if (btnTitle) btnTitle.textContent = alreadySaved
+    ? 'Actualizar ' + getCurrentMonthLabel()
+    : 'Guardar canasta de ' + getCurrentMonthLabel();
+  if (btnDesc) btnDesc.textContent = alreadySaved
+    ? 'Ya tenés un registro guardado para este mes'
+    : 'Cargá tus gastos en "Mi canasta" y guardá el snapshot mensual';
+
+  // Tabla
+  renderHistTable(hist, isPremium);
+
+  // Gráfico
+  renderMiniBarChart(hist, isPremium);
+
+  // Banner premium
+  const banner = document.getElementById('premium-banner');
+  if (banner) banner.style.display = (!isPremium && hist.length > FREE_MONTHS_LIMIT) ? 'flex' : 'none';
+}
+
+function renderHistTable(hist, isPremium) {
+  const table = document.getElementById('mh-table');
+  if (!table) return;
+
+  if (hist.length === 0) {
+    table.innerHTML = '<div class="mh-table-empty" id="mh-table-empty"><p>Todavía no guardaste ningún mes.<br>Completá tu canasta y hacé click en "Guardar mes actual".</p></div>';
+    return;
+  }
+
+  // Límite freemium: los FREE_MONTHS_LIMIT más recientes son visibles
+  const visibleCount = isPremium ? hist.length : Math.min(hist.length, FREE_MONTHS_LIMIT);
+
+  let html = `<div class="mh-row-head">
+    <span>Mes</span>
+    <span>Tu IPC</span>
+    <span>INDEC</span>
+    <span>Diferencia</span>
+    <span>Rubro principal</span>
+    <span></span>
+  </div>`;
+
+  hist.forEach((h, i) => {
+    const diff = (h.ipcPersonal - h.ipcOficial).toFixed(2);
+    const sign = parseFloat(diff) > 0 ? '+' : '';
+    const diffClass = parseFloat(diff) > 0 ? 'pos' : parseFloat(diff) < 0 ? 'neg' : 'zero';
+    const ipcColor = h.ipcPersonal >= 3 ? 'var(--red)' : h.ipcPersonal >= 2 ? 'var(--amber)' : 'var(--green)';
+    const locked = !isPremium && i >= FREE_MONTHS_LIMIT;
+
+    html += `<div class="mh-row${locked ? ' locked' : ''}">
+      <span class="mh-mes">${h.label}</span>
+      <span class="mh-ipc-personal" style="color:${ipcColor}">${h.ipcPersonal.toFixed(2).replace('.',',')}%</span>
+      <span class="mh-ipc-indec">${h.ipcOficial.toFixed(1).replace('.',',')}%</span>
+      <span class="mh-diff ${diffClass}">${sign}${diff.replace('.',',')}pp</span>
+      <span class="mh-top-rubro">${h.topRubro}${h.totalGasto > 0 ? ' · $'+Math.round(h.totalGasto).toLocaleString('es-AR') : ''}</span>
+      <button class="mh-del" onclick="deleteSnapshot('${h.key}')" title="Eliminar">✕</button>
+    </div>`;
+  });
+
+  // Lock row si hay meses ocultos
+  if (!isPremium && hist.length > FREE_MONTHS_LIMIT) {
+    const locked = hist.length - FREE_MONTHS_LIMIT;
+    html += `<div class="mh-lock-row" onclick="showUpgrade()">
+      🔒 ${locked} mes${locked > 1 ? 'es' : ''} anterior${locked > 1 ? 'es' : ''} — desbloqueá con Premium
+    </div>`;
+  }
+
+  table.innerHTML = html;
+}
+
+function renderMiniBarChart(hist, isPremium) {
+  const chartBox = document.getElementById('mh-chart-box');
+  const empty = document.getElementById('mh-chart-empty');
+  const canvas = document.getElementById('mh-chart');
+  if (!chartBox || !canvas) return;
+
+  const visibleHist = isPremium ? hist : hist.slice(0, FREE_MONTHS_LIMIT);
+
+  if (visibleHist.length < 1) {
+    if (empty) empty.style.display = 'flex';
+    canvas.style.display = 'none';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+  canvas.style.display = 'block';
+
+  // Dibujar con Canvas API nativo
+  const dpr = window.devicePixelRatio || 1;
+  const W = chartBox.offsetWidth - 40;
+  const H = 200;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const reversed = [...visibleHist].reverse(); // cronológico
+  const allVals = reversed.flatMap(h => [h.ipcPersonal, h.ipcOficial]);
+  const maxVal = Math.max(...allVals, 4);
+  const PAD_TOP = 20; const PAD_BOT = 36; const PAD_SIDES = 20;
+  const chartH = H - PAD_TOP - PAD_BOT;
+  const chartW = W - PAD_SIDES * 2;
+  const groupW = chartW / reversed.length;
+  const barW = Math.min(groupW * 0.35, 22);
+
+  // Fondo grid
+  ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = PAD_TOP + chartH - (chartH / 4) * i;
+    ctx.beginPath(); ctx.moveTo(PAD_SIDES, y); ctx.lineTo(W - PAD_SIDES, y); ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,0.2)';
+    ctx.font = '9px monospace';
+    ctx.fillText(((maxVal/4)*i).toFixed(1)+'%', 2, y + 3);
+  }
+
+  // Barras
+  reversed.forEach((h, i) => {
+    const x = PAD_SIDES + groupW * i + groupW/2;
+
+    // Tu IPC
+    const hP = (h.ipcPersonal / maxVal) * chartH;
+    const accentColor = '#C8F135';
+    ctx.fillStyle = accentColor;
+    ctx.beginPath();
+    ctx.roundRect(x - barW - 2, PAD_TOP + chartH - hP, barW, hP, [3,3,0,0]);
+    ctx.fill();
+
+    // INDEC
+    const hI = (h.ipcOficial / maxVal) * chartH;
+    ctx.fillStyle = 'rgba(255,255,255,0.2)';
+    ctx.beginPath();
+    ctx.roundRect(x + 2, PAD_TOP + chartH - hI, barW, hI, [3,3,0,0]);
+    ctx.fill();
+
+    // Valores encima
+    ctx.fillStyle = accentColor;
+    ctx.font = 'bold 9px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(h.ipcPersonal.toFixed(1)+'%', x - barW/2 - 2, PAD_TOP + chartH - hP - 4);
+
+    // Label mes
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    ctx.font = '9px sans-serif';
+    const shortMonth = h.label.slice(0,3);
+    ctx.fillText(shortMonth, x, PAD_TOP + chartH + 14);
+
+    // Año si cambia
+    const yr = h.label.split(' ')[1];
+    ctx.fillStyle = 'rgba(255,255,255,0.2)';
+    ctx.font = '8px sans-serif';
+    ctx.fillText(yr, x, PAD_TOP + chartH + 24);
+    ctx.textAlign = 'left';
+  });
+}
+
+function showUpgrade() {
+  document.getElementById('upgrade-modal').style.display = 'flex';
+}
+function hideUpgrade() {
+  document.getElementById('upgrade-modal').style.display = 'none';
+}
+
+// Cerrar modal con ESC
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') hideUpgrade();
+});
+
+// ═══════════════════════════════════════════════
+// CALENDARIO IPC — cuándo sale el próximo dato
+// ═══════════════════════════════════════════════
+function getIPCPublishStatus() {
+  const now = new Date();
+  const day = now.getDate();
+  const month = now.getMonth(); // 0-indexed
+  const year = now.getFullYear();
+
+  // El INDEC publica entre el día 10 y 15 de cada mes
+  // Si hoy es entre 1 y 9 → el dato de este mes todavía no salió
+  // Si hoy es entre 10 y 15 → puede que salga hoy o estos días (zona de publicación)
+  // Si hoy es 16+ → el dato ya salió, el próximo es el mes que viene
+
+  const months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+  let status, daysToNext, nextMonth, nextYear, hint;
+
+  if (day < 10) {
+    // Esperando dato del mes anterior (que se publica ahora)
+    // Ej: estamos en junio 7 → el dato de mayo sale en ~10-15 de junio
+    const diasFaltantes = 10 - day;
+    const mesEspera = months[month > 0 ? month - 1 : 11];
+    status = 'waiting';
+    daysToNext = diasFaltantes;
+    hint = `Se espera el IPC de ${mesEspera} ${year} entre el 10 y 15 de ${months[month]}`;
+  } else if (day <= 15) {
+    // Zona de publicación: puede haber salido o salir hoy
+    status = 'published';
+    // Próximo: entre 10 y 15 del mes siguiente
+    nextMonth = months[(month + 1) % 12];
+    nextYear = month === 11 ? year + 1 : year;
+    const diasProximo = (month === 11 ? new Date(nextYear, 0, 10) : new Date(year, month+1, 10)) - now;
+    daysToNext = Math.max(0, Math.ceil(diasProximo / (1000*60*60*24)));
+    hint = `IPC de ${months[month]} sale en unos ${daysToNext} días`;
+  } else {
+    // Dato del mes ya salió, próximo es el mes que viene
+    nextMonth = months[(month + 1) % 12];
+    nextYear = month === 11 ? year + 1 : year;
+    const targetDate = month === 11 ? new Date(nextYear, 0, 12) : new Date(year, month+1, 12);
+    const diasProximo = targetDate - now;
+    daysToNext = Math.max(1, Math.ceil(diasProximo / (1000*60*60*24)));
+    status = 'expected';
+    hint = `El IPC de ${months[month]} ya fue publicado`;
+  }
+
+  return { status, daysToNext, hint, day, month, months };
+}
+
+function renderIPCStatus() {
+  const s = getIPCPublishStatus();
+  const dot = document.getElementById('ipc-dot');
+  const txt = document.getElementById('ipc-status-txt');
+  const nextRow = document.getElementById('ipc-status-next');
+  const nextTxt = document.getElementById('ipc-next-txt');
+  const hintRow = document.getElementById('ipc-status-hint');
+  const hintTxt = document.getElementById('ipc-hint-txt');
+
+  if (!dot || !txt) return;
+
+  dot.className = 'ipc-status-dot ' + s.status;
+
+  if (s.status === 'waiting') {
+    txt.innerHTML = `Dato pendiente: IPC de <b style="color:var(--t2)">${s.months[s.month > 0 ? s.month-1 : 11]}</b> — se publica en aprox. <b style="color:var(--amber)">${s.daysToNext} días</b>`;
+  } else if (s.status === 'published') {
+    txt.innerHTML = `✓ Zona de publicación activa — el INDEC puede publicar el IPC de <b style="color:var(--t2)">${s.months[s.month]}</b> hoy o en los próximos días`;
+  } else {
+    txt.innerHTML = `IPC publicado · Próximo dato en <b style="color:var(--t2)">${s.daysToNext} días</b>`;
+  }
+
+  if (hintRow && hintTxt) {
+    hintRow.style.display = 'flex';
+    hintTxt.textContent = s.hint;
+  }
+
+  // Update countdown en panel planes
+  const countdown = document.getElementById('ipc-cal-countdown');
+  const calSub = document.getElementById('ipc-cal-sub');
+  const calTitle = document.getElementById('ipc-cal-title');
+  const calDesc = document.getElementById('ipc-cal-desc');
+  const calIcon = document.getElementById('ipc-cal-icon');
+
+  if (countdown) {
+    if (s.status === 'published') {
+      countdown.textContent = '🟢';
+      countdown.className = 'ipc-cal-countdown';
+      if (calSub) calSub.textContent = 'publicando ahora';
+      if (calTitle) calTitle.textContent = 'El INDEC está publicando el IPC';
+      if (calDesc) calDesc.textContent = s.hint + ' — actualizá la app para ver el dato oficial';
+      if (calIcon) calIcon.textContent = '📡';
+    } else if (s.status === 'waiting') {
+      countdown.textContent = s.daysToNext;
+      countdown.className = 'ipc-cal-countdown soon';
+      if (calSub) calSub.textContent = 'días hasta la publicación';
+      if (calTitle) calTitle.textContent = 'Próxima publicación del IPC';
+      if (calDesc) calDesc.textContent = s.hint + '. Guardá tu canasta antes de que salga el dato.';
+    } else {
+      countdown.textContent = s.daysToNext;
+      countdown.className = 'ipc-cal-countdown';
+      if (calSub) calSub.textContent = 'días hasta el próximo IPC';
+      if (calTitle) calTitle.textContent = 'Próxima publicación del IPC';
+      if (calDesc) calDesc.textContent = s.hint + '. El plan Premium te avisa el día exacto.';
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════
+// CALCULADORA DE AJUSTE SALARIAL
+// ═══════════════════════════════════════════════
+function calcSalary() {
+  const salActual = parseFloat(document.getElementById('sal-actual')?.value) || 0;
+  const meses = parseInt(document.getElementById('sal-meses')?.value) || 3;
+
+  const perdidaEl = document.getElementById('sr-perdida');
+  const aumentoEl = document.getElementById('sr-aumento');
+  const equivEl = document.getElementById('sr-equiv');
+
+  if (salActual <= 0) {
+    if (perdidaEl) perdidaEl.textContent = '—';
+    if (aumentoEl) aumentoEl.textContent = '—';
+    if (equivEl) equivEl.textContent = '—';
+    return;
+  }
+
+  // Usar IPC personal si está calculado, sino IPC oficial
+  let ipcMensual;
+  const totW = CATS.reduce((a,c) => a+(state[c.id]?.w||0), 0);
+  if (totW > 0) {
+    let miIpc = 0;
+    CATS.forEach(c => { miIpc += ((state[c.id]?.w||0)/100)*catEffIpc(c); });
+    ipcMensual = (miIpc * 100 / totW) / 100;
+  } else {
+    ipcMensual = (ipcLastVal || 2.1) / 100;
+  }
+
+  // Inflación acumulada compuesta
+  const acumFactor = Math.pow(1 + ipcMensual, meses);
+  const salEquiv = salActual * acumFactor;
+  const perdidaAbs = salEquiv - salActual;
+  const perdidaPct = ((acumFactor - 1) * 100).toFixed(1);
+  const aumentoNecesario = ((acumFactor - 1) * 100).toFixed(1);
+
+  if (perdidaEl) {
+    perdidaEl.textContent = '-$' + Math.round(perdidaAbs).toLocaleString('es-AR');
+    perdidaEl.className = 'sr-val red';
+  }
+  if (aumentoEl) {
+    aumentoEl.textContent = '+' + aumentoNecesario + '%';
+    aumentoEl.className = 'sr-val accent';
+  }
+  if (equivEl) {
+    equivEl.textContent = '$' + Math.round(salEquiv).toLocaleString('es-AR');
+    equivEl.className = 'sr-val';
+  }
+}
+
+
+// ═══════════════════════════════════════════════
+// FLUJO DE PAGO
+// ═══════════════════════════════════════════════
+let selectedPlan = 'mensual';
+const PLAN_PRICES = { mensual: '$2.490', anual: '$19.900' };
+
+function selectPlan(plan) {
+  selectedPlan = plan;
+  document.querySelectorAll('.pay-plan-opt').forEach(el => el.style.borderColor = 'var(--b2)');
+  document.getElementById('opt-'+plan).style.borderColor = 'var(--accent)';
+}
+
+function goPayStep2() {
+  document.getElementById('pay-step-1').style.display = 'none';
+  document.getElementById('pay-step-2').style.display = 'block';
+  const label = selectedPlan === 'mensual' ? 'Suscripción mensual · $2.490' : 'Suscripción anual · $19.900';
+  const titleEl = document.getElementById('pay-step2-title');
+  if (titleEl) titleEl.textContent = label;
+  const amountEl = document.getElementById('pay-amount-display');
+  if (amountEl) amountEl.textContent = PLAN_PRICES[selectedPlan];
+}
+
+function goPayStep1() {
+  document.getElementById('pay-step-1').style.display = 'block';
+  document.getElementById('pay-step-2').style.display = 'none';
+}
+
+function selectPayMethod(method) {
+  document.querySelectorAll('.pay-method-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('pm-'+method).classList.add('active');
+  document.getElementById('pay-mp').style.display = method === 'mp' ? 'block' : 'none';
+  document.getElementById('pay-transfer').style.display = method === 'transfer' ? 'block' : 'none';
+}
+
+function copyText(text, el) {
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = el.textContent;
+    el.textContent = '✓ Copiado';
+    el.style.color = 'var(--green)';
+    setTimeout(() => { el.textContent = orig; el.style.color = ''; }, 1800);
+  }).catch(() => {
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+  });
+}
+
+// ═══════════════════════════════════════════════
+// EXPORT PDF MEJORADO — con gráficos y proyección
+// ═══════════════════════════════════════════════
+function goToMercadoPago() {
+  const amounts = { mensual: 2490, anual: 19900 };
+  const amount = amounts[selectedPlan] || 2490;
+  // Link de cobro de Mercado Pago — reemplazar con link real generado desde MP
+  // Por ahora redirige al perfil del alias con el monto precargado
+  const mpUrls = {
+    mensual: 'https://mpago.la/1SSjSf6',
+    anual:   'https://mpago.la/1kxiiNU'
+  };
+  const mpUrl = mpUrls[selectedPlan] || mpUrls.mensual;
+  window.open(mpUrl, '_blank');
+}
+
+function exportMonthReport() {
+  var hist = getHistorial();
+  if (hist.length === 0) { alert('No tenés meses guardados para exportar.'); return; }
+  var h = hist[0];
+  var ipcOf = ipcLastVal || 2.1;
+
+  // Proyección
+  var sum3 = 0, count3 = Math.min(hist.length, 3);
+  for (var i = 0; i < count3; i++) sum3 += hist[i].ipcPersonal;
+  var ipcProy = (sum3 / count3).toFixed(2);
+
+  var colors = ['#C8F135','#3DDC84','#5BC8FF','#F5A623','#B39DFF','#FF7070','#FFD166','#A8E6CF','#FF9F9F','#9BB3FF'];
+
+  // SVG torta
+  function buildPieSVG(rubros) {
+    var cx = 100, cy = 100, R = 88, r = 52;
+    var total = 0;
+    for (var i = 0; i < rubros.length; i++) total += rubros[i].w;
+    if (total === 0) return '<svg width="200" height="200"><circle cx="100" cy="100" r="88" fill="#eee"/></svg>';
+    var angle = -Math.PI / 2;
+    var paths = '<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">';
+    for (var i = 0; i < rubros.length; i++) {
+      var rb = rubros[i];
+      var sweep = (rb.w / total) * 2 * Math.PI;
+      var x1 = cx + R * Math.cos(angle), y1 = cy + R * Math.sin(angle);
+      var x2 = cx + R * Math.cos(angle + sweep), y2 = cy + R * Math.sin(angle + sweep);
+      var xi1 = cx + r * Math.cos(angle), yi1 = cy + r * Math.sin(angle);
+      var xi2 = cx + r * Math.cos(angle + sweep), yi2 = cy + r * Math.sin(angle + sweep);
+      var lg = sweep > Math.PI ? 1 : 0;
+      var col = colors[i % colors.length];
+      paths += '<path d="M ' + x1 + ' ' + y1 + ' A ' + R + ' ' + R + ' 0 ' + lg + ' 1 ' + x2 + ' ' + y2 +
+               ' L ' + xi2 + ' ' + yi2 + ' A ' + r + ' ' + r + ' 0 ' + lg + ' 0 ' + xi1 + ' ' + yi1 + ' Z" fill="' + col + '"/>';
+      angle += sweep;
+    }
+    paths += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="white"/>';
+    paths += '</svg>';
+    return paths;
+  }
+
+  // SVG barras horizontales
+  function buildBarSVG(rubros) {
+    var sorted = rubros.slice().sort(function(a,b){ return b.ipc - a.ipc; }).slice(0, 7);
+    var maxIpc = 0;
+    for (var i = 0; i < sorted.length; i++) if (sorted[i].ipc > maxIpc) maxIpc = sorted[i].ipc;
+    if (maxIpc < 4) maxIpc = 4;
+    var W = 500, barH = 24, gap = 10, padL = 145, padTop = 8;
+    var totalH = sorted.length * (barH + gap) + padTop + 10;
+    var svg = '<svg width="' + W + '" height="' + totalH + '" xmlns="http://www.w3.org/2000/svg">';
+    // Línea de IPC oficial de referencia
+    var xRef = padL + ((ipcOf / maxIpc) * (W - padL - 20));
+    svg += '<line x1="' + xRef + '" y1="0" x2="' + xRef + '" y2="' + totalH + '" stroke="#ccc" stroke-width="1" stroke-dasharray="4,3"/>';
+    svg += '<text x="' + (xRef+3) + '" y="10" font-size="9" fill="#aaa" font-family="sans-serif">INDEC ' + ipcOf.toFixed(1) + '%</text>';
+    for (var i = 0; i < sorted.length; i++) {
+      var rb = sorted[i];
+      var y = padTop + i * (barH + gap);
+      var bw = Math.max(2, (rb.ipc / maxIpc) * (W - padL - 20));
+      var col = rb.ipc >= 3 ? '#CC3333' : rb.ipc >= 2 ? '#E8A020' : '#339944';
+      var isTop = i === 0;
+      if (isTop) svg += '<rect x="' + padL + '" y="' + y + '" width="' + (W-padL-2) + '" height="' + barH + '" fill="#fffbe6" rx="3"/>';
+      svg += '<text x="0" y="' + (y + 16) + '" font-size="11" fill="' + (isTop?'#333':'#555') + '" font-weight="' + (isTop?'bold':'normal') + '" font-family="sans-serif">' + rb.name.slice(0,18) + (isTop?' ▲':'') + '</text>';
+      svg += '<rect x="' + padL + '" y="' + (y+3) + '" width="' + bw + '" height="' + (barH-6) + '" fill="' + col + '" rx="3"/>';
+      svg += '<text x="' + (padL+bw+4) + '" y="' + (y+16) + '" font-size="11" fill="' + col + '" font-weight="bold" font-family="monospace">' + rb.ipc.toFixed(1) + '%</text>';
+    }
+    svg += '</svg>';
+    return svg;
+  }
+
+  // Leyenda torta
+  function buildLegend(rubros) {
+    var html = '';
+    for (var i = 0; i < rubros.length; i++) {
+      var rb = rubros[i];
+      var col = colors[i % colors.length];
+      html += '<div style="display:flex;align-items:center;gap:6px;font-size:11px;margin-bottom:4px">' +
+              '<span style="width:9px;height:9px;border-radius:50%;background:' + col + ';flex-shrink:0;display:inline-block"></span>' +
+              '<span>' + rb.name + ' &mdash; <b>' + rb.w + '%</b></span></div>';
+    }
+    return html;
+  }
+
+  // Tabla de rubros
+  function buildTable(rubros) {
+    var sorted = rubros.slice().sort(function(a,b){ return b.ipc - a.ipc; });
+    var maxIpc = sorted.length > 0 ? sorted[0].ipc : 0;
+    var rows = '';
+    for (var i = 0; i < sorted.length; i++) {
+      var rb = sorted[i];
+      var contrib = ((rb.w / 100) * rb.ipc).toFixed(2);
+      var isTop = rb.ipc === maxIpc;
+      var bg = isTop ? ' style="background:#f4fae8;font-weight:600"' : '';
+      var montoStr = rb.monto > 0 ? '$' + Math.round(rb.monto).toLocaleString('es-AR') : '&mdash;';
+      rows += '<tr' + bg + '><td>' + rb.name + (isTop ? ' ▲' : '') + '</td>' +
+              '<td>' + rb.w + '%</td><td>' + montoStr + '</td>' +
+              '<td>' + rb.ipc.toFixed(1) + '%</td><td>' + contrib + 'pp</td></tr>';
+    }
+    return rows;
+  }
+
+  var diffVal = (h.ipcPersonal - h.ipcOficial).toFixed(2);
+  var diffSign = parseFloat(diffVal) > 0 ? '+' : '';
+  var diffCol = parseFloat(diffVal) > 0 ? '#CC3333' : '#339944';
+  var gastStr = h.totalGasto > 0 ? '$' + Math.round(h.totalGasto).toLocaleString('es-AR') : '&mdash;';
+  var perdMensual = Math.round(500000 * (parseFloat(ipcProy) / 100));
+  var acumProy = (h.ipcPersonal * 2).toFixed(1);
+  var today = new Date().toLocaleDateString('es-AR');
+
+  var pieSVG = buildPieSVG(h.rubros);
+  var barSVG = buildBarSVG(h.rubros);
+  var legendHTML = buildLegend(h.rubros);
+  var tableRows = buildTable(h.rubros);
+
+  var html = '<!DOCTYPE html><html lang="es"><head>' +
+    '<meta charset="UTF-8"><title>Mi Inflaci\u00f3n \u2014 ' + h.label + '</title>' +
+    '<style>' +
+    '*{box-sizing:border-box;margin:0;padding:0}' +
+    'body{font-family:Arial,sans-serif;background:#fff;color:#111;padding:40px;max-width:740px;margin:0 auto;font-size:14px}' +
+    '.hdr{display:flex;justify-content:space-between;align-items:start;margin-bottom:28px;padding-bottom:16px;border-bottom:2px solid #111}' +
+    '.hdr h1{font-size:20px;font-weight:700;margin-bottom:3px}' +
+    '.hdr .sub{font-size:11px;color:#666}' +
+    '.brand{font-size:17px;font-weight:900;text-align:right}' +
+    '.brand em{color:#5A8A00;font-style:normal}' +
+    '.kpis{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:24px}' +
+    '.kpi{border:1px solid #eee;border-radius:7px;padding:12px;background:#fafafa}' +
+    '.kpi.hi{border-color:#5A8A00;background:#f4fae8}' +
+    '.klbl{font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:#888;margin-bottom:4px}' +
+    '.kval{font-size:24px;font-weight:700;font-family:monospace;line-height:1}' +
+    '.kval.g{color:#5A8A00}.kval.r{color:#CC3333}' +
+    '.sec{margin-bottom:24px}' +
+    '.sec-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#888;margin-bottom:12px;padding-bottom:5px;border-bottom:1px solid #eee}' +
+    '.charts-row{display:grid;grid-template-columns:200px 1fr;gap:20px;align-items:center}' +
+    'table{width:100%;border-collapse:collapse;font-size:12px}' +
+    'th{text-align:left;padding:7px 9px;border-bottom:2px solid #eee;font-size:9px;text-transform:uppercase;letter-spacing:.05em;color:#888;background:#fafafa}' +
+    'td{padding:7px 9px;border-bottom:1px solid #f0f0f0}' +
+    '.proy{background:#f4fae8;border:1px solid #b8dc70;border-radius:7px;padding:16px;margin-bottom:24px}' +
+    '.proy-title{font-size:11px;font-weight:700;color:#3a5a00;margin-bottom:10px}' +
+    '.proy-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}' +
+    '.proy-grid label{font-size:9px;color:#5a7a00;display:block;margin-bottom:2px}' +
+    '.proy-grid .v{font-size:17px;font-weight:700;font-family:monospace;color:#3a5a00}' +
+    '.proy-note{font-size:10px;color:#5a7a00;margin-top:8px;font-style:italic}' +
+    '.footer{margin-top:24px;font-size:10px;color:#999;border-top:1px solid #eee;padding-top:10px;display:flex;justify-content:space-between}' +
+    '@media print{body{padding:20px}}' +
+    '</style></head><body>' +
+    '<div class="hdr"><div><h1>Reporte de Inflaci\u00f3n Personal</h1>' +
+    '<div class="sub">' + h.label + ' &nbsp;&middot;&nbsp; Regi\u00f3n: ' + h.region + ' &nbsp;&middot;&nbsp; Generado el ' + today + '</div></div>' +
+    '<div class="brand">MI<em>INFLACI\u00d3N</em><div style="font-size:10px;color:#999;margin-top:2px;font-weight:400">miinflacion.ar</div></div></div>' +
+    '<div class="kpis">' +
+    '<div class="kpi hi"><div class="klbl">Tu inflaci\u00f3n personal</div><div class="kval g">' + h.ipcPersonal.toFixed(2) + '%</div></div>' +
+    '<div class="kpi"><div class="klbl">IPC INDEC oficial</div><div class="kval">' + h.ipcOficial.toFixed(1) + '%</div></div>' +
+    '<div class="kpi"><div class="klbl">Diferencia</div><div class="kval" style="color:' + diffCol + '">' + diffSign + diffVal + 'pp</div></div>' +
+    '<div class="kpi"><div class="klbl">Gasto registrado</div><div class="kval" style="font-size:16px">' + gastStr + '</div></div>' +
+    '</div>' +
+    '<div class="sec"><div class="sec-title">Distribuci\u00f3n de tu canasta</div>' +
+    '<div class="charts-row">' + pieSVG + '<div>' + legendHTML + '</div></div></div>' +
+    '<div class="sec"><div class="sec-title">Rubros por IPC &mdash; el marcado con &#9650; impact\u00f3 m\u00e1s. L\u00ednea punteada = INDEC oficial</div>' +
+    barSVG + '</div>' +
+    '<div class="sec"><div class="sec-title">Detalle por rubro</div>' +
+    '<table><tr><th>Rubro</th><th>Peso</th><th>Gasto</th><th>IPC</th><th>Contribuci\u00f3n</th></tr>' + tableRows + '</table></div>' +
+    '<div class="proy"><div class="proy-title">&#128200; Proyecci\u00f3n mes siguiente</div>' +
+    '<div class="proy-grid">' +
+    '<div><label>IPC personal estimado</label><div class="v">~' + ipcProy + '%</div></div>' +
+    '<div><label>Acumulado proyectado (2 meses)</label><div class="v">~' + acumProy + '%</div></div>' +
+    '<div><label>P\u00e9rdida mensual (sueldo $500k)</label><div class="v">-$' + perdMensual.toLocaleString('es-AR') + '</div></div>' +
+    '</div><div class="proy-note">Estimaci\u00f3n basada en el promedio de tus \u00faltimos registros. No reemplaza el dato publicado por el INDEC.</div></div>' +
+    '<div class="footer"><span>Fuente: INDEC IPC ' + h.label + ' &middot; ArgentinaDatos API &middot; miinflacion.ar</span><span>Datos al ' + today + '</span></div>' +
+    '<script>setTimeout(function(){window.print();},400);<\/script>' +
+    '</body></html>';
+
+  var win = window.open('', '_blank');
+  if (!win) { alert('Permití las ventanas emergentes para exportar el PDF.'); return; }
+  win.document.open();
+  win.document.write(html);
+  win.document.close();
+}
+
+
+
+// ═══════════════════════════════════════════════
+// UI MULTI-CANASTA
+// ═══════════════════════════════════════════════
+
+function renderCanastaSelector() {
+  const c = getActiveCanasta();
+  if (!c) return;
+  const dot = document.getElementById('nav-canasta-dot');
+  const name = document.getElementById('nav-canasta-name');
+  if (dot) dot.className = 'cdi-dot cc-' + activeCanastaIdx;
+  if (name) name.textContent = c.name;
+  renderCanastaList();
+}
+
+function renderCanastaList() {
+  const list = document.getElementById('canasta-list');
+  if (!list) return;
+  list.innerHTML = canastas.map((c, i) => {
+    const ipc = calcCanastaIPC(c);
+    const ipcStr = ipc > 0 ? ipc.toFixed(2)+'%' : '—';
+    return `<div class="canasta-dropdown-item${i===activeCanastaIdx?' active-c':''}" onclick="switchCanasta(${i})">
+      <span class="cdi-dot cc-${i}"></span>
+      <span class="cdi-name">${c.name}</span>
+      <span class="cdi-ipc">${ipcStr}</span>
+      ${canastas.length > 1 ? `<button class="cdi-del" onclick="deleteCanasta(event,${i})" title="Eliminar">✕</button>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function toggleCanastaDropdown(e) {
+  e.stopPropagation();
+  const dd = document.getElementById('canasta-dropdown');
+  const addForm = document.getElementById('canasta-add-form');
+  if (!dd) return;
+  const isOpen = dd.style.display !== 'none';
+  dd.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) {
+    renderCanastaList();
+    if (addForm) addForm.style.display = 'none';
+  }
+}
+
+function showAddCanasta(e) {
+  if (e) e.stopPropagation();
+  const isPremium = false; // futura integración
+  if (!isPremium && canastas.length >= MAX_CANASTAS_FREE) {
+    showUpgrade();
+    return;
+  }
+  const dd = document.getElementById('canasta-dropdown');
+  const addForm = document.getElementById('canasta-add-form');
+  if (dd) dd.style.display = 'block';
+  if (addForm) addForm.style.display = 'flex';
+  const inp = document.getElementById('canasta-name-inp');
+  if (inp) { inp.value = ''; inp.focus(); }
+}
+
+function createCanasta() {
+  const inp = document.getElementById('canasta-name-inp');
+  const name = inp ? inp.value.trim() : '';
+  if (!name) return;
+  if (canastas.length >= MAX_CANASTAS_PRO) { showUpgrade(); return; }
+  const newC = {
+    id: 'c' + Date.now(),
+    name,
+    state: makeEmptyState(),
+    region: 'nacional'
+  };
+  canastas.push(newC);
+  switchCanasta(canastas.length - 1);
+  document.getElementById('canasta-dropdown').style.display = 'none';
+  saveCurrentState();
+}
+
+function switchCanasta(idx) {
+  if (idx === activeCanastaIdx) {
+    document.getElementById('canasta-dropdown').style.display = 'none';
+    return;
+  }
+  // Guardar estado actual antes de cambiar
+  pushStateToActive();
+  activeCanastaIdx = idx;
+  syncActiveAliases();
+  document.getElementById('canasta-dropdown').style.display = 'none';
+  // Re-render toda la UI con la nueva canasta
+  rebuildAppForCanasta();
+  saveCurrentState();
+}
+
+function deleteCanasta(e, idx) {
+  e.stopPropagation();
+  if (canastas.length <= 1) return;
+  if (!confirm('¿Eliminar la canasta "' + canastas[idx].name + '"?')) return;
+  canastas.splice(idx, 1);
+  if (activeCanastaIdx >= canastas.length) activeCanastaIdx = canastas.length - 1;
+  syncActiveAliases();
+  renderCanastaSelector();
+  rebuildAppForCanasta();
+  saveCurrentState();
+}
+
+function rebuildAppForCanasta() {
+  initState();
+  renderCanastaSelector();
+  // Actualizar selector de región
+  const c = getActiveCanasta();
+  document.querySelectorAll('.rbtn').forEach(b => {
+    b.classList.toggle('active', b.dataset.r === (c?.region || 'nacional'));
+  });
+  buildCatGrid();
+  updateMain();
+  renderFamilyPanel();
+}
+
+// Cerrar dropdown al click afuera
+document.addEventListener('click', () => {
+  const dd = document.getElementById('canasta-dropdown');
+  if (dd) dd.style.display = 'none';
+});
+
+// Enter en el input de nombre
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.activeElement?.id === 'canasta-name-inp') createCanasta();
+});
+
+// ═══════════════════════════════════════════════
+// PANEL FAMILIAR — render
+// ═══════════════════════════════════════════════
+function calcCanastaIPC(canasta) {
+  let totW = 0, ipc = 0;
+  const adj_r = v => parseFloat((v + (REGION_ADJ[canasta.region || 'nacional']?.adj || 0)).toFixed(1));
+  CATS.forEach(c => {
+    const w = canasta.state[c.id]?.w || 0;
+    totW += w;
+    // Calcular IPC efectivo del rubro para esta canasta
+    const subTotMonto = c.subs.reduce((a,s) => a+(canasta.state[c.id+'_'+s.id]?.monto||0), 0);
+    let rubIpc;
+    if (subTotMonto > 0) {
+      rubIpc = c.subs.reduce((a,s) => {
+        const sm = canasta.state[c.id+'_'+s.id]?.monto || 0;
+        return a + (sm/subTotMonto)*adj_r(s.ipc);
+      }, 0);
+    } else {
+      const subTotW = c.subs.reduce((a,s) => a+(canasta.state[c.id+'_'+s.id]?.w||0), 0);
+      rubIpc = subTotW > 0
+        ? c.subs.reduce((a,s) => a+((canasta.state[c.id+'_'+s.id]?.w||0)/subTotW)*adj_r(s.ipc), 0)
+        : adj_r(c.ipc_base);
+    }
+    ipc += (w/100)*rubIpc;
+  });
+  return totW > 0 ? parseFloat((ipc*100/totW).toFixed(2)) : 0;
+}
+
+function canastaTotalGasto(canasta) {
+  return CATS.reduce((a,c) => {
+    const subSum = c.subs.reduce((s2,s) => s2+(canasta.state[c.id+'_'+s.id]?.monto||0), 0);
+    return a + (subSum > 0 ? subSum : (canasta.state[c.id]?.monto||0));
+  }, 0);
+}
+
+function renderFamilyPanel() {
+  const cardsEl = document.getElementById('family-cards');
+  const emptyEl = document.getElementById('family-empty');
+  const combinedEl = document.getElementById('family-combined');
+  const compWrap = document.getElementById('family-comparison-wrap');
+  const gateEl = document.getElementById('family-premium-gate');
+  if (!cardsEl) return;
+
+  const isPremium = false;
+  const hasMultiple = canastas.length > 1;
+
+  // Premium gate
+  if (gateEl) gateEl.style.display = (!isPremium && canastas.length >= MAX_CANASTAS_FREE) ? 'block' : 'none';
+
+  if (!hasMultiple) {
+    emptyEl && (emptyEl.style.display = 'block');
+    combinedEl && (combinedEl.style.display = 'none');
+    compWrap && (compWrap.style.display = 'none');
+    cardsEl.innerHTML = '';
+    cardsEl.appendChild(emptyEl);
+    return;
+  }
+  if (emptyEl) emptyEl.style.display = 'none';
+
+  // Calcular IPCs y gastos
+  const canastaData = canastas.map((c, i) => ({
+    ...c, idx: i,
+    ipc: calcCanastaIPC(c),
+    gasto: canastaTotalGasto(c),
+    color: CANASTA_COLORS[i % CANASTA_COLORS.length]
+  }));
+
+  // IPC combinado ponderado por gasto
+  const totalGasto = canastaData.reduce((a,c) => a+c.gasto, 0);
+  let ipcCombinado = 0;
+  if (totalGasto > 0) {
+    ipcCombinado = canastaData.reduce((a,c) => a + (c.gasto/totalGasto)*c.ipc, 0);
+  } else {
+    ipcCombinado = canastaData.reduce((a,c) => a+c.ipc, 0) / canastaData.length;
+  }
+
+  // Mostrar IPC combinado
+  if (combinedEl) combinedEl.style.display = 'flex';
+  const combVal = document.getElementById('family-ipc-combined');
+  if (combVal) combVal.textContent = ipcCombinado.toFixed(2) + '%';
+
+  // Mini barras de contribución por canasta
+  const miniBars = document.getElementById('family-mini-bars');
+  if (miniBars) {
+    miniBars.innerHTML = canastaData.map(c => `
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <span style="font-size:11px;color:var(--t2);width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.name}</span>
+        <div style="flex:1;height:4px;background:var(--b2);border-radius:2px;overflow:hidden">
+          <div style="height:100%;width:${Math.min((c.ipc/5)*100,100)}%;background:${c.color};border-radius:2px"></div>
+        </div>
+        <span style="font-family:var(--mono);font-size:11px;font-weight:700;color:${c.color};min-width:40px;text-align:right">${c.ipc.toFixed(2)}%</span>
+      </div>`).join('');
+  }
+
+  // Cards individuales
+  const maxIpc = Math.max(...canastaData.map(c=>c.ipc), 0.1);
+  cardsEl.innerHTML = '';
+  if (emptyEl) cardsEl.appendChild(emptyEl);
+  canastaData.forEach(c => {
+    // Top 3 rubros con gasto
+    const topRubros = CATS.map(cat => ({
+      name: cat.name.split(' y ')[0].split(' ')[0],
+      w: c.state[cat.id]?.w || 0
+    })).filter(r=>r.w>0).sort((a,b)=>b.w-a.w).slice(0,3);
+
+    const card = document.createElement('div');
+    card.className = 'family-card' + (c.idx===activeCanastaIdx?' fc-active':'');
+    card.onclick = () => { switchCanasta(c.idx); document.querySelector('[data-panel="canasta"]').click(); };
+    card.innerHTML = `
+      <div class="fc-header">
+        <span class="fc-dot" style="background:${c.color}"></span>
+        <span class="fc-name">${c.name}</span>
+        <span class="fc-region">${REGION_ADJ[c.region||'nacional'].label}</span>
+      </div>
+      <div class="fc-ipc" style="color:${c.color}">${c.ipc > 0 ? c.ipc.toFixed(2)+'%' : '—'}</div>
+      <div class="fc-ipc-sub">inflación personal mensual${c.gasto>0?' · $'+Math.round(c.gasto).toLocaleString('es-AR'):''}</div>
+      <div class="fc-bar-wrap"><div class="fc-bar-fill" style="width:${Math.round((c.ipc/maxIpc)*100)}%;background:${c.color}"></div></div>
+      <div class="fc-rubros">
+        ${topRubros.map(r=>`<div class="fc-rubro-row"><span class="fc-rubro-dot" style="background:${c.color}"></span><span class="fc-rubro-nm">${r.name}</span><span class="fc-rubro-pct">${r.w}%</span></div>`).join('')}
+        ${topRubros.length===0?'<div style="font-size:11px;color:var(--t3)">Sin gastos cargados</div>':''}
+      </div>
+      <div style="margin-top:12px;font-size:11px;color:var(--t3)">Click para editar esta canasta →</div>
+    `;
+    cardsEl.appendChild(card);
+  });
+
+  // Comparativa por rubro
+  if (compWrap) compWrap.style.display = 'block';
+  const compRows = document.getElementById('family-comp-rows');
+  if (compRows) {
+    const colDefs = 'grid-template-columns: 120px ' + canastaData.map(()=>'1fr').join(' ');
+    let html = `<div class="fc-comp-row" style="${colDefs}">
+      <span style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em">Rubro</span>
+      ${canastaData.map(c=>`<span style="font-size:11px;font-weight:600;color:${c.color};text-align:right">${c.name}</span>`).join('')}
+    </div>`;
+    CATS.forEach(cat => {
+      const hasAny = canastaData.some(c => (c.state[cat.id]?.w||0) > 0);
+      if (!hasAny) return;
+      html += `<div class="fc-comp-row" style="${colDefs}">
+        <span class="fc-comp-rubro">${cat.name.split(' y ')[0]}</span>
+        ${canastaData.map(c=>{
+          const w = c.state[cat.id]?.w||0;
+          return `<span style="font-family:var(--mono);font-size:12px;font-weight:${w>0?'600':'400'};color:${w>0?c.color:'var(--t3)'};text-align:right">${w>0?w+'%':'—'}</span>`;
+        }).join('')}
+      </div>`;
+    });
+    compRows.innerHTML = html;
+  }
+}
+
+// ═══════════════════════════════════════════════
+// MODAL DE AUTH (para usuarios en demo mode)
+// ═══════════════════════════════════════════════
+function showAuthModal(tab) {
+  const modal = document.getElementById('auth-modal');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  switchModalTab(tab || 'register');
+}
+
+function hideAuthModal() {
+  const modal = document.getElementById('auth-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function switchModalTab(tab) {
+  const isRegister = tab === 'register';
+  const trEl = document.getElementById('modal-tab-register');
+  const tlEl = document.getElementById('modal-tab-login');
+  const frEl = document.getElementById('modal-form-register');
+  const flEl = document.getElementById('modal-form-login');
+  const title = document.getElementById('auth-modal-title');
+  const sub = document.getElementById('auth-modal-sub');
+  if (trEl) trEl.classList.toggle('active', isRegister);
+  if (tlEl) tlEl.classList.toggle('active', !isRegister);
+  if (frEl) frEl.style.display = isRegister ? 'flex' : 'none';
+  if (flEl) flEl.style.display = !isRegister ? 'flex' : 'none';
+  if (title) title.textContent = isRegister ? 'Creá tu cuenta gratis' : 'Ingresá a tu cuenta';
+  if (sub) sub.textContent = isRegister
+    ? 'Tu canasta actual se guarda automáticamente y podés acceder desde cualquier dispositivo.'
+    : 'Ingresá para recuperar tu canasta guardada.';
+  // Limpiar errores
+  ['mr-error','mr-success','ml-error'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('show');
+  });
+}
+
+async function doModalRegister() {
+  const name  = document.getElementById('mr-name')?.value.trim();
+  const email = document.getElementById('mr-email')?.value.trim().toLowerCase();
+  const pass  = document.getElementById('mr-pass')?.value;
+  const errEl = document.getElementById('mr-error');
+  const sucEl = document.getElementById('mr-success');
+  if (!name || !email || !pass) return showError('mr-error', 'Completá todos los campos');
+  if (pass.length < 6) return showError('mr-error', 'La contraseña debe tener al menos 6 caracteres');
+  showAuthLoading('Creando tu cuenta…');
+  const { data, error } = await _sb.auth.signUp({
+    email, password: pass,
+    options: { data: { full_name: name } }
+  });
+  hideAuthLoading();
+  if (error) return showError('mr-error', error.message);
+  if (data?.user) {
+    await loginSuccess(data.user);
+  } else {
+    if (sucEl) { sucEl.textContent = '¡Cuenta creada! Revisá tu email para confirmar.'; sucEl.classList.add('show'); }
+  }
+}
+
+async function doModalLogin() {
+  const email = document.getElementById('ml-email')?.value.trim().toLowerCase();
+  const pass  = document.getElementById('ml-pass')?.value;
+  if (!email || !pass) return showError('ml-error', 'Completá todos los campos');
+  showAuthLoading('Iniciando sesión…');
+  const { data, error } = await _sb.auth.signInWithPassword({ email, password: pass });
+  hideAuthLoading();
+  if (error) return showError('ml-error', error.message === 'Invalid login credentials' ? 'Email o contraseña incorrectos' : error.message);
+  // onAuthStateChange se encarga
+}
+
+async function doModalForgot() {
+  const email = document.getElementById('ml-email')?.value.trim().toLowerCase();
+  if (!email) return showError('ml-error', 'Ingresá tu email primero');
+  await _sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.href });
+  const errEl = document.getElementById('ml-error');
+  if (errEl) { errEl.textContent = 'Te enviamos un email para restablecer tu contraseña.'; errEl.style.color='var(--green)'; errEl.classList.add('show'); }
+}
+
+// Enter keys en el modal
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    if (document.activeElement?.id === 'mr-pass') doModalRegister();
+    if (document.activeElement?.id === 'ml-pass') doModalLogin();
+  }
+});
+
+
+// ═══════════════════════════════════════════════
+// CONTADOR DE GASTOS POR SUBRUBRO
+// ═══════════════════════════════════════════════
+function addSubMonto(catId, subId) {
+  const inp = document.getElementById('sub-quick-' + catId + '-' + subId);
+  if (!inp) return;
+  const amount = parseFloat(inp.value) || 0;
+  if (amount <= 0) { inp.focus(); return; }
+
+  const sk = catId + '_' + subId;
+  if (!state[sk]) state[sk] = { w: 0, monto: 0 };
+  state[sk].monto = (state[sk].monto || 0) + amount;
+
+  const ac = getActiveCanasta();
+  if (ac) {
+    if (!ac.state[sk]) ac.state[sk] = { w: 0, monto: 0 };
+    ac.state[sk].monto = state[sk].monto;
+  }
+
+  inp.value = '';
+
+  // Mostrar acumulado
+  const acumRow = document.getElementById('sub-acum-row-' + catId + '-' + subId);
+  const acumVal = document.getElementById('sub-acum-val-' + catId + '-' + subId);
+  if (acumRow) acumRow.style.display = 'flex';
+  if (acumVal) acumVal.textContent = '$' + Math.round(state[sk].monto).toLocaleString('es-AR');
+
+  // Actualizar % internos en los headers de todos los subrubros del rubro
+  const cat = CATS.find(c => c.id === catId);
+  if (cat) {
+    recalcSubWeightsFromMoney(cat);
+    const subTotMonto = cat.subs.reduce((a,s) => a+(state[catId+'_'+s.id]?.monto||0), 0);
+    cat.subs.forEach(s => {
+      const sm2 = state[catId+'_'+s.id]?.monto || 0;
+      const pctEl = document.getElementById('sub-pct-' + catId + '-' + s.id);
+      if (pctEl) {
+        const pct = subTotMonto > 0 ? Math.round((sm2/subTotMonto)*100) : 0;
+        pctEl.textContent = pct > 0 ? pct+'%' : '—';
+      }
+    });
+  }
+
+  recalcFromMoney();
+
+  // Feedback
+  const wrap = document.getElementById('sub-quick-' + catId + '-' + subId)?.parentElement;
+  if (wrap) { wrap.style.borderColor='var(--accent)'; setTimeout(()=>{wrap.style.borderColor='';},500); }
+
+  saveCurrentState();
+}
+
+function resetSubMonto(catId, subId) {
+  if (!confirm('¿Reiniciar el acumulado de este subrubro?')) return;
+  const sk = catId + '_' + subId;
+  if (state[sk]) state[sk].monto = 0;
+  const ac = getActiveCanasta();
+  if (ac && ac.state[sk]) ac.state[sk].monto = 0;
+
+  const acumRow = document.getElementById('sub-acum-row-' + catId + '-' + subId);
+  if (acumRow) acumRow.style.display = 'none';
+
+  const cat = CATS.find(c => c.id === catId);
+  if (cat) recalcSubWeightsFromMoney(cat);
+  recalcFromMoney();
+  saveCurrentState();
+}
+
+function showFamilyAddForm() {
+  const isPremium = false;
+  if (!isPremium && canastas.length >= MAX_CANASTAS_PRO) { showUpgrade(); return; }
+  if (!isPremium && canastas.length >= MAX_CANASTAS_FREE) { showUpgrade(); return; }
+  const form = document.getElementById('family-add-form');
+  if (form) {
+    form.style.display = 'block';
+    const inp = document.getElementById('family-name-inp');
+    if (inp) { inp.value = ''; inp.focus(); }
+  }
+}
+
+function hideFamilyAddForm() {
+  const form = document.getElementById('family-add-form');
+  if (form) form.style.display = 'none';
+}
+
+function submitFamilyAdd() {
+  const inp = document.getElementById('family-name-inp');
+  const name = inp ? inp.value.trim() : '';
+  if (!name) { if(inp) inp.focus(); return; }
+  if (canastas.length >= MAX_CANASTAS_PRO) { showUpgrade(); return; }
+  const newC = {
+    id: 'c' + Date.now(),
+    name,
+    state: makeEmptyState(),
+    region: 'nacional'
+  };
+  canastas.push(newC);
+  hideFamilyAddForm();
+  renderFamilyPanel();
+  renderCanastaSelector();
+  saveCurrentState();
+}
+
+// Boot
+checkSession();
+</script>
+</body>
+</html>
