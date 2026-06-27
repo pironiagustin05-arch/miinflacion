@@ -4361,7 +4361,11 @@ async function fetchMacro() {
 
     // Una sola llamada al proxy — sin CORS, sin bloqueos
     const res = await fetch(MACRO_PROXY, {
-      headers: { 'apikey': SUPABASE_KEY }
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'application/json'
+      }
     });
 
     if (!res.ok) throw new Error('proxy ' + res.status);
@@ -4387,8 +4391,7 @@ async function fetchMacro() {
     setMacro('mc-reservas', '—', '');
     const tsEl = document.getElementById('arg-last-update');
     if (tsEl) tsEl.textContent = 'Sin conexión — reintentando';
-    // Reintentar en 30 segundos
-    setTimeout(fetchMacro, 30000);
+    // No reintentar automáticamente para no spamear la consola
   } finally {
     document.querySelectorAll('.macro-card.loading').forEach(c => c.classList.remove('loading'));
   }
