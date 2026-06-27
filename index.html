@@ -4678,13 +4678,7 @@ async function fetchMacro() {
     if (tsEl) tsEl.textContent = 'Actualizando…';
 
     // Una sola llamada al proxy — sin CORS, sin bloqueos
-    const res = await fetch(MACRO_PROXY, {
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': 'Bearer ' + SUPABASE_KEY,
-        'Content-Type': 'application/json'
-      }
-    });
+    const res = await fetch(MACRO_PROXY);
 
     if (!res.ok) throw new Error('proxy ' + res.status);
     const data = await res.json();
