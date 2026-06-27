@@ -70,30 +70,96 @@ body{background:var(--bg);color:var(--t1);font-family:var(--sans);min-height:100
 .slogan-banner-a strong{color:var(--accent);font-weight:700}
 
 /* ══════════════ APP SCREEN ══════════════ */
-#screen-app{flex-direction:column}
+#screen-app{flex-direction:column;overflow:hidden}
 
-/* NAV */
-nav{position:sticky;top:0;z-index:100;background:rgba(11,11,11,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--b1);height:54px;display:flex;align-items:center;padding:0 2rem;gap:0}
-.nav-brand{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--accent);text-decoration:none;margin-right:auto;letter-spacing:.01em;display:flex;align-items:center;gap:6px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ══ TOPBAR ══ */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  height:52px;background:rgba(11,11,11,.96);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--b1);
+  display:flex;align-items:center;padding:0 16px 0 0;gap:0;
+}
+.nav-brand{
+  font-family:var(--mono);font-size:13px;font-weight:700;
+  color:var(--accent);letter-spacing:.01em;
+  display:flex;align-items:center;gap:6px;
+  padding:0 20px;height:100%;border-right:1px solid var(--b1);
+  flex-shrink:0;
+}
 .nav-brand span{color:var(--t2);font-weight:300}
-.nav-tabs{display:flex;height:100%;gap:0}
-.nav-tab{font-size:13px;color:var(--t3);background:none;border:none;border-bottom:2px solid transparent;height:100%;padding:0 16px;cursor:pointer;font-family:var(--sans);transition:color .15s,border-color .15s;display:flex;align-items:center;gap:6px}
-.nav-tab:hover{color:var(--t2)}
-.nav-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
-.nav-badge{font-size:9px;background:var(--accent);color:#000;font-weight:800;padding:2px 5px;border-radius:4px;letter-spacing:.03em}
-.nav-right{display:flex;align-items:center;gap:12px;margin-left:24px}
+.topbar-mid{flex:1;display:flex;align-items:center;padding:0 20px;gap:14px}
+.ipc-ticker{font-family:var(--mono);font-size:11px;color:var(--t3);display:flex;align-items:center;gap:6px}
+.ipc-ticker .live-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
+.topbar-right{display:flex;align-items:center;gap:10px;padding-left:16px}
 .nav-user{font-size:12px;color:var(--t2)}
 .nav-user b{color:var(--t1)}
 .btn-logout{font-size:11px;color:var(--t3);background:none;border:1px solid var(--b2);border-radius:6px;padding:4px 10px;cursor:pointer;font-family:var(--sans);transition:all .15s}
 .btn-logout:hover{border-color:var(--b3);color:var(--t2)}
-.ipc-ticker{font-family:var(--mono);font-size:11px;color:var(--t3);display:flex;align-items:center;gap:6px;padding:0 14px;border-left:1px solid var(--b1)}
-.ipc-ticker .live-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.nav-badge{font-size:9px;background:var(--accent);color:#000;font-weight:800;padding:2px 5px;border-radius:4px;letter-spacing:.03em}
+
+/* ══ LAYOUT PRINCIPAL ══ */
+.app-layout{display:flex;min-height:100vh;padding-top:52px}
+
+/* ══ SIDEBAR ══ */
+.sidebar{
+  position:fixed;top:52px;left:0;bottom:0;z-index:100;
+  width:220px;background:var(--surf);border-right:1px solid var(--b1);
+  display:flex;flex-direction:column;
+  transition:width .22s cubic-bezier(.4,0,.2,1);
+  overflow:hidden;
+}
+.sidebar-nav::-webkit-scrollbar{width:3px}
+.sidebar-nav::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+.sidebar.collapsed{width:56px}
+.sidebar-toggle{
+  display:flex;align-items:center;justify-content:flex-end;
+  padding:10px 12px;border-bottom:1px solid var(--b1);flex-shrink:0;
+}
+.sidebar.collapsed .sidebar-toggle{justify-content:center}
+.toggle-btn{
+  background:none;border:none;color:var(--t3);cursor:pointer;
+  font-size:16px;padding:4px;border-radius:5px;transition:all .15s;line-height:1;
+}
+.toggle-btn:hover{background:var(--surf2);color:var(--t1)}
+.sidebar-nav{display:flex;flex-direction:column;gap:2px;padding:10px 8px;flex:1;overflow-y:auto}
+.nav-tab{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 10px;border-radius:8px;cursor:pointer;
+  background:none;border:none;color:var(--t3);
+  font-size:13px;font-family:var(--sans);font-weight:500;
+  transition:all .15s;white-space:nowrap;overflow:hidden;
+  text-align:left;width:100%;
+}
+.nav-tab:hover{background:var(--surf2);color:var(--t2)}
+.nav-tab.active{background:var(--accent-bg);color:var(--accent)}
+.nav-tab .tab-icon{font-size:16px;flex-shrink:0;width:20px;text-align:center}
+.nav-tab .tab-label{overflow:hidden;text-overflow:ellipsis;transition:opacity .2s}
+.sidebar.collapsed .tab-label{opacity:0;width:0;pointer-events:none}
+.sidebar.collapsed .nav-tab{justify-content:center;padding:9px 0}
+.sidebar-divider{height:1px;background:var(--b1);margin:6px 8px}
+.sidebar-section-lbl{
+  font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--t3);padding:6px 10px 2px;font-weight:600;
+  transition:opacity .2s;
+}
+.sidebar.collapsed .sidebar-section-lbl{opacity:0}
+.sidebar-bottom{padding:10px 8px;border-top:1px solid var(--b1);flex-shrink:0}
+
+/* ══ CONTENT AREA ══ */
+.content-area{
+  margin-left:220px;flex:1;min-width:0;
+  transition:margin-left .22s cubic-bezier(.4,0,.2,1);
+  min-height:calc(100vh - 52px);
+  overflow-y:auto;overflow-x:hidden;
+}
+.sidebar.collapsed ~ .content-area{margin-left:56px}
 
 /* PANELS */
 .container{max-width:1060px;margin:0 auto;padding:0 2rem}
 .panel{display:none;padding:2.5rem 0 5rem}
-.panel.active{display:block}
+.panel.active{display:block;min-height:calc(100vh - 52px)}
 
 /* HERO */
 .hero{display:grid;grid-template-columns:1fr 1fr;gap:1.6rem;align-items:start;margin-bottom:2rem}
@@ -658,6 +724,64 @@ footer{border-top:1px solid var(--b1);padding:18px 2rem;display:flex;align-items
 .sub-quick-inp::placeholder{color:var(--b3)}
 .sub-quick-btn{background:var(--accent);color:#000;border:none;border-radius:7px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sans);white-space:nowrap;transition:opacity .15s;flex-shrink:0}
 .sub-quick-btn:hover{opacity:.88}
+
+/* ══════════ ARGENTINA HOY ══════════ */
+.arg-header{display:flex;align-items:start;justify-content:space-between;gap:12px;margin-bottom:1.6rem;flex-wrap:wrap}
+.arg-title{font-size:26px;font-weight:700;color:var(--t1);margin-bottom:4px}
+.arg-sub{font-size:13px;color:var(--t2)}
+
+/* MACRO GRID */
+.macro-section-title{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:8px;font-weight:600}
+.macro-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.macro-card{background:var(--surf);border:1px solid var(--b1);border-radius:var(--r);padding:14px;transition:border-color .15s;position:relative;overflow:hidden}
+.macro-card:hover{border-color:var(--b2)}
+.macro-card.loading::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.03),transparent);animation:shimmer 1.5s infinite}
+@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+.mc-lbl{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--t3);margin-bottom:6px}
+.mc-val{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--t1);line-height:1;margin-bottom:3px}
+.mc-val.up{color:var(--red)}
+.mc-val.dn{color:var(--green)}
+.mc-sub{font-size:10px;color:var(--t3)}
+.mc-delta{font-size:10px;font-family:var(--mono);margin-top:4px}
+.mc-delta.up{color:var(--red)}
+.mc-delta.dn{color:var(--green)}
+
+/* NOTICIAS */
+.arg-add-btn{background:var(--accent);color:#000;border:none;border-radius:7px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sans);transition:opacity .15s}
+.arg-add-btn:hover{opacity:.88}
+.add-noticia-form{background:var(--surf);border:1px solid var(--accent);border-radius:var(--rl);padding:20px;margin-bottom:1.4rem}
+.anf-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.noticias-list-inner{display:flex;flex-direction:column;gap:14px;margin-bottom:2rem}
+
+/* NOTICIA CARD */
+.noticia-card{background:var(--surf);border:1px solid var(--b1);border-radius:var(--rl);overflow:hidden;transition:border-color .2s}
+.noticia-card:hover{border-color:var(--b2)}
+.noticia-img{width:100%;height:180px;object-fit:cover;display:block;border-bottom:1px solid var(--b1)}
+.noticia-body{padding:18px 20px}
+.noticia-cat{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:3px 9px;border-radius:4px;margin-bottom:10px}
+.cat-macro{background:rgba(200,241,53,.1);color:var(--accent)}
+.cat-economia{background:rgba(61,220,132,.1);color:var(--green)}
+.cat-politica{background:rgba(91,200,255,.1);color:#5BC8FF}
+.cat-internacional{background:rgba(179,157,255,.1);color:var(--purple)}
+.cat-general{background:rgba(245,166,35,.1);color:var(--amber)}
+.noticia-titulo{font-size:16px;font-weight:700;color:var(--t1);line-height:1.35;margin-bottom:10px}
+.noticia-resumen{font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:14px}
+.noticia-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.noticia-link{font-size:12px;color:var(--accent);text-decoration:none;display:flex;align-items:center;gap:4px;font-weight:500}
+.noticia-link:hover{opacity:.8}
+.noticia-fecha{font-size:11px;color:var(--t3);font-family:var(--mono)}
+.noticia-admin-btns{display:flex;gap:6px}
+.noticia-del-btn{background:none;border:1px solid var(--b2);border-radius:5px;color:var(--t3);font-size:11px;padding:3px 8px;cursor:pointer;transition:all .15s}
+.noticia-del-btn:hover{border-color:var(--red);color:var(--red)}
+
+/* WIDGET MINI en canasta */
+.macro-mini-bar{display:flex;gap:16px;background:var(--surf);border:1px solid var(--b1);border-radius:var(--r);padding:10px 16px;margin-bottom:1.2rem;flex-wrap:wrap;align-items:center}
+.mmi-item{display:flex;align-items:center;gap:6px}
+.mmi-lbl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.05em}
+.mmi-val{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--t1)}
+.mmi-sep{width:1px;height:16px;background:var(--b1)}
+
+@media(max-width:768px){.anf-grid{grid-template-columns:1fr}.macro-cards{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
@@ -736,20 +860,12 @@ footer{border-top:1px solid var(--b1);padding:18px 2rem;display:flex;align-items
 ═══════════════════════════════════════════ -->
 <div class="screen active" id="screen-app">
 
-<nav>
+<!-- TOPBAR -->
+<nav class="topbar">
   <span class="nav-brand">MI<span>INFLACIÓN</span></span>
-  <div class="nav-tabs">
-    <button class="nav-tab active" data-panel="canasta">Mi canasta</button>
-    <button class="nav-tab" data-panel="familia">Familia <span class="nav-badge" style="background:var(--purple)">PRO</span></button>
-    <button class="nav-tab" data-panel="mi-historial">Mi historial</button>
-    <button class="nav-tab" data-panel="planes">Planes</button>
-    <button class="nav-tab" data-panel="historial">IPC mensual <span class="nav-badge" id="nav-badge-mes">—</span></button>
-    <button class="nav-tab" data-panel="como">Cómo funciona</button>
-    <button class="nav-tab" data-panel="fuentes">Fuentes</button>
-  </div>
-  <div class="nav-right">
-    <!-- Selector de canasta activa -->
-    <div class="canasta-selector" id="canasta-selector" style="position:relative">
+  <div class="topbar-mid">
+    <!-- Selector de canasta -->
+    <div class="canasta-selector" id="canasta-selector" style="position:relative;display:none">
       <button class="canasta-active-btn" onclick="toggleCanastaDropdown(event)">
         <span class="cdi-dot cc-0" id="nav-canasta-dot"></span>
         <span id="nav-canasta-name">Mi canasta</span>
@@ -757,7 +873,6 @@ footer{border-top:1px solid var(--b1);padding:18px 2rem;display:flex;align-items
       </button>
       <div class="canasta-sep"></div>
       <button class="canasta-add-btn" onclick="showAddCanasta(event)" title="Agregar canasta">+</button>
-      <!-- Dropdown -->
       <div class="canasta-dropdown" id="canasta-dropdown" style="display:none">
         <div id="canasta-list"></div>
         <div class="canasta-add-form" id="canasta-add-form" style="display:none">
@@ -770,7 +885,8 @@ footer{border-top:1px solid var(--b1);padding:18px 2rem;display:flex;align-items
       <span class="live-dot"></span>
       IPC <span id="ticker-val">—</span>
     </div>
-    <!-- Estado de sesión en nav -->
+  </div>
+  <div class="topbar-right">
     <div id="nav-guest" style="display:flex;align-items:center;gap:8px">
       <button class="btn-logout" style="background:var(--accent);color:#000;font-weight:700;border-color:var(--accent)" onclick="showAuthModal()">Registrarse</button>
       <button class="btn-logout" onclick="showAuthModal('login')">Ingresar</button>
@@ -781,6 +897,59 @@ footer{border-top:1px solid var(--b1);padding:18px 2rem;display:flex;align-items
     </div>
   </div>
 </nav>
+
+<!-- APP LAYOUT -->
+<div class="app-layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-toggle">
+    <button class="toggle-btn" onclick="toggleSidebar()" id="sidebar-toggle-btn" title="Colapsar menú">☰</button>
+  </div>
+  <div class="sidebar-nav">
+    <button class="nav-tab active" data-panel="canasta">
+      <span class="tab-icon">📊</span>
+      <span class="tab-label">Mi canasta</span>
+    </button>
+    <button class="nav-tab" data-panel="mi-historial">
+      <span class="tab-icon">📅</span>
+      <span class="tab-label">Mi historial</span>
+    </button>
+    <button class="nav-tab" data-panel="familia">
+      <span class="tab-icon">👨‍👩‍👧</span>
+      <span class="tab-label">Familia <span class="nav-badge" style="background:var(--purple)">PRO</span></span>
+    </button>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section-lbl">Datos</div>
+    <button class="nav-tab" data-panel="argentina">
+      <span class="tab-icon">🇦🇷</span>
+      <span class="tab-label">Argentina Hoy</span>
+    </button>
+    <button class="nav-tab" data-panel="historial">
+      <span class="tab-icon">📈</span>
+      <span class="tab-label">IPC mensual <span class="nav-badge" id="nav-badge-mes">—</span></span>
+    </button>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section-lbl">Info</div>
+    <button class="nav-tab" data-panel="planes">
+      <span class="tab-icon">⭐</span>
+      <span class="tab-label">Planes</span>
+    </button>
+    <button class="nav-tab" data-panel="info">
+      <span class="tab-icon">ℹ️</span>
+      <span class="tab-label">Ayuda y fuentes</span>
+    </button>
+  </div>
+  <div class="sidebar-bottom">
+    <div id="sb-user-info" style="display:none;padding:6px 2px;margin-bottom:6px">
+      <div style="font-size:11px;color:var(--t3)">Sesión activa</div>
+      <div style="font-size:12px;color:var(--t2);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="sb-username">—</div>
+    </div>
+  </div>
+</aside>
+
+<!-- CONTENT -->
+<div class="content-area" id="content-area">
 
 <!-- BARRA DE ESTADO IPC -->
 <div class="ipc-status-bar" id="ipc-status-bar">
@@ -812,6 +981,32 @@ footer{border-top:1px solid var(--b1);padding:18px 2rem;display:flex;align-items
 
 <!-- ── PANEL: CANASTA ── -->
 <div class="panel active container" id="panel-canasta">
+
+  <!-- WIDGET MACRO MINI -->
+  <div class="macro-mini-bar" id="macro-mini-bar">
+    <div class="mmi-item">
+      <span class="mmi-lbl">🔵 Oficial</span>
+      <span class="mmi-val" id="mini-oficial">—</span>
+    </div>
+    <div class="mmi-sep"></div>
+    <div class="mmi-item">
+      <span class="mmi-lbl">💵 Blue</span>
+      <span class="mmi-val" id="mini-blue">—</span>
+    </div>
+    <div class="mmi-sep"></div>
+    <div class="mmi-item">
+      <span class="mmi-lbl">📊 Riesgo País</span>
+      <span class="mmi-val" id="mini-riesgo">—</span>
+    </div>
+    <div class="mmi-sep"></div>
+    <div class="mmi-item">
+      <span class="mmi-lbl">📈 IPC Acum.</span>
+      <span class="mmi-val" id="mini-ipc">14,7%</span>
+    </div>
+    <div style="margin-left:auto;font-size:10px;color:var(--t3)">
+      <a href="#" onclick="document.querySelector('[data-panel=argentina]').click();return false" style="color:var(--accent);text-decoration:none;font-size:11px">Ver todo →</a>
+    </div>
+  </div>
 
   <div class="slogan-banner">
     <div class="slogan-banner-text">
@@ -882,28 +1077,7 @@ footer{border-top:1px solid var(--b1);padding:18px 2rem;display:flex;align-items
 
   <div class="cat-grid" id="cat-grid"></div>
 
-  <!-- CALCULADORA AJUSTE SALARIAL -->
-  <div class="salary-calc">
-    <div class="contrib-hd" style="margin-bottom:14px">
-      <span class="contrib-title">Calculadora de ajuste salarial</span>
-      <span class="contrib-sub">¿Cuánto necesitás pedir para no perder poder adquisitivo?</span>
-    </div>
-    <div class="salary-grid">
-      <div class="salary-field">
-        <label>Sueldo actual (neto) $</label>
-        <input type="number" class="salary-input" id="sal-actual" placeholder="500.000" min="0" step="1000" oninput="calcSalary()" />
-      </div>
-      <div class="salary-field">
-        <label>Meses sin aumento</label>
-        <input type="number" class="salary-input" id="sal-meses" placeholder="3" min="1" max="24" value="3" oninput="calcSalary()" />
-      </div>
-    </div>
-    <div class="salary-result" id="salary-result">
-      <div class="salary-res-item"><div class="sr-label">Pérdida acumulada</div><div class="sr-val" id="sr-perdida">—</div></div>
-      <div class="salary-res-item"><div class="sr-label">Aumento necesario</div><div class="sr-val accent" id="sr-aumento">—</div></div>
-      <div class="salary-res-item"><div class="sr-label">Sueldo equivalente hoy</div><div class="sr-val" id="sr-equiv">—</div></div>
-    </div>
-  </div>
+
 
   <!-- ACCESO RÁPIDO AL HISTORIAL -->
   <div class="save-month-box" style="margin-bottom:1.4rem" id="quick-save-box">
@@ -1178,6 +1352,20 @@ footer{border-top:1px solid var(--b1);padding:18px 2rem;display:flex;align-items
     <div class="loading-msg"><span class="spinner"></span>Cargando datos desde ArgentinaDatos API…</div>
   </div>
 
+  <!-- GRÁFICO EVOLUCIÓN -->
+  <div class="sec-hd" style="margin-top:0"><div class="sec-title">Evolución — tu IPC vs. INDEC</div></div>
+  <div style="background:var(--surf);border:1px solid var(--b1);border-radius:var(--rl);padding:20px;margin-bottom:1.6rem;position:relative">
+    <div id="evolucion-empty" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;gap:10px;color:var(--t3);font-size:13px;text-align:center">
+      <span style="font-size:28px">📈</span>
+      <span>Guardá al menos 2 meses para ver la evolución comparativa</span>
+    </div>
+    <canvas id="evolucion-chart" style="display:none;width:100%"></canvas>
+    <div style="display:flex;gap:20px;justify-content:center;margin-top:12px;font-size:11px;color:var(--t2)">
+      <span style="display:flex;align-items:center;gap:6px"><span style="width:16px;height:2px;background:var(--accent);display:inline-block"></span>Tu IPC personal</span>
+      <span style="display:flex;align-items:center;gap:6px"><span style="width:16px;height:2px;background:rgba(255,255,255,.3);display:inline-block;border-top:2px dashed rgba(255,255,255,.3)"></span>IPC INDEC</span>
+    </div>
+  </div>
+
   <div class="sec-hd" style="margin-top:1.4rem"><div class="sec-title">Variación por división — último mes</div></div>
   <div class="rubros-table">
     <div class="rt-head">
@@ -1205,8 +1393,97 @@ footer{border-top:1px solid var(--b1);padding:18px 2rem;display:flex;align-items
   </div>
 </div><!-- /panel-historial -->
 
+<!-- ── PANEL: ARGENTINA HOY ── -->
+<div class="panel container" id="panel-argentina">
+
+  <!-- HEADER -->
+  <div class="arg-header">
+    <div>
+      <div class="hero-eyebrow">Actualización diaria</div>
+      <div class="arg-title">Argentina Hoy</div>
+      <div class="arg-sub">Indicadores macro en tiempo real · Noticias curadas</div>
+    </div>
+    <div class="arg-update-info">
+      <span class="live-dot" style="display:inline-block;margin-right:6px"></span>
+      <span id="arg-last-update" style="font-size:11px;color:var(--t3)">Actualizando…</span>
+    </div>
+  </div>
+
+  <!-- INDICADORES MACRO -->
+  <div class="sec-hd"><div class="sec-title">Indicadores macro</div></div>
+  <div class="macro-grid" id="macro-grid">
+    <!-- Dólares -->
+    <div class="macro-section-title">Tipo de cambio</div>
+    <div class="macro-cards" id="macro-dolar">
+      <div class="macro-card loading"><div class="mc-lbl">Oficial</div><div class="mc-val" id="mc-oficial">—</div><div class="mc-sub">Banco Nación</div></div>
+      <div class="macro-card loading"><div class="mc-lbl">Blue</div><div class="mc-val" id="mc-blue">—</div><div class="mc-sub">Informal</div></div>
+      <div class="macro-card loading"><div class="mc-lbl">MEP</div><div class="mc-val" id="mc-mep">—</div><div class="mc-sub">Bolsa</div></div>
+      <div class="macro-card loading"><div class="mc-lbl">CCL</div><div class="mc-val" id="mc-ccl">—</div><div class="mc-sub">Contado c/liqui</div></div>
+      <div class="macro-card loading"><div class="mc-lbl">Brecha</div><div class="mc-val" id="mc-brecha">—</div><div class="mc-sub">Blue vs Oficial</div></div>
+    </div>
+    <!-- Otros indicadores -->
+    <div class="macro-section-title" style="margin-top:16px">Economía</div>
+    <div class="macro-cards">
+      <div class="macro-card loading"><div class="mc-lbl">Riesgo País</div><div class="mc-val" id="mc-riesgo">—</div><div class="mc-sub">EMBI+ Argentina</div></div>
+      <div class="macro-card loading"><div class="mc-lbl">Reservas BCRA</div><div class="mc-val" id="mc-reservas">—</div><div class="mc-sub">USD millones</div></div>
+      <div class="macro-card loading"><div class="mc-lbl">Tasa BCRA</div><div class="mc-val" id="mc-tasa">—</div><div class="mc-sub">TNA política monetaria</div></div>
+      <div class="macro-card loading"><div class="mc-lbl">Inflación acum.</div><div class="mc-val" id="mc-ipc-acum">—</div><div class="mc-sub">Acumulada 2026</div></div>
+    </div>
+  </div>
+
+  <!-- NOTICIAS -->
+  <div class="sec-hd" style="margin-top:1.6rem">
+    <div class="sec-title">Noticias del día</div>
+    <!-- Botón + solo para el admin -->
+    <button class="arg-add-btn" id="btn-add-noticia" style="display:none" onclick="showAddNoticiaForm()">+ Agregar</button>
+  </div>
+
+  <!-- Formulario admin (oculto por defecto) -->
+  <div class="add-noticia-form" id="add-noticia-form" style="display:none">
+    <div class="anf-grid">
+      <div class="form-group">
+        <label class="form-label">Categoría</label>
+        <select class="form-input" id="anf-cat">
+          <option value="macro">🏦 Macro argentina</option>
+          <option value="economia">💰 Economía AR</option>
+          <option value="politica">🏛️ Política AR</option>
+          <option value="internacional">🌍 Internacional</option>
+          <option value="general">⚡ Hecho relevante</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">URL de imagen (opcional)</label>
+        <input class="form-input" type="url" id="anf-img" placeholder="https://..." />
+      </div>
+      <div class="form-group" style="grid-column:1/-1">
+        <label class="form-label">Titular</label>
+        <input class="form-input" type="text" id="anf-titulo" placeholder="Titular de la noticia" maxlength="120" />
+      </div>
+      <div class="form-group" style="grid-column:1/-1">
+        <label class="form-label">Resumen (4-5 líneas)</label>
+        <textarea class="form-input" id="anf-resumen" rows="4" placeholder="Resumen de la noticia..." style="resize:vertical;font-family:var(--sans)"></textarea>
+      </div>
+      <div class="form-group" style="grid-column:1/-1">
+        <label class="form-label">Link al medio</label>
+        <input class="form-input" type="url" id="anf-link" placeholder="https://..." />
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button class="btn-primary" style="flex:1" onclick="submitNoticia()">Publicar noticia</button>
+      <button class="btn-logout" onclick="hideAddNoticiaForm()">Cancelar</button>
+    </div>
+    <div class="auth-error" id="anf-error"></div>
+  </div>
+
+  <!-- Lista de noticias -->
+  <div id="noticias-list">
+    <div class="loading-msg"><span class="spinner"></span>Cargando noticias…</div>
+  </div>
+
+</div><!-- /panel-argentina -->
+
 <!-- ── PANEL: CÓMO FUNCIONA ── -->
-<div class="panel container" id="panel-como">
+<div class="panel container" id="panel-info">
   <div class="how-hero">
     <div class="how-hero-title">¿Cómo funciona?</div>
     <div class="how-hero-sub">La inflación oficial del INDEC mide el promedio de precios de una canasta representativa de todos los hogares argentinos. El problema: tu canasta no es la de todos. Esta herramienta te permite calcular <em>tu</em> inflación real, según lo que vos gastás cada mes.</div>
@@ -1330,116 +1607,10 @@ footer{border-top:1px solid var(--b1);padding:18px 2rem;display:flex;align-items
 </div><!-- /panel-planes -->
 
 <!-- ── PANEL: FUENTES ── -->
-<div class="panel container" id="panel-fuentes">
-  <div class="src-hero">
-    <div class="src-icon">⊛</div>
-    <div class="src-intro">
-      <h2>Fuentes y metodología</h2>
-      <p>Base primaria: datos oficiales del INDEC. Los IPC de subrubros son estimaciones a partir de aperturas de grupos y clases del informe de prensa, complementadas con mediciones de consultoras privadas de reconocimiento técnico.</p>
-    </div>
-  </div>
 
-  <div class="sec-hd"><div class="sec-title">Fuentes oficiales</div></div>
-  <div class="src-grid">
-    <a href="https://www.indec.gob.ar/indec/web/Nivel4-Tema-3-5-31" target="_blank" class="src-card">
-      <span class="src-arrow">↗</span>
-      <span class="src-badge badge-of">Oficial</span>
-      <div class="src-name">INDEC — IPC Nacional</div>
-      <div class="src-desc">Índice de Precios al Consumidor. Variaciones por división, grupo y clase. Cobertura regional. Base dic. 2016 = 100.</div>
-    </a>
-    <a href="https://www.indec.gob.ar/uploads/informesdeprensa/ipc_06_26C132AEE4E9.pdf" target="_blank" class="src-card">
-      <span class="src-arrow">↗</span>
-      <span class="src-badge badge-of">Oficial</span>
-      <div class="src-name">IPC Mayo 2026 — Informe INDEC</div>
-      <div class="src-desc">Informe completo con variaciones mensuales, interanuales, incidencias regionales, CBA y CBT. Publicado 11/06/2026.</div>
-    </a>
-    <a href="https://www.indec.gob.ar/indec/web/Nivel4-Tema-3-5-33" target="_blank" class="src-card">
-      <span class="src-arrow">↗</span>
-      <span class="src-badge badge-of">Oficial</span>
-      <div class="src-name">INDEC — Canasta Básica</div>
-      <div class="src-desc">CBA y CBT mensuales. Líneas de indigencia y pobreza por regiones. Familia tipo de 4 integrantes.</div>
-    </a>
-    <a href="https://argentinadatos.com/docs/operations/get-finanzas-indices-inflacion.html" target="_blank" class="src-card">
-      <span class="src-arrow">↗</span>
-      <span class="src-badge badge-of">API Pública</span>
-      <div class="src-name">ArgentinaDatos — API IPC</div>
-      <div class="src-desc">API abierta que republica la serie histórica del IPC mensual del INDEC. Usada para actualización automática de datos en esta calculadora.</div>
-    </a>
-  </div>
 
-  <div class="sec-hd"><div class="sec-title">Instituciones académicas</div></div>
-  <div class="src-grid">
-    <a href="https://www.utdt.edu/ver_contenido.php?id_contenido=24042&id_item_menu=28690" target="_blank" class="src-card">
-      <span class="src-arrow">↗</span>
-      <span class="src-badge badge-ver">Académica</span>
-      <div class="src-name">Universidad Torcuato Di Tella (UTDT)</div>
-      <div class="src-desc">Encuesta mensual de Expectativas de Inflación (UTDT-CIF). Referencia clave para medir la brecha entre inflación oficial y la percibida por los hogares argentinos.</div>
-    </a>
-    <a href="https://datos.gob.ar/dataset/sspm-expectativas-inflacion" target="_blank" class="src-card">
-      <span class="src-arrow">↗</span>
-      <span class="src-badge badge-ver">Datos abiertos</span>
-      <div class="src-name">Expectativas Di Tella — Datos.gob.ar</div>
-      <div class="src-desc">Serie histórica de expectativas de inflación publicada por la Subsecretaría de Programación Macroeconómica. Fuente primaria: UTDT.</div>
-    </a>
-  </div>
-
-  <div class="sec-hd"><div class="sec-title">Medios y verificadores</div></div>
-  <div class="src-grid">
-    <a href="https://chequeado.com" target="_blank" class="src-card">
-      <span class="src-arrow">↗</span>
-      <span class="src-badge badge-ver">Verificador</span>
-      <div class="src-name">Chequeado</div>
-      <div class="src-desc">Análisis explicativos del IPC. Desglose por división, incidencias regionales y contexto histórico. Referencia para comunicación de los datos.</div>
-    </a>
-    <a href="https://www.cronista.com" target="_blank" class="src-card">
-      <span class="src-arrow">↗</span>
-      <span class="src-badge badge-med">Medio especializado</span>
-      <div class="src-name">El Cronista</div>
-      <div class="src-desc">Cobertura del IPC mensual con variaciones por rubro, estimaciones de consultoras y contexto de política económica.</div>
-    </a>
-  </div>
-
-  <div class="sec-hd"><div class="sec-title">Consultoras privadas</div></div>
-  <div class="src-grid">
-    <a href="https://equilibra.ar" target="_blank" class="src-card">
-      <span class="src-arrow">↗</span>
-      <span class="src-badge badge-con">Consultora</span>
-      <div class="src-name">Equilibra</div>
-      <div class="src-desc">IPC subyacente propio. Relevamientos de precios independientes. Análisis de componentes estacionales y regulados. Usada para estimación de subrubros.</div>
-    </a>
-    <a href="https://www.libertadyprogreso.org" target="_blank" class="src-card">
-      <span class="src-arrow">↗</span>
-      <span class="src-badge badge-con">Consultora</span>
-      <div class="src-name">Libertad y Progreso</div>
-      <div class="src-desc">Medición mensual independiente del IPC con apertura por componentes. Referencia cruzada para validar datos oficiales.</div>
-    </a>
-    <a href="https://ecogo.com.ar" target="_blank" class="src-card">
-      <span class="src-arrow">↗</span>
-      <span class="src-badge badge-con">Consultora</span>
-      <div class="src-name">EcoGo</div>
-      <div class="src-desc">Desglose detallado de Alimentos y bebidas. Estimaciones semanales de precios. Fuente para variaciones de carnes, verduras y canasta alimentaria.</div>
-    </a>
-    <a href="https://ojf.com.ar" target="_blank" class="src-card">
-      <span class="src-arrow">↗</span>
-      <span class="src-badge badge-con">Consultora</span>
-      <div class="src-name">Orlando J. Ferreres & Asociados</div>
-      <div class="src-desc">IPC-OJF mensual. Relevamiento diario de más de 15.000 precios en GBA. Contexto para variaciones regionales del área metropolitana.</div>
-    </a>
-  </div>
-
-  <div class="meth-box">
-    <h3>Metodología de la calculadora</h3>
-    <ul>
-      <li>El IPC general se obtiene automáticamente vía API de ArgentinaDatos, que republica la serie del INDEC.</li>
-      <li>Los IPC de cada división corresponden al dato oficial del INDEC del último mes publicado.</li>
-      <li>Los IPC de subrubros son estimaciones basadas en aperturas de grupos/clases del informe de prensa del INDEC y consultoras.</li>
-      <li>Las variaciones regionales ajustan el IPC nacional con el diferencial publicado por el INDEC para cada región estadística.</li>
-      <li>La inflación personal se normaliza sobre el total asignado, por lo que el cálculo es válido con ponderación parcial.</li>
-      <li>Los datos del usuario se guardan en la nube (Supabase) de forma segura y encriptada, accesibles desde cualquier dispositivo.</li>
-    </ul>
-  </div>
-
-</div><!-- /panel-fuentes -->
+</div><!-- /content-area -->
+</div><!-- /app-layout -->
 
 <footer>
   <div class="footer-left"><span>MIINFLACIÓN</span> · Calculadora personal Argentina · Datos: INDEC + ArgentinaDatos API</div>
@@ -1676,11 +1847,47 @@ const CATS = [
   ║                                                              ║
   ╚══════════════════════════════════════════════════════════════╝
 */
+
+/*
+  ╔══════════════════════════════════════════════════════════════╗
+  ║  TABLA NOTICIAS — ejecutar en Supabase SQL Editor          ║
+  ╠══════════════════════════════════════════════════════════════╣
+  ║                                                              ║
+  ║  create table public.noticias (                              ║
+  ║    id           uuid primary key default gen_random_uuid(),  ║
+  ║    titulo       text not null,                               ║
+  ║    resumen      text not null,                               ║
+  ║    link         text,                                        ║
+  ║    imagen_url   text,                                        ║
+  ║    categoria    text default 'general',                      ║
+  ║    autor_email  text,                                        ║
+  ║    created_at   timestamptz default now()                    ║
+  ║  );                                                          ║
+  ║                                                              ║
+  ║  alter table public.noticias enable row level security;      ║
+  ║                                                              ║
+  ║  -- Todos pueden leer                                        ║
+  ║  create policy "read noticias" on public.noticias            ║
+  ║    for select using (true);                                  ║
+  ║                                                              ║
+  ║  -- Solo el admin puede escribir                             ║
+  ║  create policy "admin insert" on public.noticias             ║
+  ║    for insert with check (                                   ║
+  ║      auth.email() = 'pironiagustin05@gmail.com'              ║
+  ║    );                                                        ║
+  ║                                                              ║
+  ║  create policy "admin delete" on public.noticias             ║
+  ║    for delete using (                                        ║
+  ║      auth.email() = 'pironiagustin05@gmail.com'              ║
+  ║    );                                                        ║
+  ║                                                              ║
+  ╚══════════════════════════════════════════════════════════════╝
+*/
 // ═══════════════════════════════════════════════════════════════
 // SUPABASE CONFIG — reemplazá con tus datos reales de Supabase
 // ═══════════════════════════════════════════════════════════════
-const SUPABASE_URL  = 'https://amkzcednpjkhnqejttio.supabase.co';
-const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFta3pjZWRucGpraG5xZWp0dGlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3MTY4NjQsImV4cCI6MjA5NzI5Mjg2NH0.P5_GMgGFCHIaZzPvLxszOfUTd1TxeQHLLGzaC3YJUiw';
+const SUPABASE_URL  = 'https://jpmphuqutcwqbcqdaayk.supabase.co';
+const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpwbXBodXF1dGN3cWJjcWRhYXlrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5OTA1MDcsImV4cCI6MjA5NzU2NjUwN30.SY__v57oSw0H71tHWr9UCW3qBLJhH2vBrP5gqqEQFUQ';
 const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ── Auth state global ──
@@ -1812,6 +2019,11 @@ async function loginSuccess(sbUser) {
 
   // Nav: mostrar estado logueado
   document.getElementById('nav-username').textContent = name.split(' ')[0];
+  const sbUsernameEl = document.getElementById('sb-username');
+  const sbUserInfoEl = document.getElementById('sb-user-info');
+  if (sbUsernameEl) sbUsernameEl.textContent = name;
+  if (sbUserInfoEl) sbUserInfoEl.style.display = 'block';
+  checkAdminUI();
   document.getElementById('nav-guest').style.display = 'none';
   document.getElementById('nav-logged').style.display = 'flex';
   document.getElementById('canasta-selector').style.display = 'flex';
@@ -2261,13 +2473,20 @@ function buildCatGrid() {
     `;
     grid.appendChild(card);
 
-    // Toggle cat
+    // Toggle cat — acordeón: cierra el anterior al abrir uno nuevo
     card.querySelector('.cat-head').addEventListener('click', () => {
       const body = document.getElementById('body-'+c.id);
       const chev = document.getElementById('chev-'+c.id);
-      const open = body.classList.toggle('open');
-      chev.classList.toggle('open', open);
-      card.classList.toggle('open', open);
+      const isOpen = body.classList.contains('open');
+      // Si vamos a abrir, cerrar todos los demás
+      if (!isOpen) {
+        document.querySelectorAll('.cat-body.open').forEach(b => b.classList.remove('open'));
+        document.querySelectorAll('.cat-chev.open').forEach(ch => ch.classList.remove('open'));
+        document.querySelectorAll('.cat-card.open').forEach(cc => cc.classList.remove('open'));
+      }
+      body.classList.toggle('open', !isOpen);
+      chev.classList.toggle('open', !isOpen);
+      card.classList.toggle('open', !isOpen);
     });
 
     // Main slider
@@ -2779,8 +2998,10 @@ document.querySelectorAll('.rbtn').forEach(btn => {
 // INIT
 // ═══════════════════════════════════════════════
 function initApp() {
+  initSidebar();
   renderCanastaSelector();
   buildCatGrid();
+  fetchMacro(); // mini widget en canasta
   buildRubrosHist();
   updateMain();
   fetchIPC();
@@ -2792,20 +3013,8 @@ function initApp() {
 // ═══════════════════════════════════════════════
 // HISTORIAL PERSONAL — SNAPSHOTS MENSUALES
 // ═══════════════════════════════════════════════
-const FREE_MONTHS_LIMIT = 3;
+const FREE_MONTHS_LIMIT = 2;
 const MONTH_NAMES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-
-function getHistorial() {
-  if (!currentUser) return [];
-  const key = 'mi_inflation_hist_' + btoa(currentUser.email);
-  try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) { return []; }
-}
-
-function saveHistorial(hist) {
-  if (!currentUser) return;
-  const key = 'mi_inflation_hist_' + btoa(currentUser.email);
-  localStorage.setItem(key, JSON.stringify(hist));
-}
 
 function getCurrentMonthKey() {
   const now = new Date();
@@ -2894,7 +3103,9 @@ async function deleteSnapshot(key) {
 
 async function renderHistorial() {
   const hist = await getHistorial();
-  const isPremium = false; // futura integración de pago
+  const isPremium = false;
+  // Gráfico de evolución
+  renderEvolucionChart(hist); // futura integración de pago
 
   // Stats hero
   const countEl = document.getElementById('mh-count');
@@ -3487,7 +3698,7 @@ function exportMonthReport() {
     '<div><label>P\u00e9rdida mensual (sueldo $500k)</label><div class="v">-$' + perdMensual.toLocaleString('es-AR') + '</div></div>' +
     '</div><div class="proy-note">Estimaci\u00f3n basada en el promedio de tus \u00faltimos registros. No reemplaza el dato publicado por el INDEC.</div></div>' +
     '<div class="footer"><span>Fuente: INDEC IPC ' + h.label + ' &middot; ArgentinaDatos API &middot; miinflacion.ar</span><span>Datos al ' + today + '</span></div>' +
-    '<script>setTimeout(function(){window.print();},400);<\/script>' +
+    '<scri' + 'pt>setTimeout(function(){window.print();},400);</' + 'script>' +
     '</body></html>';
 
   var win = window.open('', '_blank');
@@ -3963,6 +4174,393 @@ function submitFamilyAdd() {
   renderCanastaSelector();
   saveCurrentState();
 }
+
+// ═══════════════════════════════════════════════
+// SIDEBAR
+// ═══════════════════════════════════════════════
+let sidebarCollapsed = false;
+
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const btn = document.getElementById('sidebar-toggle-btn');
+  sidebarCollapsed = !sidebarCollapsed;
+  sb.classList.toggle('collapsed', sidebarCollapsed);
+  if (btn) btn.textContent = sidebarCollapsed ? '»' : '☰';
+  localStorage.setItem('sb_collapsed', sidebarCollapsed ? '1' : '0');
+}
+
+function initSidebar() {
+  const saved = localStorage.getItem('sb_collapsed');
+  if (saved === '1') toggleSidebar();
+}
+
+// ═══════════════════════════════════════════════
+// GRÁFICO DE LÍNEAS — evolución IPC personal vs INDEC
+// ═══════════════════════════════════════════════
+function renderEvolucionChart(hist) {
+  const canvas = document.getElementById('evolucion-chart');
+  if (!canvas || hist.length < 2) {
+    const empty = document.getElementById('evolucion-empty');
+    if (empty) empty.style.display = 'flex';
+    if (canvas) canvas.style.display = 'none';
+    return;
+  }
+  const empty = document.getElementById('evolucion-empty');
+  if (empty) empty.style.display = 'none';
+  canvas.style.display = 'block';
+
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.parentElement.offsetWidth - 2;
+  const H = 240;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  // Datos cronológicos
+  const data = [...hist].reverse();
+  const months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+
+  const PAD = { top: 24, right: 20, bottom: 44, left: 44 };
+  const cW = W - PAD.left - PAD.right;
+  const cH = H - PAD.top - PAD.bottom;
+
+  const allVals = data.flatMap(d => [d.ipcPersonal, d.ipcOficial]);
+  const minV = Math.max(0, Math.min(...allVals) - 0.5);
+  const maxV = Math.max(...allVals) + 0.5;
+
+  const xPos = (i) => PAD.left + (i / (data.length - 1)) * cW;
+  const yPos = (v) => PAD.top + cH - ((v - minV) / (maxV - minV)) * cH;
+
+  // Grid
+  ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+  ctx.lineWidth = 1;
+  const gridLines = 4;
+  for (let i = 0; i <= gridLines; i++) {
+    const v = minV + ((maxV - minV) / gridLines) * i;
+    const y = yPos(v);
+    ctx.beginPath(); ctx.moveTo(PAD.left, y); ctx.lineTo(W - PAD.right, y); ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,0.25)';
+    ctx.font = '10px monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText(v.toFixed(1) + '%', PAD.left - 6, y + 3);
+  }
+
+  // Área rellena IPC personal
+  ctx.beginPath();
+  data.forEach((d, i) => {
+    const x = xPos(i), y = yPos(d.ipcPersonal);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.lineTo(xPos(data.length - 1), PAD.top + cH);
+  ctx.lineTo(xPos(0), PAD.top + cH);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(200,241,53,0.07)';
+  ctx.fill();
+
+  // Línea IPC INDEC
+  ctx.beginPath();
+  ctx.setLineDash([5, 4]);
+  ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+  ctx.lineWidth = 2;
+  data.forEach((d, i) => {
+    const x = xPos(i), y = yPos(d.ipcOficial);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Línea IPC personal
+  ctx.beginPath();
+  ctx.strokeStyle = '#C8F135';
+  ctx.lineWidth = 2.5;
+  data.forEach((d, i) => {
+    const x = xPos(i), y = yPos(d.ipcPersonal);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // Puntos y valores IPC personal
+  data.forEach((d, i) => {
+    const x = xPos(i), y = yPos(d.ipcPersonal);
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.fillStyle = '#C8F135';
+    ctx.fill();
+    ctx.fillStyle = '#C8F135';
+    ctx.font = 'bold 10px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(d.ipcPersonal.toFixed(1) + '%', x, y - 10);
+  });
+
+  // Labels del eje X
+  ctx.fillStyle = 'rgba(255,255,255,0.3)';
+  ctx.font = '10px sans-serif';
+  ctx.textAlign = 'center';
+  data.forEach((d, i) => {
+    const x = xPos(i);
+    const label = d.label ? d.label.slice(0, 3) : '';
+    ctx.fillText(label, x, H - PAD.bottom + 16);
+  });
+
+  // Leyenda
+  ctx.font = '11px sans-serif';
+  ctx.textAlign = 'left';
+  // Personal
+  ctx.fillStyle = '#C8F135';
+  ctx.fillRect(PAD.left, H - 18, 16, 2);
+  ctx.fillText('Tu IPC personal', PAD.left + 22, H - 14);
+  // INDEC
+  ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  ctx.setLineDash([4,3]);
+  ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(PAD.left + 140, H - 17); ctx.lineTo(PAD.left + 156, H - 17); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.fillText('IPC INDEC', PAD.left + 162, H - 14);
+}
+
+// ═══════════════════════════════════════════════
+// ARGENTINA HOY — INDICADORES MACRO + NOTICIAS
+// ═══════════════════════════════════════════════
+const ADMIN_EMAIL = 'pironiagustin05@gmail.com';
+
+const CAT_LABELS = {
+  macro:         { label: '🏦 Macro AR',       cls: 'cat-macro' },
+  economia:      { label: '💰 Economía AR',    cls: 'cat-economia' },
+  politica:      { label: '🏛️ Política AR',    cls: 'cat-politica' },
+  internacional: { label: '🌍 Internacional',  cls: 'cat-internacional' },
+  general:       { label: '⚡ Hecho relevante', cls: 'cat-general' },
+};
+
+// ── INDICADORES MACRO desde ArgentinaDatos API ──
+// Cache en memoria — 5 minutos
+let _macroCache = null;
+let _macroCacheTime = 0;
+const MACRO_CACHE_TTL = 5 * 60 * 1000;
+const MACRO_PROXY = 'https://jpmphuqutcwqbcqdaayk.supabase.co/functions/v1/macro-datos';
+
+async function fetchMacro() {
+  const now = Date.now();
+
+  // Servir desde cache si está fresco
+  if (_macroCache && (now - _macroCacheTime) < MACRO_CACHE_TTL) {
+    applyMacroData(_macroCache);
+    return;
+  }
+
+  // Mostrar cache viejo mientras refresca
+  if (_macroCache) applyMacroData(_macroCache);
+
+  try {
+    const tsEl = document.getElementById('arg-last-update');
+    if (tsEl) tsEl.textContent = 'Actualizando…';
+
+    // Una sola llamada al proxy — sin CORS, sin bloqueos
+    const res = await fetch(MACRO_PROXY, {
+      headers: { 'apikey': SUPABASE_KEY }
+    });
+
+    if (!res.ok) throw new Error('proxy ' + res.status);
+    const data = await res.json();
+
+    // Cachear
+    _macroCache = data;
+    _macroCacheTime = Date.now();
+
+    applyMacroData(data);
+
+    if (tsEl) tsEl.textContent = 'Actualizado ' + new Date().toLocaleTimeString('es-AR', {hour:'2-digit',minute:'2-digit'});
+
+  } catch(e) {
+    console.warn('fetchMacro error:', e.message);
+    // Mostrar valores hardcodeados como fallback
+    setMacro('mc-oficial',  '$ —', '');
+    setMacro('mc-blue',     '$ —', '');
+    setMacro('mc-mep',      '$ —', '');
+    setMacro('mc-ccl',      '$ —', '');
+    setMacro('mc-brecha',   '—', '');
+    setMacro('mc-riesgo',   '—', '');
+    setMacro('mc-reservas', '—', '');
+    const tsEl = document.getElementById('arg-last-update');
+    if (tsEl) tsEl.textContent = 'Sin conexión — reintentando';
+    // Reintentar en 30 segundos
+    setTimeout(fetchMacro, 30000);
+  } finally {
+    document.querySelectorAll('.macro-card.loading').forEach(c => c.classList.remove('loading'));
+  }
+}
+
+function applyMacroData(data) {
+  if (!data) return;
+  const fmtD = v => v ? '$' + Math.round(v).toLocaleString('es-AR') : '—';
+
+  if (data.dolares && Array.isArray(data.dolares)) {
+    const oficial = data.dolares.find(d => d.casa === 'oficial');
+    const blue    = data.dolares.find(d => d.casa === 'blue');
+    const mep     = data.dolares.find(d => d.casa === 'bolsa');
+    const ccl     = data.dolares.find(d => d.casa === 'contadoconliqui');
+    setMacro('mc-oficial',   fmtD(oficial?.venta), '');
+    setMacro('mini-oficial', fmtD(oficial?.venta), '');
+    setMacro('mc-blue',      fmtD(blue?.venta),    '');
+    setMacro('mini-blue',    fmtD(blue?.venta),    '');
+    setMacro('mc-mep',       fmtD(mep?.venta),     '');
+    setMacro('mc-ccl',       fmtD(ccl?.venta),     '');
+    if (oficial?.venta && blue?.venta) {
+      const brecha = Math.round(((blue.venta / oficial.venta) - 1) * 100);
+      setMacro('mc-brecha', brecha + '%', brecha > 20 ? 'up' : '');
+    }
+  }
+
+  if (data.riesgo !== null && data.riesgo !== undefined) {
+    const val = typeof data.riesgo === 'number' ? data.riesgo : (data.riesgo?.valor ?? null);
+    if (val !== null) {
+      setMacro('mc-riesgo',   Math.round(val).toLocaleString('es-AR'), val > 1500 ? 'up' : val < 800 ? 'dn' : '');
+      setMacro('mini-riesgo', Math.round(val).toLocaleString('es-AR'), '');
+    }
+  }
+
+  if (data.reservas !== null && data.reservas !== undefined) {
+    const val = typeof data.reservas === 'number' ? data.reservas : (data.reservas?.valor ?? null);
+    if (val !== null) setMacro('mc-reservas', 'USD ' + Math.round(val/1000).toLocaleString('es-AR') + 'B', '');
+  }
+
+  setMacro('mc-ipc-acum', '14,7%', '');
+  setMacro('mc-tasa', '47%', '');
+  document.querySelectorAll('.macro-card.loading').forEach(c => c.classList.remove('loading'));
+}
+
+function setMacro(id, val, cls) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = val;
+  if (cls) el.className = 'mc-val ' + cls;
+  el.closest('.macro-card')?.classList.remove('loading');
+}
+
+// ── NOTICIAS ──
+async function fetchNoticias() {
+  const el = document.getElementById('noticias-list');
+  if (!el) return;
+  try {
+    const { data, error } = await _sb
+      .from('noticias')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(20);
+
+    if (error || !data || data.length === 0) {
+      el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--t3);font-size:13px">No hay noticias publicadas todavía.</div>';
+      return;
+    }
+
+    const isAdmin = currentUser?.email === ADMIN_EMAIL;
+    const inner = document.createElement('div');
+    inner.className = 'noticias-list-inner';
+
+    data.forEach(n => {
+      const cat = CAT_LABELS[n.categoria] || CAT_LABELS.general;
+      const fecha = new Date(n.created_at).toLocaleDateString('es-AR', {day:'numeric',month:'short',year:'numeric'});
+      const card = document.createElement('div');
+      card.className = 'noticia-card';
+      card.innerHTML =
+        (n.imagen_url ? '<img class="noticia-img" src="' + n.imagen_url + '" alt="" style="background:var(--surf2)" />' : '') +
+        '<div class="noticia-body">' +
+          '<span class="noticia-cat ' + cat.cls + '">' + cat.label + '</span>' +
+          '<div class="noticia-titulo">' + n.titulo + '</div>' +
+          '<div class="noticia-resumen">' + n.resumen + '</div>' +
+          '<div class="noticia-footer">' +
+            (n.link ? '<a class="noticia-link" href="' + n.link + '" target="_blank" rel="noopener">Leer nota completa ↗</a>' : '<span></span>') +
+            '<div style="display:flex;align-items:center;gap:8px">' +
+              '<span class="noticia-fecha">' + fecha + '</span>' +
+              (isAdmin ? '<button class="noticia-del-btn" onclick="deleteNoticia(\"' + n.id + '\")">✕ Eliminar</button>' : '') +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      inner.appendChild(card);
+    });
+
+    el.innerHTML = '';
+    el.appendChild(inner);
+
+  } catch(e) {
+    console.warn('Error noticias:', e);
+    el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--t3)">Error cargando noticias.</div>';
+  }
+}
+
+// ── ADMIN: agregar/eliminar noticias ──
+function showAddNoticiaForm() {
+  document.getElementById('add-noticia-form').style.display = 'block';
+  document.getElementById('anf-titulo').focus();
+}
+function hideAddNoticiaForm() {
+  document.getElementById('add-noticia-form').style.display = 'none';
+  ['anf-titulo','anf-resumen','anf-link','anf-img'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+}
+
+async function submitNoticia() {
+  const titulo   = document.getElementById('anf-titulo')?.value.trim();
+  const resumen  = document.getElementById('anf-resumen')?.value.trim();
+  const link     = document.getElementById('anf-link')?.value.trim();
+  const imagen   = document.getElementById('anf-img')?.value.trim();
+  const categoria= document.getElementById('anf-cat')?.value;
+  const errEl    = document.getElementById('anf-error');
+
+  if (!titulo || !resumen) {
+    if (errEl) { errEl.textContent = 'Titular y resumen son obligatorios'; errEl.classList.add('show'); }
+    return;
+  }
+
+  const { error } = await _sb.from('noticias').insert({
+    titulo, resumen, link: link || null,
+    imagen_url: imagen || null,
+    categoria: categoria || 'general',
+    autor_email: currentUser.email
+  });
+
+  if (error) {
+    if (errEl) { errEl.textContent = 'Error al publicar: ' + error.message; errEl.classList.add('show'); }
+    return;
+  }
+
+  hideAddNoticiaForm();
+  fetchNoticias();
+}
+
+async function deleteNoticia(id) {
+  if (!confirm('¿Eliminar esta noticia?')) return;
+  await _sb.from('noticias').delete().eq('id', id);
+  fetchNoticias();
+}
+
+// ── Mostrar botón admin si corresponde ──
+function checkAdminUI() {
+  const btnAdd = document.getElementById('btn-add-noticia');
+  if (btnAdd && currentUser?.email === ADMIN_EMAIL) {
+    btnAdd.style.display = 'inline-flex';
+  }
+}
+
+// ── Inicializar panel ──
+function initArgentinaPanel() {
+  fetchMacro();
+  fetchNoticias();
+  checkAdminUI();
+}
+
+// ── Refrescar macro cada 5 minutos ──
+setInterval(() => {
+  if (document.getElementById('panel-argentina')?.classList.contains('active')) {
+    fetchMacro();
+  }
+}, 5 * 60 * 1000);
 
 // Boot
 checkSession();
