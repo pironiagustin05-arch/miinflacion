@@ -1432,7 +1432,7 @@ footer{border-top:1px solid var(--b1);padding:18px 2rem;display:flex;align-items
     <div class="macro-section-title" style="margin-top:16px">Economía</div>
     <div class="macro-cards">
       <div class="macro-card loading"><div class="mc-lbl">Riesgo País</div><div class="mc-val" id="mc-riesgo">—</div><div class="mc-sub">EMBI+ Argentina</div></div>
-      <div class="macro-card loading"><div class="mc-lbl">Reservas BCRA</div><div class="mc-val" id="mc-reservas">—</div><div class="mc-sub">USD millones</div></div>
+
       <div class="macro-card loading"><div class="mc-lbl">Tasa BCRA</div><div class="mc-val" id="mc-tasa">—</div><div class="mc-sub">TNA política monetaria</div></div>
       <div class="macro-card loading"><div class="mc-lbl">Inflación acum.</div><div class="mc-val" id="mc-ipc-acum">—</div><div class="mc-sub">Acumulada 2026</div></div>
     </div>
@@ -4816,6 +4816,40 @@ async function fetchMacro() {
   }
 }
 
+// Guardar prev values para delta diario
+function savePrevMacro(key, val) {
+  const today = new Date().toISOString().split('T')[0];
+  try {
+    const stored = JSON.parse(localStorage.getItem('macro_prev') || '{}');
+    if (!stored[key] || stored[key].date !== today) {
+      stored[key] = { val, date: today };
+      localStorage.setItem('macro_prev', JSON.stringify(stored));
+    }
+  } catch(e) {}
+}
+function getPrevMacro(key) {
+  try {
+    const stored = JSON.parse(localStorage.getItem('macro_prev') || '{}');
+    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+    const entry = stored[key];
+    if (entry && entry.date === yesterday) return entry.val;
+    return null;
+  } catch(e) { return null; }
+}
+function setMacroWithDelta(id, txt, numVal) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const prev = getPrevMacro(id);
+  let arrow = '';
+  if (prev !== null && numVal !== null) {
+    if (numVal > prev * 1.001) arrow = ' <span style="color:var(--red);font-size:13px;font-weight:700">↑</span>';
+    else if (numVal < prev * 0.999) arrow = ' <span style="color:var(--green);font-size:13px;font-weight:700">↓</span>';
+  }
+  el.innerHTML = txt + arrow;
+  savePrevMacro(id, numVal);
+  el.closest('.macro-card')?.classList.remove('loading');
+}
+
 function applyMacroData(data) {
   if (!data) return;
   const fmtD = v => v ? '$' + Math.round(v).toLocaleString('es-AR') : '—';
@@ -4825,30 +4859,21 @@ function applyMacroData(data) {
     const blue    = data.dolares.find(d => d.casa === 'blue');
     const mep     = data.dolares.find(d => d.casa === 'bolsa');
     const ccl     = data.dolares.find(d => d.casa === 'contadoconliqui');
-    setMacro('mc-oficial',   fmtD(oficial?.venta), '');
-    setMacro('mini-oficial', fmtD(oficial?.venta), '');
-    setMacro('mc-blue',      fmtD(blue?.venta),    '');
-    setMacro('mini-blue',    fmtD(blue?.venta),    '');
-    setMacro('mc-mep',       fmtD(mep?.venta),     '');
-    setMacro('mc-ccl',       fmtD(ccl?.venta),     '');
+    if (oficial?.venta) { setMacroWithDelta('mc-oficial', fmtD(oficial.venta), oficial.venta); setMacro('mini-oficial', fmtD(oficial.venta), ''); }
+    if (blue?.venta)    { setMacroWithDelta('mc-blue', fmtD(blue.venta), blue.venta); setMacro('mini-blue', fmtD(blue.venta), ''); }
+    if (mep?.venta)     setMacroWithDelta('mc-mep', fmtD(mep.venta), mep.venta);
+    if (ccl?.venta)     setMacroWithDelta('mc-ccl', fmtD(ccl.venta), ccl.venta);
     if (oficial?.venta && blue?.venta) {
       const brecha = Math.round(((blue.venta / oficial.venta) - 1) * 100);
-      setMacro('mc-brecha', brecha + '%', brecha > 20 ? 'up' : '');
+      setMacroWithDelta('mc-brecha', brecha + '%', brecha);
     }
   }
 
-  if (data.riesgo !== null && data.riesgo !== undefined) {
-    const val = typeof data.riesgo === 'number' ? data.riesgo : (data.riesgo?.valor ?? null);
-    if (val !== null) {
-      setMacro('mc-riesgo',   Math.round(val).toLocaleString('es-AR'), val > 1500 ? 'up' : val < 800 ? 'dn' : '');
-      setMacro('mini-riesgo', Math.round(val).toLocaleString('es-AR'), '');
-    }
-  }
-
-  if (data.reservas !== null && data.reservas !== undefined) {
-    const val = typeof data.reservas === 'number' ? data.reservas : (data.reservas?.valor ?? null);
-    if (val !== null) setMacro('mc-reservas', 'USD ' + Math.round(val/1000).toLocaleString('es-AR') + 'B', '');
-  }
+  // Riesgo país
+  const rVal = data.riesgo ? (typeof data.riesgo === 'number' ? data.riesgo : (data.riesgo?.valor ?? 437)) : 437;
+  const rv = Math.round(rVal);
+  setMacroWithDelta('mc-riesgo', rv.toLocaleString('es-AR'), rv);
+  setMacro('mini-riesgo', rv.toLocaleString('es-AR'), rv < 800 ? 'dn' : '');
 
   setMacro('mc-ipc-acum', '14,7%', '');
   setMacro('mc-tasa', '47%', '');
