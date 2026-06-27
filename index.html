@@ -939,6 +939,10 @@ footer{border-top:1px solid var(--b1);padding:18px 2rem;display:flex;align-items
       <span class="tab-icon">ℹ️</span>
       <span class="tab-label">Ayuda y fuentes</span>
     </button>
+    <button class="nav-tab" data-panel="legal">
+      <span class="tab-icon">📋</span>
+      <span class="tab-label">Legal</span>
+    </button>
   </div>
   <div class="sidebar-bottom">
     <div id="sb-user-info" style="display:none;padding:6px 2px;margin-bottom:6px">
@@ -1428,6 +1432,236 @@ footer{border-top:1px solid var(--b1);padding:18px 2rem;display:flex;align-items
 
 </div><!-- /panel-argentina -->
 
+<!-- ── PANEL: LEGAL ── -->
+<div class="panel container" id="panel-legal" style="padding-bottom:5rem">
+
+  <div class="how-hero">
+    <div class="how-hero-title">Legal</div>
+    <div class="how-hero-sub">Política de Privacidad y Términos y Condiciones de Mi Inflación · Última actualización: junio 2026</div>
+  </div>
+
+  <!-- TABS -->
+  <div style="display:flex;gap:0;border-bottom:1px solid var(--b1);margin-bottom:1.6rem">
+    <button id="legal-tab-pp" onclick="switchLegalTab('pp')"
+      style="padding:10px 20px;background:none;border:none;border-bottom:2px solid var(--accent);color:var(--accent);font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer">
+      Política de Privacidad
+    </button>
+    <button id="legal-tab-tyc" onclick="switchLegalTab('tyc')"
+      style="padding:10px 20px;background:none;border:none;border-bottom:2px solid transparent;color:var(--t3);font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer">
+      Términos y Condiciones
+    </button>
+  </div>
+
+  <!-- POLÍTICA DE PRIVACIDAD -->
+  <div id="legal-pp">
+    <div class="how-step">
+      <div class="how-step-num">1</div>
+      <div class="how-step-body">
+        <div class="how-step-title">¿Qué información recopilamos?</div>
+        <div class="how-step-desc">
+          Mi Inflación recopila únicamente la información necesaria para brindarte el servicio:
+          <br><br>
+          <b>Información de cuenta:</b> tu nombre y dirección de correo electrónico, proporcionados al registrarte con email/contraseña o al iniciar sesión con Google.
+          <br><br>
+          <b>Datos de uso:</b> los gastos y ponderaciones que cargás en tu canasta personal, tu historial de meses guardados y la configuración de tu cuenta (región, canastas, plan).
+          <br><br>
+          <b>Datos de pago:</b> los pagos se procesan exclusivamente a través de Mercado Pago. Mi Inflación no almacena datos de tarjetas de crédito, débito ni información bancaria. Solo guardamos la confirmación de que el pago fue aprobado y el plan que contrataste.
+        </div>
+      </div>
+    </div>
+
+    <div class="how-step">
+      <div class="how-step-num">2</div>
+      <div class="how-step-body">
+        <div class="how-step-title">¿Cómo usamos tu información?</div>
+        <div class="how-step-desc">
+          Usamos tu información exclusivamente para:
+          <br><br>
+          · Proveerte el servicio de calculadora de inflación personal<br>
+          · Sincronizar tu canasta y historial entre dispositivos<br>
+          · Gestionar tu suscripción Premium<br>
+          · Enviarte notificaciones sobre el IPC (solo si las activaste)<br>
+          · Mejorar la aplicación mediante análisis de uso agregado y anónimo
+          <br><br>
+          <b>No vendemos, alquilamos ni compartimos tu información personal con terceros</b> para fines comerciales o publicitarios.
+        </div>
+      </div>
+    </div>
+
+    <div class="how-step">
+      <div class="how-step-num">3</div>
+      <div class="how-step-body">
+        <div class="how-step-title">¿Dónde se almacenan tus datos?</div>
+        <div class="how-step-desc">
+          Tus datos se almacenan en Supabase (infraestructura en la nube), con servidores en la región de São Paulo, Brasil. Supabase cumple con estándares internacionales de seguridad y protección de datos. La información se transmite siempre mediante conexiones cifradas (HTTPS/TLS).
+          <br><br>
+          Mi Inflación cumple con la <b>Ley 25.326 de Protección de Datos Personales</b> de la República Argentina.
+        </div>
+      </div>
+    </div>
+
+    <div class="how-step">
+      <div class="how-step-num">4</div>
+      <div class="how-step-body">
+        <div class="how-step-title">Servicios de terceros</div>
+        <div class="how-step-desc">
+          Mi Inflación utiliza los siguientes servicios de terceros:
+          <br><br>
+          · <b>Supabase</b> — base de datos y autenticación (supabase.com)<br>
+          · <b>Google OAuth</b> — inicio de sesión con Google (policies.google.com/privacy)<br>
+          · <b>Mercado Pago</b> — procesamiento de pagos (mercadopago.com.ar)<br>
+          · <b>Vercel</b> — hosting de la aplicación (vercel.com)<br>
+          · <b>DolarAPI y ArgentinaDatos</b> — datos económicos públicos
+          <br><br>
+          Cada uno de estos servicios tiene su propia política de privacidad, que te recomendamos revisar.
+        </div>
+      </div>
+    </div>
+
+    <div class="how-step">
+      <div class="how-step-num">5</div>
+      <div class="how-step-body">
+        <div class="how-step-title">Tus derechos</div>
+        <div class="how-step-desc">
+          De acuerdo con la Ley 25.326, tenés derecho a:
+          <br><br>
+          · <b>Acceder</b> a tus datos personales almacenados<br>
+          · <b>Rectificar</b> información incorrecta<br>
+          · <b>Eliminar</b> tu cuenta y todos tus datos<br>
+          · <b>Oponerte</b> al tratamiento de tus datos
+          <br><br>
+          Para ejercer cualquiera de estos derechos, escribinos a <b>pironiagustin05@gmail.com</b> con el asunto "Datos personales".
+          <br><br>
+          Para eliminar tu cuenta podés hacerlo desde la configuración de tu perfil dentro de la app.
+        </div>
+      </div>
+    </div>
+
+    <div class="how-step">
+      <div class="how-step-num">6</div>
+      <div class="how-step-body">
+        <div class="how-step-title">Cookies y almacenamiento local</div>
+        <div class="how-step-desc">
+          Mi Inflación utiliza el almacenamiento local del navegador (localStorage) únicamente para recordar preferencias de visualización como el estado del menú lateral. No utilizamos cookies de seguimiento ni publicidad.
+        </div>
+      </div>
+    </div>
+
+    <div class="how-step">
+      <div class="how-step-num">7</div>
+      <div class="how-step-body">
+        <div class="how-step-title">Cambios en esta política</div>
+        <div class="how-step-desc">
+          Podemos actualizar esta política ocasionalmente. En caso de cambios significativos te notificaremos por email o mediante un aviso dentro de la app. El uso continuado del servicio después de la notificación implica aceptación de los cambios.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TÉRMINOS Y CONDICIONES -->
+  <div id="legal-tyc" style="display:none">
+    <div class="how-step">
+      <div class="how-step-num">1</div>
+      <div class="how-step-body">
+        <div class="how-step-title">Aceptación de los términos</div>
+        <div class="how-step-desc">
+          Al acceder y usar Mi Inflación, aceptás estos Términos y Condiciones en su totalidad. Si no estás de acuerdo con alguno de ellos, no debés usar el servicio.
+          <br><br>
+          El servicio es operado por <b>Agustín Pironi</b>, con domicilio en la Ciudad Autónoma de Buenos Aires, Argentina.
+        </div>
+      </div>
+    </div>
+
+    <div class="how-step">
+      <div class="how-step-num">2</div>
+      <div class="how-step-body">
+        <div class="how-step-title">Descripción del servicio</div>
+        <div class="how-step-desc">
+          Mi Inflación es una herramienta de cálculo de inflación personal que permite a los usuarios argentinos estimar su inflación mensual en base a su canasta de consumo particular. El servicio incluye:
+          <br><br>
+          · Calculadora de inflación personal por rubro y subrubro<br>
+          · Historial mensual de inflación personal vs. INDEC<br>
+          · Dashboard de indicadores macroeconómicos argentinos<br>
+          · Noticias económicas curadas<br>
+          · Modo familia (múltiples canastas) en plan Premium
+          <br><br>
+          Los datos del INDEC y fuentes económicas son informativos. Mi Inflación no es una fuente oficial y no reemplaza la medición del INDEC.
+        </div>
+      </div>
+    </div>
+
+    <div class="how-step">
+      <div class="how-step-num">3</div>
+      <div class="how-step-body">
+        <div class="how-step-title">Plan básico y plan Premium</div>
+        <div class="how-step-desc">
+          <b>Plan Básico (gratuito):</b> incluye la calculadora de inflación personal, historial de hasta 2 meses, gráfico de torta de canasta y registro de cuenta personal. No requiere tarjeta de crédito.
+          <br><br>
+          <b>Plan Premium:</b> disponible por $2.490/mes o $19.900/año. Incluye historial ilimitado, gráfico acumulado personal vs. INDEC, exportación de reporte PDF mensual, modo familia (hasta 3 canastas) y alerta cuando sale el IPC.
+          <br><br>
+          Los precios están expresados en pesos argentinos (ARS) e incluyen IVA. Mi Inflación se reserva el derecho de modificar los precios con previo aviso de 30 días.
+        </div>
+      </div>
+    </div>
+
+    <div class="how-step">
+      <div class="how-step-num">4</div>
+      <div class="how-step-body">
+        <div class="how-step-title">Pagos y facturación</div>
+        <div class="how-step-desc">
+          Los pagos se procesan a través de <b>Mercado Pago</b>. Al completar un pago, el plan Premium se activa automáticamente en tu cuenta.
+          <br><br>
+          <b>Garantía de 7 días:</b> si no estás satisfecho con el servicio dentro de los 7 días de tu primera suscripción, podés solicitar el reembolso completo escribiendo a pironiagustin05@gmail.com.
+          <br><br>
+          Las suscripciones mensuales y anuales no se renuevan automáticamente. Para continuar con Premium deberás realizar un nuevo pago al vencimiento de tu período.
+        </div>
+      </div>
+    </div>
+
+    <div class="how-step">
+      <div class="how-step-num">5</div>
+      <div class="how-step-body">
+        <div class="how-step-title">Uso aceptable</div>
+        <div class="how-step-desc">
+          Te comprometés a usar Mi Inflación únicamente para fines personales y legales. Queda prohibido:
+          <br><br>
+          · Compartir tu cuenta con terceros<br>
+          · Intentar acceder a datos de otros usuarios<br>
+          · Usar el servicio para fines comerciales sin autorización previa<br>
+          · Reproducir o distribuir el contenido de la app sin permiso
+        </div>
+      </div>
+    </div>
+
+    <div class="how-step">
+      <div class="how-step-num">6</div>
+      <div class="how-step-body">
+        <div class="how-step-title">Limitación de responsabilidad</div>
+        <div class="how-step-desc">
+          Mi Inflación provee información con fines educativos e informativos. No constituye asesoramiento financiero, económico ni legal.
+          <br><br>
+          Los cálculos son estimaciones basadas en datos públicos del INDEC y fuentes secundarias. Mi Inflación no garantiza la exactitud absoluta de los datos ni se hace responsable de decisiones tomadas en base a la información provista.
+          <br><br>
+          El servicio se provee "tal cual" sin garantías de disponibilidad continua. Nos esforzamos por mantener el servicio disponible 24/7 pero podemos realizar tareas de mantenimiento que impliquen interrupciones temporales.
+        </div>
+      </div>
+    </div>
+
+    <div class="how-step">
+      <div class="how-step-num">7</div>
+      <div class="how-step-body">
+        <div class="how-step-title">Jurisdicción</div>
+        <div class="how-step-desc">
+          Estos términos se rigen por las leyes de la República Argentina. Cualquier controversia se someterá a la jurisdicción de los tribunales ordinarios de la Ciudad Autónoma de Buenos Aires.
+          <br><br>
+          Para consultas legales: <b>pironiagustin05@gmail.com</b>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /panel-legal -->
+
 <!-- ── PANEL: CÓMO FUNCIONA ── -->
 <div class="panel container" id="panel-info">
   <div class="how-hero">
@@ -1524,7 +1758,7 @@ footer{border-top:1px solid var(--b1);padding:18px 2rem;display:flex;align-items
         <li class="feat-ok feat-hl">Alerta cuando sale el IPC cada mes</li>
       </ul>
       <button class="plan-btn plan-btn-pro" onclick="showUpgrade()">Quiero Premium →</button>
-      <div class="plan-guarantee">30 días de garantía — si no te sirve, te devolvemos el dinero</div>
+      <div class="plan-guarantee">7 días de garantía — si no te sirve, te devolvemos el dinero</div>
     </div>
   </div>
 
@@ -1559,7 +1793,7 @@ footer{border-top:1px solid var(--b1);padding:18px 2rem;display:flex;align-items
 </div><!-- /app-layout -->
 
 <footer>
-  <div class="footer-left"><span>MIINFLACIÓN</span> · Calculadora personal Argentina · Datos: INDEC + ArgentinaDatos API</div>
+  <div class="footer-left"><span>MIINFLACIÓN</span> · Calculadora personal Argentina · Datos: INDEC + ArgentinaDatos API · <a href="#" onclick="document.querySelector('[data-panel=legal]').click();return false" style="color:var(--t3);text-decoration:none">Privacidad</a> · <a href="#" onclick="document.querySelector('[data-panel=legal]').click();switchLegalTab('tyc');return false" style="color:var(--t3);text-decoration:none">Términos</a></div>
   <div class="footer-center">
     <a href="https://www.indec.gob.ar" target="_blank">indec.gob.ar</a> ·
     <a href="https://argentinadatos.com" target="_blank">argentinadatos.com</a> ·
@@ -1596,7 +1830,7 @@ footer{border-top:1px solid var(--b1);padding:18px 2rem;display:flex;align-items
           <li>✓ Modo familia (hasta 3 canastas)</li>
         </ul>
         <button class="btn-primary" style="width:100%" onclick="goPayStep2()">Continuar →</button>
-        <div style="font-size:11px;color:var(--t3);text-align:center;margin-top:10px">30 días de garantía · Cancelás cuando querés</div>
+        <div style="font-size:11px;color:var(--t3);text-align:center;margin-top:10px">7 días de garantía · Cancelás cuando querés</div>
       </div>
 
       <!-- PASO 2: Redirige a MP -->
@@ -1619,7 +1853,7 @@ footer{border-top:1px solid var(--b1);padding:18px 2rem;display:flex;align-items
           🔵 Pagar con Mercado Pago →
         </button>
         <div style="font-size:11px;color:var(--t3);text-align:center;margin-top:10px;line-height:1.5">
-          Después del pago escribinos a <b style="color:var(--t2)">pironiagustin05@gmail.com</b> con el comprobante.<br>Activación en menos de 24hs hábiles.
+          El premium se activa automáticamente al completar el pago.
         </div>
       </div>
 
@@ -4648,6 +4882,16 @@ setInterval(() => {
     fetchMacro();
   }
 }, 5 * 60 * 1000);
+
+function switchLegalTab(tab) {
+  const isPP = tab === 'pp';
+  document.getElementById('legal-pp').style.display = isPP ? 'block' : 'none';
+  document.getElementById('legal-tyc').style.display = !isPP ? 'block' : 'none';
+  const tabPP = document.getElementById('legal-tab-pp');
+  const tabTyC = document.getElementById('legal-tab-tyc');
+  if (tabPP) { tabPP.style.borderBottomColor = isPP ? 'var(--accent)' : 'transparent'; tabPP.style.color = isPP ? 'var(--accent)' : 'var(--t3)'; }
+  if (tabTyC) { tabTyC.style.borderBottomColor = !isPP ? 'var(--accent)' : 'transparent'; tabTyC.style.color = !isPP ? 'var(--accent)' : 'var(--t3)'; }
+}
 
 // Boot
 checkSession();
