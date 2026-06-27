@@ -2328,9 +2328,14 @@ async function doForgotPassword() {
 
 // ── Logout ──
 async function doLogout() {
-  await saveCurrentState();
-  await _sb.auth.signOut();
+  try {
+    if (currentUser) await saveCurrentState();
+    await _sb.auth.signOut();
+  } catch(e) {
+    console.warn('Logout error:', e);
+  }
   currentUser = null;
+  isPremiumUser = false;
   // Reset a demo mode
   canastas = [{ id: 'demo', name: 'Mi canasta', state: makeEmptyState(), region: 'nacional' }];
   activeCanastaIdx = 0;
@@ -2460,6 +2465,7 @@ const CANASTA_COLORS    = ['#C8F135','#5BC8FF','#B39DFF'];
 // Canastas: array de { id, name, state, region }
 let canastas = [];
 let activeCanastaIdx = 0;
+let isPremiumUser = false; // se carga desde Supabase
 
 // Accesos rápidos a la canasta activa
 function getActiveCanasta() { return canastas[activeCanastaIdx] || canastas[0]; }
@@ -2521,6 +2527,7 @@ async function saveCurrentState() {
     canastas: JSON.stringify(canastas),
     active_idx: activeCanastaIdx,
     version: 3
+    // is_premium no se toca desde el cliente — solo el webhook de MP lo actualiza
   };
   await _sb.from('user_state').upsert({ user_id: currentUser.id, ...payload }, { onConflict: 'user_id' });
 }
@@ -2539,6 +2546,9 @@ async function loadUserState() {
   }
 
   try {
+    // Leer estado premium
+    isPremiumUser = data.is_premium === true;
+
     if (data.version >= 3 && data.canastas) {
       // Formato nuevo multi-canasta
       canastas = JSON.parse(data.canastas);
@@ -3447,7 +3457,7 @@ async function deleteSnapshot(key) {
 
 async function renderHistorial() {
   const hist = await getHistorial();
-  const isPremium = false;
+  const isPremium = isPremiumUser;
   // Gráfico de evolución
   renderEvolucionChart(hist); // futura integración de pago
 
@@ -3866,85 +3876,101 @@ function copyText(text, el) {
 // EXPORT PDF MEJORADO — con gráficos y proyección
 // ═══════════════════════════════════════════════
 async function goToMercadoPago() {
-  const mpUrls = {
-    mensual: 'https://mpago.la/1SSjSf6',
-    anual:   'https://mpago.la/1kxiiNU'
-  };
-
-  // Si no hay sesión, redirigir directo al link de MP
+  // Si no hay sesión, pedir que se loguee primero
   if (!currentUser) {
-    window.open(mpUrls[selectedPlan] || mpUrls.mensual, '_blank');
+    showAuthModal('register');
     return;
   }
 
-  // Con sesión: intentar crear preferencia con metadata del usuario
   const btn = document.getElementById('btn-go-mp');
-  if (btn) { btn.textContent = 'Redirigiendo…'; btn.disabled = true; }
+  if (btn) { btn.innerHTML = '⏳ Generando link de pago…'; btn.disabled = true; }
 
   try {
-    // Crear preferencia de pago con user_id en metadata
-    const MP_ACCESS_TOKEN = 'APP_USR-7062594778135741-062021-bbe15106abc69963edcec00e064d0ece-1216449967';
-    const isAnual = selectedPlan === 'anual';
-    const prefBody = {
-      items: [{
-        title: isAnual ? 'Mi Inflación Premium — Plan Anual' : 'Mi Inflación Premium — Plan Mensual',
-        quantity: 1,
-        unit_price: isAnual ? 19900 : 2490,
-        currency_id: 'ARS'
-      }],
-      metadata: { user_id: currentUser.id, plan: selectedPlan },
-      back_urls: {
-        success: 'https://miinflacion-gamma.vercel.app?payment=success',
-        failure: 'https://miinflacion-gamma.vercel.app?payment=failure',
-        pending: 'https://miinflacion-gamma.vercel.app?payment=pending'
-      },
-      auto_return: 'approved',
-      notification_url: 'https://jpmphuqutcwqbcqdaayk.supabase.co/functions/v1/mp-webhook'
-    };
+    // Crear preferencia desde Edge Function (evita CORS con API de MP)
+    const res = await fetch(
+      'https://jpmphuqutcwqbcqdaayk.supabase.co/functions/v1/mp-webhook',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'create_preference',
+          user_id: currentUser.id,
+          plan: selectedPlan || 'mensual'
+        })
+      }
+    );
 
-    const prefRes = await fetch('https://api.mercadopago.com/checkout/preferences', {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + MP_ACCESS_TOKEN,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(prefBody)
-    });
-
-    if (prefRes.ok) {
-      const pref = await prefRes.json();
-      window.location.href = pref.init_point; // Redirige a MP con metadata
-    } else {
-      throw new Error('preference failed');
+    if (res.ok) {
+      const data = await res.json();
+      if (data.init_point) {
+        window.location.href = data.init_point;
+        return;
+      }
     }
+    throw new Error('No se pudo crear el link de pago');
   } catch(e) {
-    console.warn('MP preference error:', e);
-    // Fallback a link directo
-    window.open(mpUrls[selectedPlan] || mpUrls.mensual, '_blank');
+    console.warn('MP preference error:', e.message);
+    // Fallback: redirigir al link estático (el webhook no sabrá el user_id)
+    // pero el usuario puede contactar soporte
+    showToast('Hubo un error. Reintentá en unos segundos.', 'error');
   } finally {
-    if (btn) { btn.textContent = 'Pagar con Mercado Pago'; btn.disabled = false; }
+    if (btn) { btn.innerHTML = '🔵 Pagar con Mercado Pago →'; btn.disabled = false; }
   }
 }
 
-// Detectar retorno de MP con pago exitoso
+// Detectar retorno de MP — reintenta hasta que el webhook procese
 async function checkPaymentReturn() {
   const params = new URLSearchParams(window.location.search);
   const status = params.get('payment');
+  const paymentId = params.get('payment_id') || params.get('collection_id');
+
   if (!status) return;
 
-  // Limpiar URL
+  // Limpiar URL inmediatamente
   window.history.replaceState({}, '', window.location.pathname);
 
-  if (status === 'success') {
-    // Esperar un momento para que el webhook procese
-    await new Promise(r => setTimeout(r, 2000));
-    // Recargar estado del usuario
-    if (currentUser) {
-      await loadUserState();
-      showToast('¡Premium activado! Bienvenido 🎉', 'success');
-    }
-  } else if (status === 'failure') {
+  if (status === 'failure' || status === 'rejected') {
     showToast('El pago no se completó. Podés intentarlo de nuevo.', 'error');
+    return;
+  }
+
+  if (status === 'success' || status === 'approved') {
+    showToast('Procesando tu pago…', 'success');
+
+    // Reintentar hasta 15 segundos para que el webhook procese
+    let attempts = 0;
+    const maxAttempts = 6;
+    const checkPremium = async () => {
+      attempts++;
+      // Consultar directamente la tabla para ver si ya es premium
+      const { data } = await _sb
+        .from('user_state')
+        .select('is_premium')
+        .eq('user_id', currentUser?.id)
+        .single();
+
+      if (data?.is_premium) {
+        isPremiumUser = true;
+        // Recargar todo el estado
+        await loadUserState();
+        // Actualizar UI
+        renderHistorial();
+        renderFamilyPanel();
+        renderCanastaSelector();
+        showToast('¡Premium activado! Bienvenido 🎉', 'success');
+        return;
+      }
+
+      if (attempts < maxAttempts) {
+        setTimeout(checkPremium, 2500); // reintenta cada 2.5s
+      } else {
+        // Después de 15 segundos, avisar que puede demorar
+        showToast('Tu pago está siendo procesado. Si en unos minutos no ves el Premium, recargá la página.', 'success');
+      }
+    };
+
+    // Primera verificación a los 3 segundos
+    setTimeout(checkPremium, 3000);
   }
 }
 
@@ -4179,7 +4205,7 @@ function toggleCanastaDropdown(e) {
 
 function showAddCanasta(e) {
   if (e) e.stopPropagation();
-  const isPremium = false; // futura integración
+  const isPremium = isPremiumUser;
   if (!isPremium && canastas.length >= MAX_CANASTAS_FREE) {
     showUpgrade();
     return;
@@ -4196,7 +4222,8 @@ function createCanasta() {
   const inp = document.getElementById('canasta-name-inp');
   const name = inp ? inp.value.trim() : '';
   if (!name) return;
-  if (canastas.length >= MAX_CANASTAS_PRO) { showUpgrade(); return; }
+  const maxC = isPremiumUser ? MAX_CANASTAS_PRO : MAX_CANASTAS_FREE;
+  if (canastas.length >= maxC) { showUpgrade(); return; }
   const newC = {
     id: 'c' + Date.now(),
     name,
@@ -4303,7 +4330,7 @@ function renderFamilyPanel() {
   const gateEl = document.getElementById('family-premium-gate');
   if (!cardsEl) return;
 
-  const isPremium = false;
+  const isPremium = isPremiumUser;
   const hasMultiple = canastas.length > 1;
 
   // Premium gate
@@ -4566,7 +4593,7 @@ function resetSubMonto(catId, subId) {
 }
 
 function showFamilyAddForm() {
-  const isPremium = false;
+  const isPremium = isPremiumUser;
   if (!isPremium && canastas.length >= MAX_CANASTAS_PRO) { showUpgrade(); return; }
   if (!isPremium && canastas.length >= MAX_CANASTAS_FREE) { showUpgrade(); return; }
   const form = document.getElementById('family-add-form');
@@ -4586,7 +4613,8 @@ function submitFamilyAdd() {
   const inp = document.getElementById('family-name-inp');
   const name = inp ? inp.value.trim() : '';
   if (!name) { if(inp) inp.focus(); return; }
-  if (canastas.length >= MAX_CANASTAS_PRO) { showUpgrade(); return; }
+  const maxCF = isPremiumUser ? MAX_CANASTAS_PRO : MAX_CANASTAS_FREE;
+  if (canastas.length >= maxCF) { showUpgrade(); return; }
   const newC = {
     id: 'c' + Date.now(),
     name,
@@ -4873,7 +4901,8 @@ function applyMacroData(data) {
   const rVal = data.riesgo ? (typeof data.riesgo === 'number' ? data.riesgo : (data.riesgo?.valor ?? 437)) : 437;
   const rv = Math.round(rVal);
   setMacroWithDelta('mc-riesgo', rv.toLocaleString('es-AR'), rv);
-  setMacro('mini-riesgo', rv.toLocaleString('es-AR'), rv < 800 ? 'dn' : '');
+  const miniRiesgoEl = document.getElementById('mini-riesgo');
+  if (miniRiesgoEl) miniRiesgoEl.textContent = rv.toLocaleString('es-AR');
 
   setMacro('mc-ipc-acum', '14,7%', '');
   setMacro('mc-tasa', '47%', '');
