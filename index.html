@@ -1269,61 +1269,7 @@ footer{border-top:1px solid var(--b1);padding:18px 2rem;display:flex;align-items
 
   <!-- UPGRADE MODAL -->
   <!-- MODAL UPGRADE — FLUJO DE PAGO -->
-  <div class="upgrade-modal" id="upgrade-modal" style="display:none">
-    <div class="upgrade-box" style="max-width:460px">
-      <button class="upgrade-close" onclick="hideUpgrade()">✕</button>
 
-      <!-- PASO 1: Elegir plan -->
-      <div id="pay-step-1">
-        <div class="upgrade-badge">★ PREMIUM</div>
-        <div class="upgrade-title">Desbloqueá Mi Inflación Premium</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
-          <div class="pay-plan-opt" id="opt-mensual" onclick="selectPlan('mensual')" style="border-color:var(--accent)">
-            <div class="pay-plan-name">Mensual</div>
-            <div class="pay-plan-price">$2.490<span>/mes</span></div>
-          </div>
-          <div class="pay-plan-opt" id="opt-anual" onclick="selectPlan('anual')">
-            <div class="pay-plan-name">Anual <span class="pay-plan-savings">2 meses gratis</span></div>
-            <div class="pay-plan-price">$19.900<span>/año</span></div>
-            <div style="font-size:10px;color:var(--t3)">= $1.658/mes</div>
-          </div>
-        </div>
-        <ul class="upgrade-list" style="margin-bottom:20px">
-          <li>✓ Historial ilimitado de meses</li>
-          <li>✓ Gráfico acumulado personal vs. INDEC</li>
-          <li>✓ Alerta cuando sale el IPC</li>
-          <li>✓ Modo familia (hasta 3 canastas)</li>
-        </ul>
-        <button class="btn-primary" style="width:100%" onclick="goPayStep2()">Continuar →</button>
-        <div style="font-size:11px;color:var(--t3);text-align:center;margin-top:10px">30 días de garantía · Cancelás cuando querés</div>
-      </div>
-
-      <!-- PASO 2: Redirige a MP -->
-      <div id="pay-step-2" style="display:none">
-        <button onclick="goPayStep1()" style="background:none;border:none;color:var(--t3);font-size:12px;cursor:pointer;margin-bottom:16px;padding:0">← Volver</button>
-        <div class="upgrade-badge">PAGO SEGURO VÍA MERCADO PAGO</div>
-        <div class="upgrade-title" id="pay-step2-title">Suscripción mensual · $2.490</div>
-        <div style="font-size:13px;color:var(--t2);margin-bottom:20px;line-height:1.5">
-          Al hacer click se abre Mercado Pago donde podés pagar con tarjeta, débito, saldo de MP o transferencia. Elegís vos el método.
-        </div>
-        <div class="pay-info-box" style="margin-bottom:16px">
-          <div class="pay-info-label">Destinatario</div>
-          <div class="pay-info-value">Agustín Pironi</div>
-          <div class="pay-info-label" style="margin-top:10px">Alias MP</div>
-          <div class="pay-info-value pay-copyable" onclick="copyText('agustinpironi.mp', this)">agustinpironi.mp</div>
-          <div class="pay-info-label" style="margin-top:10px">Importe</div>
-          <div class="pay-info-value accent" id="pay-amount-display" style="color:var(--accent)">$2.490</div>
-        </div>
-        <button class="btn-primary" style="width:100%;font-size:15px;padding:14px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="goToMercadoPago()" id="btn-go-mp">
-          🔵 Pagar con Mercado Pago →
-        </button>
-        <div style="font-size:11px;color:var(--t3);text-align:center;margin-top:10px;line-height:1.5">
-          Después del pago escribinos a <b style="color:var(--t2)">pironiagustin05@gmail.com</b> con el comprobante.<br>Activación en menos de 24hs hábiles.
-        </div>
-      </div>
-
-    </div>
-  </div>
 
 </div><!-- /panel-mi-historial -->
 
@@ -1623,6 +1569,62 @@ footer{border-top:1px solid var(--b1);padding:18px 2rem;display:flex;align-items
   <div class="footer-right"><a href="#" title="Creador">Agustín Pironi</a></div>
 </footer>
 
+
+  <div class="upgrade-modal" id="upgrade-modal" style="display:none">
+    <div class="upgrade-box" style="max-width:460px">
+      <button class="upgrade-close" onclick="hideUpgrade()">✕</button>
+
+      <!-- PASO 1: Elegir plan -->
+      <div id="pay-step-1">
+        <div class="upgrade-badge">★ PREMIUM</div>
+        <div class="upgrade-title">Desbloqueá Mi Inflación Premium</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
+          <div class="pay-plan-opt" id="opt-mensual" onclick="selectPlan('mensual')" style="border-color:var(--accent)">
+            <div class="pay-plan-name">Mensual</div>
+            <div class="pay-plan-price">$2.490<span>/mes</span></div>
+          </div>
+          <div class="pay-plan-opt" id="opt-anual" onclick="selectPlan('anual')">
+            <div class="pay-plan-name">Anual <span class="pay-plan-savings">2 meses gratis</span></div>
+            <div class="pay-plan-price">$19.900<span>/año</span></div>
+            <div style="font-size:10px;color:var(--t3)">= $1.658/mes</div>
+          </div>
+        </div>
+        <ul class="upgrade-list" style="margin-bottom:20px">
+          <li>✓ Historial ilimitado de meses</li>
+          <li>✓ Gráfico acumulado personal vs. INDEC</li>
+          <li>✓ Alerta cuando sale el IPC</li>
+          <li>✓ Modo familia (hasta 3 canastas)</li>
+        </ul>
+        <button class="btn-primary" style="width:100%" onclick="goPayStep2()">Continuar →</button>
+        <div style="font-size:11px;color:var(--t3);text-align:center;margin-top:10px">30 días de garantía · Cancelás cuando querés</div>
+      </div>
+
+      <!-- PASO 2: Redirige a MP -->
+      <div id="pay-step-2" style="display:none">
+        <button onclick="goPayStep1()" style="background:none;border:none;color:var(--t3);font-size:12px;cursor:pointer;margin-bottom:16px;padding:0">← Volver</button>
+        <div class="upgrade-badge">PAGO SEGURO VÍA MERCADO PAGO</div>
+        <div class="upgrade-title" id="pay-step2-title">Suscripción mensual · $2.490</div>
+        <div style="font-size:13px;color:var(--t2);margin-bottom:20px;line-height:1.5">
+          Al hacer click se abre Mercado Pago donde podés pagar con tarjeta, débito, saldo de MP o transferencia. Elegís vos el método.
+        </div>
+        <div class="pay-info-box" style="margin-bottom:16px">
+          <div class="pay-info-label">Destinatario</div>
+          <div class="pay-info-value">Agustín Pironi</div>
+          <div class="pay-info-label" style="margin-top:10px">Alias MP</div>
+          <div class="pay-info-value pay-copyable" onclick="copyText('agustinpironi.mp', this)">agustinpironi.mp</div>
+          <div class="pay-info-label" style="margin-top:10px">Importe</div>
+          <div class="pay-info-value accent" id="pay-amount-display" style="color:var(--accent)">$2.490</div>
+        </div>
+        <button class="btn-primary" style="width:100%;font-size:15px;padding:14px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="goToMercadoPago()" id="btn-go-mp">
+          🔵 Pagar con Mercado Pago →
+        </button>
+        <div style="font-size:11px;color:var(--t3);text-align:center;margin-top:10px;line-height:1.5">
+          Después del pago escribinos a <b style="color:var(--t2)">pironiagustin05@gmail.com</b> con el comprobante.<br>Activación en menos de 24hs hábiles.
+        </div>
+      </div>
+
+    </div>
+  </div>
 
   <!-- MODAL AUTH — aparece cuando se necesita cuenta -->
   <div class="upgrade-modal" id="auth-modal" style="display:none">
