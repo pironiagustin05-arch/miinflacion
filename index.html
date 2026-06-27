@@ -2072,6 +2072,7 @@ _sb.auth.onAuthStateChange(async (event, session) => {
 async function checkSession() {
   // Arrancar siempre en modo demo primero (app visible de inmediato)
   enterDemoMode();
+  checkPaymentReturn();
 
   // Luego verificar si hay sesión activa
   try {
@@ -3521,17 +3522,98 @@ function copyText(text, el) {
 // ═══════════════════════════════════════════════
 // EXPORT PDF MEJORADO — con gráficos y proyección
 // ═══════════════════════════════════════════════
-function goToMercadoPago() {
-  const amounts = { mensual: 2490, anual: 19900 };
-  const amount = amounts[selectedPlan] || 2490;
-  // Link de cobro de Mercado Pago — reemplazar con link real generado desde MP
-  // Por ahora redirige al perfil del alias con el monto precargado
+async function goToMercadoPago() {
   const mpUrls = {
     mensual: 'https://mpago.la/1SSjSf6',
     anual:   'https://mpago.la/1kxiiNU'
   };
-  const mpUrl = mpUrls[selectedPlan] || mpUrls.mensual;
-  window.open(mpUrl, '_blank');
+
+  // Si no hay sesión, redirigir directo al link de MP
+  if (!currentUser) {
+    window.open(mpUrls[selectedPlan] || mpUrls.mensual, '_blank');
+    return;
+  }
+
+  // Con sesión: intentar crear preferencia con metadata del usuario
+  const btn = document.getElementById('btn-go-mp');
+  if (btn) { btn.textContent = 'Redirigiendo…'; btn.disabled = true; }
+
+  try {
+    // Crear preferencia de pago con user_id en metadata
+    const MP_ACCESS_TOKEN = 'APP_USR-7062594778135741-062021-bbe15106abc69963edcec00e064d0ece-1216449967';
+    const isAnual = selectedPlan === 'anual';
+    const prefBody = {
+      items: [{
+        title: isAnual ? 'Mi Inflación Premium — Plan Anual' : 'Mi Inflación Premium — Plan Mensual',
+        quantity: 1,
+        unit_price: isAnual ? 19900 : 2490,
+        currency_id: 'ARS'
+      }],
+      metadata: { user_id: currentUser.id, plan: selectedPlan },
+      back_urls: {
+        success: 'https://miinflacion-gamma.vercel.app?payment=success',
+        failure: 'https://miinflacion-gamma.vercel.app?payment=failure',
+        pending: 'https://miinflacion-gamma.vercel.app?payment=pending'
+      },
+      auto_return: 'approved',
+      notification_url: 'https://jpmphuqutcwqbcqdaayk.supabase.co/functions/v1/mp-webhook'
+    };
+
+    const prefRes = await fetch('https://api.mercadopago.com/checkout/preferences', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + MP_ACCESS_TOKEN,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(prefBody)
+    });
+
+    if (prefRes.ok) {
+      const pref = await prefRes.json();
+      window.location.href = pref.init_point; // Redirige a MP con metadata
+    } else {
+      throw new Error('preference failed');
+    }
+  } catch(e) {
+    console.warn('MP preference error:', e);
+    // Fallback a link directo
+    window.open(mpUrls[selectedPlan] || mpUrls.mensual, '_blank');
+  } finally {
+    if (btn) { btn.textContent = 'Pagar con Mercado Pago'; btn.disabled = false; }
+  }
+}
+
+// Detectar retorno de MP con pago exitoso
+async function checkPaymentReturn() {
+  const params = new URLSearchParams(window.location.search);
+  const status = params.get('payment');
+  if (!status) return;
+
+  // Limpiar URL
+  window.history.replaceState({}, '', window.location.pathname);
+
+  if (status === 'success') {
+    // Esperar un momento para que el webhook procese
+    await new Promise(r => setTimeout(r, 2000));
+    // Recargar estado del usuario
+    if (currentUser) {
+      await loadUserState();
+      showToast('¡Premium activado! Bienvenido 🎉', 'success');
+    }
+  } else if (status === 'failure') {
+    showToast('El pago no se completó. Podés intentarlo de nuevo.', 'error');
+  }
+}
+
+function showToast(msg, type) {
+  const toast = document.createElement('div');
+  toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:' +
+    (type==='success' ? 'var(--accent)' : 'var(--red)') +
+    ';color:' + (type==='success' ? '#000' : '#fff') +
+    ';padding:12px 24px;border-radius:10px;font-size:14px;font-weight:600;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.3)';
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 4000);
 }
 
 function exportMonthReport() {
