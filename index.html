@@ -782,6 +782,63 @@ footer{border-top:1px solid var(--b1);padding:18px 2rem;display:flex;align-items
 .mmi-sep{width:1px;height:16px;background:var(--b1)}
 
 @media(max-width:768px){.anf-grid{grid-template-columns:1fr}.macro-cards{grid-template-columns:repeat(2,1fr)}}
+
+/* ══════════ ONBOARDING ══════════ */
+.onboarding-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.85);
+  z-index:800;display:flex;align-items:center;justify-content:center;
+  padding:1rem;backdrop-filter:blur(8px);
+}
+.onboarding-box{
+  background:var(--surf);border:1px solid var(--b2);
+  border-radius:20px;max-width:480px;width:100%;
+  padding:0;overflow:hidden;
+}
+.onboarding-header{
+  background:linear-gradient(135deg,#0f1a0f,#111);
+  padding:28px 28px 20px;border-bottom:1px solid var(--b1);
+  text-align:center;
+}
+.onboarding-logo{
+  font-family:var(--mono);font-size:18px;font-weight:700;
+  color:var(--accent);letter-spacing:.04em;margin-bottom:10px;
+}
+.onboarding-logo span{color:var(--t2);font-weight:300}
+.onboarding-welcome{font-size:22px;font-weight:700;color:var(--t1);margin-bottom:6px}
+.onboarding-sub{font-size:13px;color:var(--t2);line-height:1.5}
+.onboarding-steps{padding:24px 28px}
+.ob-step{
+  display:flex;align-items:start;gap:14px;
+  padding:14px 0;border-bottom:1px solid var(--b1);
+}
+.ob-step:last-child{border-bottom:none}
+.ob-step-icon{
+  width:36px;height:36px;border-radius:10px;
+  background:var(--accent-bg);border:1px solid rgba(200,241,53,.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;
+}
+.ob-step-body{}
+.ob-step-title{font-size:14px;font-weight:600;color:var(--t1);margin-bottom:3px}
+.ob-step-desc{font-size:12px;color:var(--t2);line-height:1.5}
+.ob-step-accent{color:var(--accent);font-weight:600}
+.onboarding-footer{padding:20px 28px;background:var(--surf2);border-top:1px solid var(--b1)}
+.ob-progress{display:flex;gap:4px;justify-content:center;margin-bottom:14px}
+.ob-dot{width:6px;height:6px;border-radius:50%;background:var(--b2);transition:background .2s}
+.ob-dot.active{background:var(--accent)}
+.ob-actions{display:flex;gap:8px}
+.ob-btn-primary{
+  flex:1;background:var(--accent);color:#000;border:none;
+  border-radius:8px;padding:11px;font-size:14px;font-weight:700;
+  cursor:pointer;font-family:var(--sans);transition:opacity .15s;
+}
+.ob-btn-primary:hover{opacity:.88}
+.ob-btn-skip{
+  background:none;border:1px solid var(--b2);color:var(--t3);
+  border-radius:8px;padding:11px 16px;font-size:13px;
+  cursor:pointer;font-family:var(--sans);transition:all .15s;
+}
+.ob-btn-skip:hover{border-color:var(--b3);color:var(--t2)}
 </style>
 </head>
 <body>
@@ -1857,6 +1914,55 @@ footer{border-top:1px solid var(--b1);padding:18px 2rem;display:flex;align-items
         </div>
       </div>
 
+    </div>
+  </div>
+
+
+  <!-- ONBOARDING — aparece la primera vez -->
+  <div class="onboarding-overlay" id="onboarding-overlay" style="display:none">
+    <div class="onboarding-box">
+      <div class="onboarding-header">
+        <div class="onboarding-logo">MI<span>INFLACIÓN</span></div>
+        <div class="onboarding-welcome">Bienvenido 👋</div>
+        <div class="onboarding-sub">En 3 pasos vas a calcular tu inflación personal real — la que aplica <em>a vos</em>, no al promedio.</div>
+      </div>
+
+      <!-- PASO 1 -->
+      <div class="onboarding-steps" id="ob-step-1">
+        <div class="ob-step">
+          <div class="ob-step-icon">📊</div>
+          <div class="ob-step-body">
+            <div class="ob-step-title">1. Cargá tus gastos por rubro</div>
+            <div class="ob-step-desc">Expandí cada categoría (Alimentos, Vivienda, Transporte…) y sumá cuánto gastás en cada una. Podés ir sumando a lo largo del mes.</div>
+          </div>
+        </div>
+        <div class="ob-step">
+          <div class="ob-step-icon">🧮</div>
+          <div class="ob-step-body">
+            <div class="ob-step-title">2. Tu IPC se calcula solo</div>
+            <div class="ob-step-desc">A medida que cargás montos, la app calcula en tiempo real tu <span class="ob-step-accent">inflación personal mensual</span> y la compara con el INDEC.</div>
+          </div>
+        </div>
+        <div class="ob-step">
+          <div class="ob-step-icon">📅</div>
+          <div class="ob-step-body">
+            <div class="ob-step-title">3. Guardá el mes y seguí la evolución</div>
+            <div class="ob-step-desc">Al cierre de mes guardás el snapshot. En <b>Mi historial</b> vas a ver cómo evolucionó tu inflación vs. la oficial mes a mes.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="onboarding-footer">
+        <div class="ob-progress">
+          <div class="ob-dot active" id="ob-dot-1"></div>
+          <div class="ob-dot" id="ob-dot-2"></div>
+          <div class="ob-dot" id="ob-dot-3"></div>
+        </div>
+        <div class="ob-actions">
+          <button class="ob-btn-skip" onclick="closeOnboarding()">Saltear</button>
+          <button class="ob-btn-primary" id="ob-next-btn" onclick="obNext()">Siguiente →</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -3236,6 +3342,7 @@ document.querySelectorAll('.rbtn').forEach(btn => {
 // ═══════════════════════════════════════════════
 function initApp() {
   initSidebar();
+  checkOnboarding();
   renderCanastaSelector();
   buildCatGrid();
   fetchMacro(); // mini widget en canasta
@@ -4885,6 +4992,92 @@ function switchLegalTab(tab) {
   const tabTyC = document.getElementById('legal-tab-tyc');
   if (tabPP) { tabPP.style.borderBottomColor = isPP ? 'var(--accent)' : 'transparent'; tabPP.style.color = isPP ? 'var(--accent)' : 'var(--t3)'; }
   if (tabTyC) { tabTyC.style.borderBottomColor = !isPP ? 'var(--accent)' : 'transparent'; tabTyC.style.color = !isPP ? 'var(--accent)' : 'var(--t3)'; }
+}
+
+// ═══════════════════════════════════════════════
+// ONBOARDING — aparece solo la primera vez
+// ═══════════════════════════════════════════════
+let obCurrentStep = 1;
+const OB_STEPS_CONTENT = [
+  {
+    title: 'Paso 1 de 3 — Tu canasta',
+    steps: [
+      { icon: '📊', title: '1. Cargá tus gastos por rubro', desc: 'Expandí cada categoría (Alimentos, Vivienda, Transporte…) y sumá cuánto gastás. Podés ir cargando a lo largo del mes.' },
+      { icon: '🧮', title: '2. Tu IPC se calcula solo', desc: 'A medida que cargás montos, la app calcula en tiempo real tu inflación personal y la compara con el INDEC.' },
+      { icon: '📅', title: '3. Guardá el mes', desc: 'Al cierre de mes guardás el snapshot. En Mi historial vas a ver la evolución mes a mes.' },
+    ],
+    btn: 'Siguiente →'
+  },
+  {
+    title: 'Paso 2 de 3 — Argentina Hoy',
+    steps: [
+      { icon: '🇦🇷', title: 'Indicadores macro en tiempo real', desc: 'Dólar oficial, blue, MEP, CCL, riesgo país y reservas actualizados automáticamente.' },
+      { icon: '📰', title: 'Noticias económicas curadas', desc: 'Macro argentina, política, geopolítica y acuerdos internacionales relevantes. Actualizadas cada 2-3 días.' },
+      { icon: '📈', title: 'IPC mensual del INDEC', desc: 'Seguí la evolución del IPC oficial por división y región, en tiempo real cuando el INDEC publica.' },
+    ],
+    btn: 'Siguiente →'
+  },
+  {
+    title: 'Paso 3 de 3 — Tu cuenta',
+    steps: [
+      { icon: '☁️', title: 'Tus datos en la nube', desc: 'Registrarte es gratis. Tu canasta se sincroniza entre todos tus dispositivos automáticamente.' },
+      { icon: '⭐', title: 'Plan Premium', desc: 'Historial ilimitado, PDF mensual, modo familia y alertas cuando sale el IPC. $2.490/mes.' },
+      { icon: '🔒', title: 'Tus datos son privados', desc: 'Nunca vendemos tu información. Podés eliminar tu cuenta y todos tus datos en cualquier momento.' },
+    ],
+    btn: '¡Empezar!'
+  }
+];
+
+function showOnboarding() {
+  const overlay = document.getElementById('onboarding-overlay');
+  if (overlay) overlay.style.display = 'flex';
+  obCurrentStep = 1;
+  renderObStep(1);
+}
+
+function closeOnboarding() {
+  const overlay = document.getElementById('onboarding-overlay');
+  if (overlay) overlay.style.display = 'none';
+  localStorage.setItem('ob_done', '1');
+}
+
+function obNext() {
+  if (obCurrentStep >= 3) { closeOnboarding(); return; }
+  obCurrentStep++;
+  renderObStep(obCurrentStep);
+}
+
+function renderObStep(step) {
+  const data = OB_STEPS_CONTENT[step - 1];
+  const stepsEl = document.getElementById('ob-step-1');
+  if (!stepsEl) return;
+
+  stepsEl.innerHTML = data.steps.map(s =>
+    '<div class="ob-step">' +
+      '<div class="ob-step-icon">' + s.icon + '</div>' +
+      '<div class="ob-step-body">' +
+        '<div class="ob-step-title">' + s.title + '</div>' +
+        '<div class="ob-step-desc">' + s.desc + '</div>' +
+      '</div>' +
+    '</div>'
+  ).join('');
+
+  // Actualizar dots
+  for (let i = 1; i <= 3; i++) {
+    const dot = document.getElementById('ob-dot-' + i);
+    if (dot) dot.classList.toggle('active', i === step);
+  }
+
+  // Actualizar botón
+  const btn = document.getElementById('ob-next-btn');
+  if (btn) btn.textContent = data.btn;
+}
+
+function checkOnboarding() {
+  const done = localStorage.getItem('ob_done');
+  if (!done) {
+    setTimeout(showOnboarding, 800); // pequeño delay para que cargue la app primero
+  }
 }
 
 // Boot
