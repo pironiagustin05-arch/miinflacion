@@ -839,6 +839,253 @@ footer{border-top:1px solid var(--b1);padding:18px 2rem;display:flex;align-items
   cursor:pointer;font-family:var(--sans);transition:all .15s;
 }
 .ob-btn-skip:hover{border-color:var(--b3);color:var(--t2)}
+
+/* ══════════ MODO CLARO ══════════ */
+body.light-mode {
+  --bg:    #f4f4f0;
+  --surf:  #ffffff;
+  --surf2: #f0f0ec;
+  --surf3: #e8e8e4;
+  --b1:    #e0e0dc;
+  --b2:    #d0d0cc;
+  --b3:    #b0b0ac;
+  --t1:    #111111;
+  --t2:    #444444;
+  --t3:    #888888;
+  --accent:#4a7c00;
+  --accent-bg: rgba(74,124,0,0.08);
+  --red:   #cc2200;
+  --green: #2a7a00;
+  --amber: #b86000;
+  --purple:#6633cc;
+}
+body.light-mode .topbar {
+  background: rgba(244,244,240,0.96);
+  border-bottom-color: var(--b1);
+}
+body.light-mode .sidebar {
+  background: #fafaf6;
+}
+body.light-mode .nav-tab.active {
+  background: rgba(74,124,0,0.1);
+}
+body.light-mode .macro-card {
+  background: #fafaf6;
+}
+body.light-mode .noticia-card {
+  background: #fafaf6;
+}
+body.light-mode .cat-card {
+  background: #fafaf6;
+}
+body.light-mode .hero-box {
+  background: linear-gradient(135deg,#f0f5e8,#e8f0d8);
+}
+
+/* Toggle btn */
+.theme-toggle {
+  background: none;
+  border: 1px solid var(--b2);
+  border-radius: 20px;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--t2);
+  transition: all .15s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  line-height: 1;
+}
+.theme-toggle:hover { border-color: var(--b3); color: var(--t1); }
+
+/* ══════════ MOBILE RESPONSIVE ══════════ */
+@media (max-width: 768px) {
+
+  /* Ocultar sidebar en mobile */
+  .sidebar { display: none !important; }
+
+  /* Content area ocupa todo el ancho */
+  .content-area {
+    margin-left: 0 !important;
+    padding-bottom: 80px; /* espacio para la barra inferior */
+  }
+
+  /* Topbar mobile */
+  .topbar { padding: 0 12px 0 0; }
+  .nav-brand { padding: 0 14px; font-size: 12px; }
+  .topbar-mid { padding: 0 10px; gap: 8px; }
+  .canasta-selector { max-width: 120px; }
+  .canasta-active-btn { font-size: 11px; padding: 4px 8px; }
+  .theme-toggle { padding: 3px 8px; font-size: 12px; }
+  .nav-user { display: none; }
+
+  /* Panels */
+  .panel { padding: 1.2rem 1rem 5rem; }
+  .container { padding: 0 1rem; }
+
+  /* Hero */
+  .hero-box { padding: 1.2rem 1rem; }
+  .hero-ipc { font-size: 52px; }
+  .hero-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  /* Cat grid */
+  .cat-grid { grid-template-columns: 1fr; gap: 8px; }
+
+  /* Macro cards */
+  .macro-cards { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+  .mc-val { font-size: 18px; }
+
+  /* Family cards */
+  .family-cards { grid-template-columns: 1fr; }
+
+  /* Onboarding */
+  .onboarding-box { margin: 1rem; border-radius: 16px; }
+
+  /* Modales */
+  .upgrade-box { margin: 1rem; max-height: 90vh; overflow-y: auto; }
+  .auth-box { margin: 1rem; }
+
+  /* Anf grid */
+  .anf-grid { grid-template-columns: 1fr; }
+
+  /* Demo banner */
+  .demo-banner { flex-direction: column; gap: 8px; padding: 10px 1rem; }
+  .demo-banner-right { width: 100%; }
+  .demo-cta-primary, .demo-cta-secondary { flex: 1; text-align: center; }
+
+  /* IPC status bar */
+  .ipc-status-bar { flex-direction: column; gap: 6px; padding: 10px 1rem; }
+}
+
+/* ══════════ BARRA INFERIOR MOBILE ══════════ */
+.mobile-bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 300;
+  background: var(--surf);
+  border-top: 1px solid var(--b1);
+  padding: 0;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.mobile-bottom-nav-inner {
+  display: flex;
+  align-items: stretch;
+  height: 58px;
+}
+
+.mbn-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px 0;
+  color: var(--t3);
+  font-family: var(--sans);
+  transition: color .15s;
+  position: relative;
+}
+.mbn-item.active { color: var(--accent); }
+.mbn-item:active { background: var(--surf2); }
+.mbn-icon { font-size: 20px; line-height: 1; }
+.mbn-label { font-size: 9px; font-weight: 600; letter-spacing: .02em; }
+.mbn-dot {
+  position: absolute;
+  top: 6px; right: calc(50% - 14px);
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: none;
+}
+.mbn-dot.show { display: block; }
+
+@media (max-width: 768px) {
+  .mobile-bottom-nav { display: block; }
+}
+
+/* ══════════ MIS FINANZAS ══════════ */
+.fin-section { margin-bottom: 1.6rem; }
+.fin-card {
+  background: var(--surf); border: 1px solid var(--b1);
+  border-radius: var(--rl); padding: 20px;
+}
+.fin-input-row { display: flex; flex-direction: column; gap: 8px; }
+.fin-input-wrap {
+  display: flex; align-items: center;
+  background: var(--surf2); border: 1px solid var(--b2);
+  border-radius: 8px; overflow: hidden;
+  transition: border-color .15s;
+}
+.fin-input-wrap:focus-within { border-color: var(--accent); }
+.fin-prefix {
+  padding: 0 14px; font-size: 16px;
+  color: var(--t3); font-family: var(--mono);
+}
+.fin-inp {
+  flex: 1; background: transparent; border: none; outline: none;
+  font-size: 18px; font-family: var(--mono); font-weight: 600;
+  color: var(--t1); padding: 12px 0;
+}
+.fin-inp::placeholder { color: var(--b3); }
+
+/* Métricas grid */
+.fin-metrics-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.fin-metric {
+  background: var(--surf2); border-radius: 8px;
+  padding: 12px; border: 1px solid var(--b1);
+}
+.fin-metric-lbl {
+  font-size: 10px; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--t3);
+  margin-bottom: 6px;
+}
+.fin-metric-val {
+  font-family: var(--mono); font-size: 20px;
+  font-weight: 700; color: var(--t1);
+  margin-bottom: 8px; line-height: 1;
+}
+.fin-metric-bar {
+  height: 5px; background: var(--b2);
+  border-radius: 3px; overflow: hidden; margin-bottom: 4px;
+}
+.fin-metric-fill {
+  height: 100%; border-radius: 3px;
+  transition: width .5s ease, background .3s;
+  width: 0%;
+}
+.fin-metric-ref { font-size: 10px; color: var(--t3); }
+
+/* Recomendaciones */
+.fin-rec {
+  display: flex; align-items: start; gap: 10px;
+  padding: 10px 12px; border-radius: 8px;
+  font-size: 12px; line-height: 1.5;
+}
+.fin-rec-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.fin-rec-text { color: var(--t2); flex: 1; }
+.fin-rec-text b { color: var(--t1); }
+.fin-rec.rec-ok { background: rgba(42,122,0,.08); border: 1px solid rgba(42,122,0,.15); }
+.fin-rec.rec-warn { background: rgba(184,96,0,.08); border: 1px solid rgba(184,96,0,.15); }
+.fin-rec.rec-bad { background: rgba(204,34,0,.08); border: 1px solid rgba(204,34,0,.15); }
+
+/* Mono alert */
+.mono-alert-ok { background: rgba(42,122,0,.08); color: var(--green); border: 1px solid rgba(42,122,0,.2); }
+.mono-alert-warn { background: rgba(184,96,0,.08); color: var(--amber); border: 1px solid rgba(184,96,0,.2); }
+.mono-alert-bad { background: rgba(204,34,0,.08); color: var(--red); border: 1px solid rgba(204,34,0,.2); }
+
+@media(max-width:768px){
+  .fin-metrics-grid { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
@@ -944,6 +1191,9 @@ footer{border-top:1px solid var(--b1);padding:18px 2rem;display:flex;align-items
     </div>
   </div>
   <div class="topbar-right">
+    <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="Cambiar tema">
+      <span id="theme-icon">☀️</span>
+    </button>
     <div id="nav-guest" style="display:flex;align-items:center;gap:8px">
       <button class="btn-logout" style="background:var(--accent);color:#000;font-weight:700;border-color:var(--accent)" onclick="showAuthModal()">Registrarse</button>
       <button class="btn-logout" onclick="showAuthModal('login')">Ingresar</button>
@@ -988,6 +1238,10 @@ footer{border-top:1px solid var(--b1);padding:18px 2rem;display:flex;align-items
     </button>
     <div class="sidebar-divider"></div>
     <div class="sidebar-section-lbl">Info</div>
+    <button class="nav-tab" data-panel="finanzas">
+      <span class="tab-icon">💡</span>
+      <span class="tab-label">Mis Finanzas</span>
+    </button>
     <button class="nav-tab" data-panel="planes">
       <span class="tab-icon">⭐</span>
       <span class="tab-label">Planes</span>
@@ -1489,6 +1743,167 @@ footer{border-top:1px solid var(--b1);padding:18px 2rem;display:flex;align-items
 
 </div><!-- /panel-argentina -->
 
+<!-- ── PANEL: MIS FINANZAS ── -->
+<div class="panel container" id="panel-finanzas" style="padding-bottom:5rem">
+
+  <div class="how-hero" style="margin-bottom:1.6rem">
+    <div class="hero-eyebrow">Salud financiera</div>
+    <div style="font-size:24px;font-weight:700;color:var(--t1);margin-bottom:4px">Mis Finanzas</div>
+    <div style="font-size:13px;color:var(--t2)">Monotributo · Score de deuda · Flujo de caja · Recomendaciones personalizadas</div>
+  </div>
+
+  <!-- INGRESO MENSUAL -->
+  <div class="fin-section">
+    <div class="sec-hd"><div class="sec-title">Ingreso mensual neto</div></div>
+    <div class="fin-card">
+      <div class="fin-input-row">
+        <div class="fin-input-wrap">
+          <span class="fin-prefix">$</span>
+          <input type="number" id="fin-ingreso" class="fin-inp" placeholder="Ej: 850.000"
+            min="0" step="10000" inputmode="numeric"
+            oninput="calcFinanzas()" />
+        </div>
+        <div style="font-size:12px;color:var(--t3);margin-top:8px">
+          Ingresá tu sueldo o facturación mensual promedio (lo que realmente recibís, después de impuestos)
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MONOTRIBUTO -->
+  <div class="fin-section">
+    <div class="sec-hd"><div class="sec-title">Categoría Monotributo</div>
+      <span style="font-size:11px;color:var(--t3)">Valores 2026</span>
+    </div>
+    <div class="fin-card">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+        <div>
+          <label class="form-label">Tu categoría</label>
+          <select id="fin-mono-cat" class="form-input" onchange="calcFinanzas()">
+            <option value="">— No soy monotributista —</option>
+            <option value="A">A — hasta $2.000.000/año</option>
+            <option value="B">B — hasta $3.000.000/año</option>
+            <option value="C">C — hasta $4.100.000/año</option>
+            <option value="D">D — hasta $5.500.000/año</option>
+            <option value="E">E — hasta $6.700.000/año</option>
+            <option value="F">F — hasta $8.200.000/año</option>
+            <option value="G">G — hasta $9.900.000/año</option>
+            <option value="H">H — hasta $12.200.000/año</option>
+            <option value="I">I — hasta $14.000.000/año</option>
+            <option value="J">J — hasta $16.300.000/año</option>
+            <option value="K">K — hasta $18.700.000/año</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Facturación mensual estimada $</label>
+          <div class="fin-input-wrap">
+            <span class="fin-prefix">$</span>
+            <input type="number" id="fin-facturacion" class="fin-inp" placeholder="Ej: 700.000"
+              min="0" step="10000" inputmode="numeric" oninput="calcFinanzas()" />
+          </div>
+        </div>
+      </div>
+      <!-- Barra de progreso monotributo -->
+      <div id="mono-progress-wrap" style="display:none">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+          <span style="font-size:12px;color:var(--t2)" id="mono-progress-lbl">Facturación anual proyectada</span>
+          <span style="font-size:12px;font-family:var(--mono);font-weight:700" id="mono-progress-pct">0%</span>
+        </div>
+        <div style="height:8px;background:var(--b2);border-radius:4px;overflow:hidden;margin-bottom:8px">
+          <div id="mono-progress-bar" style="height:100%;border-radius:4px;transition:width .4s,background .3s;width:0%"></div>
+        </div>
+        <div id="mono-alert" style="font-size:12px;padding:8px 12px;border-radius:6px;display:none"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCORE DE DEUDA -->
+  <div class="fin-section">
+    <div class="sec-hd"><div class="sec-title">Score de salud financiera</div>
+      <a href="https://tirr.com" target="_blank" rel="noopener"
+        style="font-size:11px;color:var(--accent);text-decoration:none;display:flex;align-items:center;gap:4px">
+        Ver score oficial en TIRR ↗
+      </a>
+    </div>
+    <div class="fin-card" id="fin-score-card">
+      <div id="fin-score-empty" style="text-align:center;padding:20px;color:var(--t3);font-size:13px">
+        Ingresá tu ingreso mensual para calcular tu score
+      </div>
+      <div id="fin-score-content" style="display:none">
+        <!-- Score principal -->
+        <div style="display:flex;align-items:center;gap:24px;margin-bottom:20px;flex-wrap:wrap">
+          <div style="position:relative;width:100px;height:100px;flex-shrink:0">
+            <svg viewBox="0 0 100 100" style="width:100%;height:100%;transform:rotate(-90deg)">
+              <circle cx="50" cy="50" r="42" fill="none" stroke="var(--b2)" stroke-width="10"/>
+              <circle cx="50" cy="50" r="42" fill="none" stroke-width="10"
+                id="score-circle"
+                stroke-dasharray="264"
+                stroke-dashoffset="264"
+                stroke-linecap="round"
+                style="transition:stroke-dashoffset .8s ease,stroke .4s"/>
+            </svg>
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+              <span id="score-num" style="font-family:var(--mono);font-size:26px;font-weight:700;line-height:1">—</span>
+              <span style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.05em">/100</span>
+            </div>
+          </div>
+          <div style="flex:1">
+            <div id="score-label" style="font-size:18px;font-weight:700;margin-bottom:4px">—</div>
+            <div id="score-desc" style="font-size:13px;color:var(--t2);line-height:1.5">—</div>
+          </div>
+        </div>
+
+        <!-- Métricas detalladas -->
+        <div class="fin-metrics-grid">
+          <div class="fin-metric">
+            <div class="fin-metric-lbl">Ratio deuda/ingreso (DTI)</div>
+            <div class="fin-metric-val" id="met-dti">—</div>
+            <div class="fin-metric-bar"><div id="bar-dti" class="fin-metric-fill"></div></div>
+            <div class="fin-metric-ref">Saludable: &lt;20% · Límite: 35%</div>
+          </div>
+          <div class="fin-metric">
+            <div class="fin-metric-lbl">Flujo de caja mensual</div>
+            <div class="fin-metric-val" id="met-flujo">—</div>
+            <div class="fin-metric-bar"><div id="bar-flujo" class="fin-metric-fill"></div></div>
+            <div class="fin-metric-ref">Ingreso − gastos − deudas</div>
+          </div>
+          <div class="fin-metric">
+            <div class="fin-metric-lbl">Tasa de ahorro</div>
+            <div class="fin-metric-val" id="met-ahorro">—</div>
+            <div class="fin-metric-bar"><div id="bar-ahorro" class="fin-metric-fill"></div></div>
+            <div class="fin-metric-ref">Recomendado: mínimo 10%</div>
+          </div>
+          <div class="fin-metric">
+            <div class="fin-metric-lbl">Gasto vs ingreso</div>
+            <div class="fin-metric-val" id="met-gasto">—</div>
+            <div class="fin-metric-bar"><div id="bar-gasto" class="fin-metric-fill"></div></div>
+            <div class="fin-metric-ref">Recomendado: máximo 70%</div>
+          </div>
+        </div>
+
+        <!-- Recomendaciones -->
+        <div style="margin-top:16px">
+          <div style="font-size:12px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Recomendaciones</div>
+          <div id="fin-recomendaciones" style="display:flex;flex-direction:column;gap:8px"></div>
+        </div>
+
+        <!-- Link TIRR -->
+        <div style="margin-top:16px;padding:12px;background:var(--surf2);border-radius:8px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+          <div>
+            <div style="font-size:12px;font-weight:600;color:var(--t1);margin-bottom:2px">¿Querés saber tu score crediticio oficial?</div>
+            <div style="font-size:11px;color:var(--t3)">TIRR.com es la plataforma argentina que muestra tu historial y scoring de deuda real</div>
+          </div>
+          <a href="https://tirr.com" target="_blank" rel="noopener"
+            style="background:var(--accent);color:#000;padding:8px 16px;border-radius:7px;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;flex-shrink:0">
+            Ver en TIRR →
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /panel-finanzas -->
+
 <!-- ── PANEL: LEGAL ── -->
 <div class="panel container" id="panel-legal" style="padding-bottom:5rem">
 
@@ -1906,6 +2321,19 @@ footer{border-top:1px solid var(--b1);padding:18px 2rem;display:flex;align-items
           <div class="pay-info-label" style="margin-top:10px">Importe</div>
           <div class="pay-info-value accent" id="pay-amount-display" style="color:var(--accent)">$2.490</div>
         </div>
+        <!-- Campo código promocional -->
+        <div style="margin-bottom:12px">
+          <div style="display:flex;gap:8px">
+            <input id="promo-code-inp" class="form-input" type="text" placeholder="¿Tenés un código? Ingresalo acá"
+              style="flex:1;padding:10px 14px;font-size:13px;text-transform:uppercase;letter-spacing:.05em"
+              oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')applyPromoCode()" />
+            <button onclick="applyPromoCode()" class="btn-logout"
+              style="padding:10px 16px;font-size:13px;white-space:nowrap;border-color:var(--accent);color:var(--accent)">
+              Aplicar
+            </button>
+          </div>
+          <div id="promo-msg" style="font-size:11px;margin-top:6px;display:none"></div>
+        </div>
         <button class="btn-primary" style="width:100%;font-size:15px;padding:14px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="goToMercadoPago()" id="btn-go-mp">
           🔵 Pagar con Mercado Pago →
         </button>
@@ -1917,6 +2345,36 @@ footer{border-top:1px solid var(--b1);padding:18px 2rem;display:flex;align-items
     </div>
   </div>
 
+
+  <!-- BARRA INFERIOR MOBILE -->
+  <nav class="mobile-bottom-nav" id="mobile-bottom-nav">
+    <div class="mobile-bottom-nav-inner">
+      <button class="mbn-item active" data-panel="canasta" onclick="mobileNav('canasta',this)">
+        <span class="mbn-icon">📊</span>
+        <span class="mbn-label">Canasta</span>
+      </button>
+      <button class="mbn-item" data-panel="argentina" onclick="mobileNav('argentina',this)">
+        <span class="mbn-icon">🇦🇷</span>
+        <span class="mbn-label">Hoy</span>
+      </button>
+      <button class="mbn-item" data-panel="mi-historial" onclick="mobileNav('mi-historial',this)">
+        <span class="mbn-icon">📅</span>
+        <span class="mbn-label">Historial</span>
+      </button>
+      <button class="mbn-item" data-panel="historial" onclick="mobileNav('historial',this)">
+        <span class="mbn-icon">📈</span>
+        <span class="mbn-label">IPC</span>
+      </button>
+      <button class="mbn-item" data-panel="finanzas" onclick="mobileNav('finanzas',this)">
+        <span class="mbn-icon">💡</span>
+        <span class="mbn-label">Finanzas</span>
+      </button>
+      <button class="mbn-item" data-panel="planes" onclick="mobileNav('planes',this)">
+        <span class="mbn-icon">⭐</span>
+        <span class="mbn-label">Planes</span>
+      </button>
+    </div>
+  </nav>
 
   <!-- ONBOARDING — aparece la primera vez -->
   <div class="onboarding-overlay" id="onboarding-overlay" style="display:none">
@@ -2084,6 +2542,12 @@ const CATS = [
       {id:"electricidad",name:"Electricidad",ipc:2.5,w:20},
       {id:"agua",name:"Agua",ipc:1.8,w:15},
     ]},
+  {id:"expensas",name:"Expensas",icon:"🏢",ipc_base:2.8,
+    subs:[
+      {id:"exp_ordinarias",name:"Expensas ordinarias",ipc:3.0,w:70},
+      {id:"exp_extraordinarias",name:"Expensas extraordinarias",ipc:2.5,w:20},
+      {id:"administracion",name:"Administración",ipc:2.0,w:10},
+    ]},
   {id:"transporte",name:"Transporte",icon:"🚌",ipc_base:2.0,
     subs:[
       {id:"combustible",name:"Combustible",ipc:1.5,w:30},
@@ -2132,6 +2596,26 @@ const CATS = [
       {id:"muebles",name:"Muebles",ipc:1.5,w:30},
       {id:"electrodom",name:"Electrodomésticos",ipc:1.2,w:40},
       {id:"limpieza",name:"Limpieza / Higiene",ipc:1.6,w:30},
+    ]},
+  {id:"banco_deudas",name:"Banco y Deudas",icon:"💳",ipc_base:0,
+    subs:[
+      {id:"tarjeta_credito",name:"Tarjeta de crédito",ipc:0,w:40},
+      {id:"cuotas_compras",name:"Cuotas de compras",ipc:0,w:25},
+      {id:"prestamo_bancario",name:"Préstamo bancario",ipc:0,w:20},
+      {id:"otras_deudas",name:"Otras deudas",ipc:0,w:15},
+    ]},
+  {id:"ahorro",name:"Ahorro",icon:"🏦",ipc_base:0,
+    subs:[
+      {id:"ahorro_pesos",name:"Ahorro en pesos",ipc:0,w:30},
+      {id:"ahorro_dolares",name:"Ahorro en dólares",ipc:0,w:40},
+      {id:"ahorro_plazo_fijo",name:"Plazo fijo",ipc:0,w:30},
+    ]},
+  {id:"inversion",name:"Inversión",icon:"📈",ipc_base:0,
+    subs:[
+      {id:"acciones",name:"Acciones / CEDEARs",ipc:0,w:35},
+      {id:"cripto",name:"Criptomonedas",ipc:0,w:25},
+      {id:"fondos",name:"Fondos comunes",ipc:0,w:25},
+      {id:"otras_inv",name:"Otras inversiones",ipc:0,w:15},
     ]},
 ];
 
@@ -2418,6 +2902,7 @@ _sb.auth.onAuthStateChange(async (event, session) => {
 // ── Check session al cargar ──
 async function checkSession() {
   // Arrancar siempre en modo demo primero (app visible de inmediato)
+  initTheme();
   enterDemoMode();
   checkPaymentReturn();
 
@@ -3312,7 +3797,8 @@ document.querySelectorAll('.nav-tab').forEach(t => {
     document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
     t.classList.add('active');
     const pid = 'panel-'+(t.dataset.panel);
-    document.getElementById(pid).classList.add('active');
+    document.getElementById(pid)?.classList.add('active');
+    syncMobileNav(t.dataset.panel);
     window.scrollTo({top:0,behavior:'smooth'});
     if (t.dataset.panel === 'mi-historial') {
       renderHistorial();
@@ -4922,11 +5408,16 @@ async function fetchNoticias() {
   const el = document.getElementById('noticias-list');
   if (!el) return;
   try {
+    // Auto-limpiar noticias viejas (más de 3 días) si es admin
+    if (currentUser?.email === ADMIN_EMAIL) {
+      await autoCleanNoticias();
+    }
+
     const { data, error } = await _sb
       .from('noticias')
       .select('*')
       .order('created_at', { ascending: false })
-      .limit(20);
+      .limit(30);
 
     if (error || !data || data.length === 0) {
       el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--t3);font-size:13px">No hay noticias publicadas todavía.</div>';
@@ -4940,10 +5431,26 @@ async function fetchNoticias() {
     data.forEach(n => {
       const cat = CAT_LABELS[n.categoria] || CAT_LABELS.general;
       const fecha = new Date(n.created_at).toLocaleDateString('es-AR', {day:'numeric',month:'short',year:'numeric'});
+
+      // Calcular antigüedad
+      const hoursOld = (Date.now() - new Date(n.created_at).getTime()) / 3600000;
+      const isOld = hoursOld > 48; // marcar como "ayer" si tiene más de 48hs
+
       const card = document.createElement('div');
       card.className = 'noticia-card';
+      card.dataset.noticiaId = n.id;
+
+      // Construir HTML sin onclick inline — usar data-id y event delegation
+      const delBtn = isAdmin
+        ? '<button class="noticia-del-btn" data-del-id="' + n.id + '">✕ Eliminar</button>'
+        : '';
+
+      const ageTag = isOld
+        ? '<span style="font-size:10px;color:var(--t3);padding:2px 6px;background:var(--surf2);border-radius:4px">' + Math.floor(hoursOld/24) + 'd</span>'
+        : '';
+
       card.innerHTML =
-        (n.imagen_url ? '<img class="noticia-img" src="' + n.imagen_url + '" alt="" style="background:var(--surf2)" />' : '') +
+        (n.imagen_url ? '<img class="noticia-img" src="' + n.imagen_url + '" alt="" style="background:var(--surf2)"" />' : '') +
         '<div class="noticia-body">' +
           '<span class="noticia-cat ' + cat.cls + '">' + cat.label + '</span>' +
           '<div class="noticia-titulo">' + n.titulo + '</div>' +
@@ -4952,19 +5459,55 @@ async function fetchNoticias() {
             (n.link ? '<a class="noticia-link" href="' + n.link + '" target="_blank" rel="noopener">Leer nota completa ↗</a>' : '<span></span>') +
             '<div style="display:flex;align-items:center;gap:8px">' +
               '<span class="noticia-fecha">' + fecha + '</span>' +
-              (isAdmin ? '<button class="noticia-del-btn" onclick="deleteNoticia(\"' + n.id + '\")">✕ Eliminar</button>' : '') +
+              ageTag +
+              delBtn +
             '</div>' +
           '</div>' +
         '</div>';
+
       inner.appendChild(card);
     });
 
     el.innerHTML = '';
     el.appendChild(inner);
 
+    // Event delegation para los botones de eliminar — evita problemas con comillas en UUID
+    inner.addEventListener('click', async (e) => {
+      const btn = e.target.closest('[data-del-id]');
+      if (!btn) return;
+      const id = btn.dataset.delId;
+      if (!id) return;
+      if (!confirm('¿Eliminar esta noticia?')) return;
+      btn.textContent = '...';
+      btn.disabled = true;
+      const { error } = await _sb.from('noticias').delete().eq('id', id);
+      if (error) {
+        console.error('Error eliminando noticia:', error);
+        btn.textContent = '✕ Error';
+        btn.disabled = false;
+      } else {
+        btn.closest('.noticia-card')?.remove();
+      }
+    });
+
   } catch(e) {
     console.warn('Error noticias:', e);
     el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--t3)">Error cargando noticias.</div>';
+  }
+}
+
+// ── Auto-limpiar noticias de más de 3 días ──
+async function autoCleanNoticias() {
+  try {
+    const cutoff = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
+    const { error } = await _sb
+      .from('noticias')
+      .delete()
+      .lt('created_at', cutoff);
+    if (error) console.warn('Error auto-clean noticias:', error);
+    else console.log('Auto-clean noticias ejecutado (cutoff:', cutoff, ')');
+  } catch(e) {
+    console.warn('autoCleanNoticias error:', e);
   }
 }
 
@@ -5010,11 +5553,7 @@ async function submitNoticia() {
   fetchNoticias();
 }
 
-async function deleteNoticia(id) {
-  if (!confirm('¿Eliminar esta noticia?')) return;
-  await _sb.from('noticias').delete().eq('id', id);
-  fetchNoticias();
-}
+// deleteNoticia ahora se maneja via event delegation en fetchNoticias
 
 // ── Mostrar botón admin si corresponde ──
 function checkAdminUI() {
@@ -5132,6 +5671,412 @@ function checkOnboarding() {
   if (!done) {
     setTimeout(showOnboarding, 800); // pequeño delay para que cargue la app primero
   }
+}
+
+// ═══════════════════════════════════════════════
+// CÓDIGO PROMOCIONAL / ACCESO PREMIUM
+// ═══════════════════════════════════════════════
+const PROMO_CODES = {
+  'AGUS': { type: 'premium', label: 'Acceso Premium activado ✓' },
+};
+
+async function applyPromoCode() {
+  const inp = document.getElementById('promo-code-inp');
+  const msg = document.getElementById('promo-msg');
+  const code = inp ? inp.value.trim().toUpperCase() : '';
+
+  if (!code) return;
+
+  const promo = PROMO_CODES[code];
+  if (!promo) {
+    if (msg) {
+      msg.textContent = 'Código inválido. Verificá que esté bien escrito.';
+      msg.style.color = 'var(--red)';
+      msg.style.display = 'block';
+    }
+    return;
+  }
+
+  // Si no está logueado, pedir que se registre primero
+  if (!currentUser) {
+    if (msg) {
+      msg.textContent = 'Primero registrate o ingresá con tu cuenta para activar el código.';
+      msg.style.color = 'var(--amber)';
+      msg.style.display = 'block';
+    }
+    return;
+  }
+
+  // Activar premium en Supabase
+  if (msg) {
+    msg.textContent = 'Activando…';
+    msg.style.color = 'var(--t2)';
+    msg.style.display = 'block';
+  }
+
+  const { error } = await _sb.from('user_state').upsert({
+    user_id: currentUser.id,
+    is_premium: true,
+    premium_since: new Date().toISOString()
+  }, { onConflict: 'user_id' });
+
+  if (error) {
+    if (msg) {
+      msg.textContent = 'Error al activar. Intentá de nuevo.';
+      msg.style.color = 'var(--red)';
+    }
+    return;
+  }
+
+  // Actualizar estado local
+  isPremiumUser = true;
+  await loadUserState();
+
+  if (msg) {
+    msg.textContent = '🎉 ' + promo.label;
+    msg.style.color = 'var(--green)';
+  }
+
+  if (inp) inp.value = '';
+
+  // Actualizar UI
+  renderHistorial();
+  renderFamilyPanel();
+  renderCanastaSelector();
+
+  // Cerrar modal después de 2 segundos
+  setTimeout(() => {
+    hideUpgrade();
+    showToast('¡Premium activado! Bienvenido 🎉', 'success');
+  }, 2000);
+}
+
+// ═══════════════════════════════════════════════
+// MODO CLARO / OSCURO
+// ═══════════════════════════════════════════════
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light-mode');
+  localStorage.setItem('theme', isLight ? 'light' : 'dark');
+  updateThemeIcon(isLight);
+}
+
+function updateThemeIcon(isLight) {
+  const icon = document.getElementById('theme-icon');
+  if (icon) icon.textContent = isLight ? '🌙' : '☀️';
+}
+
+function initTheme() {
+  const saved = localStorage.getItem('theme');
+  if (saved === 'light') {
+    document.body.classList.add('light-mode');
+    updateThemeIcon(true);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// NAVEGACIÓN MOBILE (barra inferior)
+// ═══════════════════════════════════════════════
+function mobileNav(panel, btn) {
+  // Actualizar estado activo en la barra inferior
+  document.querySelectorAll('.mbn-item').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
+  // Usar el mismo sistema de navegación del sidebar
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+
+  const panelEl = document.getElementById('panel-' + panel);
+  if (panelEl) panelEl.classList.add('active');
+
+  // Activar el tab del sidebar correspondiente
+  const sidebarTab = document.querySelector('.sidebar .nav-tab[data-panel="' + panel + '"]');
+  if (sidebarTab) sidebarTab.classList.add('active');
+
+  // Scroll al top
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // Callbacks específicos
+  if (panel === 'mi-historial') renderHistorial();
+  if (panel === 'familia') renderFamilyPanel();
+  if (panel === 'argentina') initArgentinaPanel();
+}
+
+// Sincronizar barra mobile cuando se navega desde el sidebar
+function syncMobileNav(panel) {
+  document.querySelectorAll('.mbn-item').forEach(b => {
+    b.classList.toggle('active', b.dataset.panel === panel);
+  });
+}
+
+// ═══════════════════════════════════════════════
+// MIS FINANZAS — SCORE DE SALUD FINANCIERA
+// ═══════════════════════════════════════════════
+
+// Límites anuales de monotributo 2026 (ARS)
+const MONO_CATS = {
+  A: { limite: 2000000,  label: 'Categoría A' },
+  B: { limite: 3000000,  label: 'Categoría B' },
+  C: { limite: 4100000,  label: 'Categoría C' },
+  D: { limite: 5500000,  label: 'Categoría D' },
+  E: { limite: 6700000,  label: 'Categoría E' },
+  F: { limite: 8200000,  label: 'Categoría F' },
+  G: { limite: 9900000,  label: 'Categoría G' },
+  H: { limite: 12200000, label: 'Categoría H' },
+  I: { limite: 14000000, label: 'Categoría I' },
+  J: { limite: 16300000, label: 'Categoría J' },
+  K: { limite: 18700000, label: 'Categoría K' },
+};
+
+function calcFinanzas() {
+  const ingreso = parseFloat(document.getElementById('fin-ingreso')?.value) || 0;
+  const monoCat = document.getElementById('fin-mono-cat')?.value || '';
+  const facturacion = parseFloat(document.getElementById('fin-facturacion')?.value) || 0;
+
+  // ── MONOTRIBUTO ──
+  calcMonotributo(monoCat, facturacion);
+
+  // ── SCORE ──
+  if (ingreso <= 0) {
+    document.getElementById('fin-score-empty')?.style && (document.getElementById('fin-score-empty').style.display = 'block');
+    document.getElementById('fin-score-content')?.style && (document.getElementById('fin-score-content').style.display = 'none');
+    return;
+  }
+  document.getElementById('fin-score-empty').style.display = 'none';
+  document.getElementById('fin-score-content').style.display = 'block';
+
+  // Obtener gastos de la canasta
+  const totalGastos = getTotalMoney();
+
+  // Separar deudas de gastos operativos
+  const deudaTotal = (() => {
+    let d = 0;
+    const catDeudas = CATS.find(c => c.id === 'banco_deudas');
+    if (catDeudas) {
+      catDeudas.subs.forEach(s => { d += state['banco_deudas_' + s.id]?.monto || 0; });
+      // También el monto del padre
+      d = Math.max(d, state['banco_deudas']?.monto || 0);
+    }
+    return d;
+  })();
+
+  const ahorroTotal = (() => {
+    let a = 0;
+    const catAhorro = CATS.find(c => c.id === 'ahorro');
+    if (catAhorro) {
+      catAhorro.subs.forEach(s => { a += state['ahorro_' + s.id]?.monto || 0; });
+      a = Math.max(a, state['ahorro']?.monto || 0);
+    }
+    const catInv = CATS.find(c => c.id === 'inversion');
+    if (catInv) {
+      catInv.subs.forEach(s => { a += state['inversion_' + s.id]?.monto || 0; });
+      a = Math.max(a, a, state['inversion']?.monto || 0);
+    }
+    return a;
+  })();
+
+  const gastosOperativos = Math.max(0, totalGastos - deudaTotal - ahorroTotal);
+
+  // ── MÉTRICAS ──
+  // 1. DTI — Debt To Income ratio
+  const dti = ingreso > 0 ? (deudaTotal / ingreso) * 100 : 0;
+
+  // 2. Flujo de caja
+  const flujo = ingreso - gastosOperativos - deudaTotal;
+
+  // 3. Tasa de ahorro
+  const tasaAhorro = ingreso > 0 ? (ahorroTotal / ingreso) * 100 : 0;
+
+  // 4. Ratio gasto/ingreso
+  const ratioGasto = ingreso > 0 ? (gastosOperativos / ingreso) * 100 : 0;
+
+  // ── SCORE 0-100 ──
+  // Ponderación: DTI 35%, Flujo 30%, Ahorro 20%, Gasto 15%
+  let scoreDTI    = dti <= 10 ? 100 : dti <= 20 ? 90 : dti <= 30 ? 70 : dti <= 40 ? 45 : dti <= 50 ? 25 : 10;
+  let scoreFlujo  = flujo >= ingreso * 0.3 ? 100 : flujo >= ingreso * 0.15 ? 80 : flujo >= ingreso * 0.05 ? 60 : flujo >= 0 ? 40 : flujo >= -ingreso * 0.1 ? 20 : 5;
+  let scoreAhorro = tasaAhorro >= 20 ? 100 : tasaAhorro >= 15 ? 85 : tasaAhorro >= 10 ? 70 : tasaAhorro >= 5 ? 50 : tasaAhorro > 0 ? 30 : 0;
+  let scoreGasto  = ratioGasto <= 40 ? 100 : ratioGasto <= 55 ? 80 : ratioGasto <= 70 ? 60 : ratioGasto <= 85 ? 35 : 15;
+
+  // Si no hay datos de deuda/ahorro, no penalizar
+  if (deudaTotal === 0) scoreDTI = 75;
+  if (ahorroTotal === 0 && totalGastos === 0) { scoreAhorro = 50; scoreFlujo = 50; scoreGasto = 50; }
+
+  const score = Math.round(
+    scoreDTI * 0.35 +
+    scoreFlujo * 0.30 +
+    scoreAhorro * 0.20 +
+    scoreGasto * 0.15
+  );
+
+  // ── SEMÁFORO ──
+  let color, label, desc;
+  if (score >= 75) {
+    color = '#2a7a00'; label = '🟢 Salud financiera excelente';
+    desc = 'Tus finanzas están en muy buen estado. Tenés control sobre tus gastos, deudas manejables y ahorro activo.';
+  } else if (score >= 55) {
+    color = '#C8F135'; label = '🟡 Salud financiera buena';
+    desc = 'Tu situación es estable pero hay áreas a mejorar. Revisá las recomendaciones para optimizar tu flujo de caja.';
+  } else if (score >= 35) {
+    color = '#b86000'; label = '🟠 Atención requerida';
+    desc = 'Hay señales de alerta en tus finanzas. Es importante tomar acción pronto para evitar complicaciones mayores.';
+  } else {
+    color = '#cc2200'; label = '🔴 Situación de riesgo';
+    desc = 'Tus finanzas requieren atención urgente. Te recomendamos revisar las recomendaciones y priorizar reducir deudas.';
+  }
+
+  // Actualizar UI
+  const scoreNum = document.getElementById('score-num');
+  const scoreCircle = document.getElementById('score-circle');
+  const scoreLbl = document.getElementById('score-label');
+  const scoreDesc = document.getElementById('score-desc');
+
+  if (scoreNum) scoreNum.textContent = score;
+  if (scoreNum) scoreNum.style.color = color;
+  if (scoreCircle) {
+    const circumference = 264;
+    scoreCircle.style.strokeDashoffset = circumference - (score / 100) * circumference;
+    scoreCircle.style.stroke = color;
+  }
+  if (scoreLbl) { scoreLbl.textContent = label; scoreLbl.style.color = color; }
+  if (scoreDesc) scoreDesc.textContent = desc;
+
+  // Actualizar métricas
+  const fmtPeso = v => '$' + Math.round(v).toLocaleString('es-AR');
+  const fmtPct  = v => v.toFixed(1) + '%';
+
+  // DTI
+  setMetric('met-dti', fmtPct(dti),
+    'bar-dti', Math.min(dti / 50 * 100, 100),
+    dti <= 20 ? '#2a7a00' : dti <= 35 ? '#b86000' : '#cc2200');
+
+  // Flujo
+  const flujoColor = flujo >= 0 ? (flujo >= ingreso * 0.15 ? '#2a7a00' : '#b86000') : '#cc2200';
+  setMetric('met-flujo', fmtPeso(flujo),
+    'bar-flujo', flujo >= 0 ? Math.min((flujo / ingreso) * 100 * 2, 100) : 0,
+    flujoColor);
+
+  // Ahorro
+  setMetric('met-ahorro', fmtPct(tasaAhorro),
+    'bar-ahorro', Math.min(tasaAhorro / 25 * 100, 100),
+    tasaAhorro >= 15 ? '#2a7a00' : tasaAhorro >= 10 ? '#C8F135' : tasaAhorro >= 5 ? '#b86000' : '#cc2200');
+
+  // Gasto
+  setMetric('met-gasto', fmtPct(ratioGasto),
+    'bar-gasto', Math.min(ratioGasto, 100),
+    ratioGasto <= 55 ? '#2a7a00' : ratioGasto <= 70 ? '#b86000' : '#cc2200');
+
+  // ── RECOMENDACIONES ──
+  const recs = [];
+
+  if (dti > 35) recs.push({ tipo: 'bad', icon: '⚠️', texto: '<b>Deuda alta:</b> tu ratio deuda/ingreso es ' + fmtPct(dti) + '. Lo recomendado es menos del 35%. Considerá renegociar tasas o cancelar la deuda más cara primero.' });
+  else if (dti > 20) recs.push({ tipo: 'warn', icon: '📊', texto: '<b>Deuda moderada:</b> tu DTI es ' + fmtPct(dti) + '. Podés manejarlo pero evitá tomar más deuda hasta bajarlo del 20%.' });
+  else if (deudaTotal > 0) recs.push({ tipo: 'ok', icon: '✅', texto: '<b>Deuda bajo control:</b> tu ratio de endeudamiento es saludable (' + fmtPct(dti) + ').' });
+
+  if (flujo < 0) recs.push({ tipo: 'bad', icon: '🚨', texto: '<b>Flujo de caja negativo:</b> gastás más de lo que ingresa. Estás usando ahorros o deuda para cubrir gastos del mes. Revisá qué gastos podés reducir.' });
+  else if (flujo < ingreso * 0.1) recs.push({ tipo: 'warn', icon: '⚡', texto: '<b>Poco margen:</b> te queda ' + fmtPeso(flujo) + ' libre por mes. Cualquier gasto imprevisto puede complicar tus finanzas. Buscá reducir al menos un gasto fijo.' });
+  else recs.push({ tipo: 'ok', icon: '✅', texto: '<b>Flujo positivo:</b> te sobran ' + fmtPeso(flujo) + ' por mes después de gastos y deudas. Usá ese margen para aumentar tu ahorro.' });
+
+  if (tasaAhorro < 5 && ahorroTotal > 0) recs.push({ tipo: 'bad', icon: '🏦', texto: '<b>Ahorro insuficiente:</b> estás ahorrando solo el ' + fmtPct(tasaAhorro) + ' de tu ingreso. El mínimo recomendado es 10%. Tratá de llegar a ese umbral antes de aumentar el consumo.' });
+  else if (tasaAhorro < 10) recs.push({ tipo: 'warn', icon: '💰', texto: '<b>Aumentá tu ahorro:</b> el ' + fmtPct(tasaAhorro) + ' de ahorro es un buen inicio, pero apuntá al 10-20% para tener colchón ante imprevistos.' });
+  else if (ahorroTotal > 0) recs.push({ tipo: 'ok', icon: '✅', texto: '<b>Buen hábito de ahorro:</b> estás ahorrando el ' + fmtPct(tasaAhorro) + ' de tu ingreso. Considerá diversificar en CEDEARs o dólares para protegerte de la inflación.' });
+  else recs.push({ tipo: 'warn', icon: '🏦', texto: '<b>Sin ahorro registrado:</b> cargá tus ahorros e inversiones en la sección correspondiente para obtener un diagnóstico completo.' });
+
+  if (ratioGasto > 80) recs.push({ tipo: 'bad', icon: '📉', texto: '<b>Gasto muy alto:</b> el ' + fmtPct(ratioGasto) + ' de tu ingreso va a gastos operativos. El límite saludable es 70%. Identificá y reducí los 3 gastos más grandes que puedas optimizar.' });
+  else if (ratioGasto > 65) recs.push({ tipo: 'warn', icon: '📊', texto: '<b>Gasto elevado:</b> el ' + fmtPct(ratioGasto) + ' va a gastos. Intentá no superar el 70% para tener margen de ahorro y emergencias.' });
+
+  if (totalGastos === 0) recs.push({ tipo: 'warn', icon: '📝', texto: '<b>Cargá tus gastos:</b> para obtener un diagnóstico preciso, completá tu canasta de gastos en el panel "Mi canasta". Así la calculadora puede analizar tu situación real.' });
+
+  const recsEl = document.getElementById('fin-recomendaciones');
+  if (recsEl) {
+    recsEl.innerHTML = recs.map(r =>
+      '<div class="fin-rec rec-' + r.tipo + '">' +
+        '<span class="fin-rec-icon">' + r.icon + '</span>' +
+        '<span class="fin-rec-text">' + r.texto + '</span>' +
+      '</div>'
+    ).join('');
+  }
+
+  // Guardar ingreso en estado del usuario
+  saveFinanzasData({ ingreso, monoCat, facturacion });
+}
+
+function setMetric(valId, val, barId, pct, color) {
+  const el = document.getElementById(valId);
+  const bar = document.getElementById(barId);
+  if (el) { el.textContent = val; el.style.color = color; }
+  if (bar) { bar.style.width = pct + '%'; bar.style.background = color; }
+}
+
+function calcMonotributo(cat, facturacion) {
+  const wrap = document.getElementById('mono-progress-wrap');
+  const bar = document.getElementById('mono-progress-bar');
+  const pct = document.getElementById('mono-progress-pct');
+  const lbl = document.getElementById('mono-progress-lbl');
+  const alert = document.getElementById('mono-alert');
+
+  if (!cat || !wrap) return;
+  wrap.style.display = 'block';
+
+  const mono = MONO_CATS[cat];
+  if (!mono) { wrap.style.display = 'none'; return; }
+
+  const anual = facturacion * 12;
+  const porcentaje = mono.limite > 0 ? Math.min((anual / mono.limite) * 100, 120) : 0;
+  const fmtM = v => '$' + Math.round(v).toLocaleString('es-AR');
+
+  if (bar) bar.style.width = Math.min(porcentaje, 100) + '%';
+  if (pct) pct.textContent = porcentaje.toFixed(1) + '%';
+
+  let barColor, alertClass, alertMsg;
+  if (porcentaje >= 100) {
+    barColor = '#cc2200';
+    alertClass = 'mono-alert-bad';
+    alertMsg = '🚨 <b>Excediste el límite de tu categoría.</b> Facturación anual proyectada: ' + fmtM(anual) + ' vs límite ' + fmtM(mono.limite) + '. Debés recategorizarte a ' + getNextMono(cat) + ' o pasarte a Responsable Inscripto para evitar sanciones de AFIP.';
+  } else if (porcentaje >= 80) {
+    barColor = '#b86000';
+    alertClass = 'mono-alert-warn';
+    alertMsg = '⚠️ <b>Cerca del límite.</b> Proyección anual: ' + fmtM(anual) + ' (' + porcentaje.toFixed(0) + '% del límite de ' + fmtM(mono.limite) + '). Te quedan ' + fmtM(mono.limite - anual) + ' de margen. Revisá si conviene recategorizarte.';
+  } else {
+    barColor = '#2a7a00';
+    alertClass = 'mono-alert-ok';
+    alertMsg = '✅ <b>Dentro del límite.</b> Facturación proyectada: ' + fmtM(anual) + ' de ' + fmtM(mono.limite) + ' permitidos. Margen disponible: ' + fmtM(mono.limite - anual) + '.';
+  }
+
+  if (bar) bar.style.background = barColor;
+  if (lbl) lbl.textContent = 'Facturación anual proyectada — ' + mono.label;
+  if (alert) {
+    alert.style.display = 'block';
+    alert.className = 'mono-alert-ok'; // reset
+    alert.className = alertClass;
+    alert.innerHTML = alertMsg;
+  }
+}
+
+function getNextMono(cat) {
+  const cats = Object.keys(MONO_CATS);
+  const idx = cats.indexOf(cat);
+  if (idx < 0 || idx >= cats.length - 1) return 'Responsable Inscripto';
+  return 'Categoría ' + cats[idx + 1];
+}
+
+// Guardar/cargar datos de finanzas en Supabase (en la columna state)
+async function saveFinanzasData(data) {
+  const ac = getActiveCanasta();
+  if (!ac) return;
+  ac.finanzas = data;
+  // Se guarda en el próximo saveCurrentState automático
+}
+
+function loadFinanzasData() {
+  const ac = getActiveCanasta();
+  if (!ac?.finanzas) return;
+  const f = ac.finanzas;
+  const inpIngreso = document.getElementById('fin-ingreso');
+  const selMono = document.getElementById('fin-mono-cat');
+  const inpFact = document.getElementById('fin-facturacion');
+  if (inpIngreso && f.ingreso) inpIngreso.value = f.ingreso;
+  if (selMono && f.monoCat) selMono.value = f.monoCat;
+  if (inpFact && f.facturacion) inpFact.value = f.facturacion;
+  if (f.ingreso) calcFinanzas();
 }
 
 // Boot
