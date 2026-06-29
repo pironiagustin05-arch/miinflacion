@@ -1396,6 +1396,18 @@ body.light-mode .deuda-body {
   from { opacity: 0; transform: translateY(-8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+
+/* Separador sección Ahorro/Inversión */
+.canasta-sep-financiero {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 4px 8px;
+  margin-top: 8px;
+  border-top: 1px solid var(--accent);
+  font-size: 12px; font-weight: 700;
+  color: var(--accent);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
 </style>
 </head>
 <body>
@@ -2371,7 +2383,7 @@ body.light-mode .deuda-body {
     </div>
     <div class="fin-card">
       <div style="font-size:13px;color:var(--t2);margin-bottom:14px;line-height:1.6">
-        Consultá tu situación crediticia oficial en el Banco Central. Ingresá tu CUIT/CUIL (11 dígitos, sin guiones) para ver tus deudas vigentes, historial de los últimos 24 meses y clasificación crediticia del 1 al 5.
+        Ingresá tu CUIT/CUIL para ver tu situación crediticia oficial en el BCRA.
       </div>
       <div style="display:flex;gap:8px;margin-bottom:12px">
         <div class="fin-input-wrap" style="flex:1">
@@ -2435,25 +2447,25 @@ body.light-mode .deuda-body {
     </div>
   </div>
 
-  <!-- ══ B: COMPARADOR TASAS ══ -->
+  <!-- ══ B: COMPARADOR RENTA FIJA ══ -->
   <div class="fin-section">
     <div class="sec-hd">
-      <div class="sec-title">📊 Comparador de tasas</div>
-      <span style="font-size:11px;color:var(--t3)">Plazo fijo vs inflación vs dólar</span>
+      <div class="sec-title">📊 Comparador de Renta Fija</div>
+      <span style="font-size:11px;color:var(--t3)">Sin recomendación · Solo información</span>
     </div>
     <div class="fin-card">
-      <div style="font-size:13px;color:var(--t2);margin-bottom:16px">¿Conviene un plazo fijo? ¿O mejor dólar?</div>
+      <div style="font-size:13px;color:var(--t2);margin-bottom:16px;line-height:1.5">Renta fija argentina · Plazo fijo, Lecap, Bono CER y Fondo Money Market comparados.</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
         <div>
           <label class="form-label">Monto a invertir $</label>
           <div class="fin-input-wrap">
             <span class="fin-prefix">$</span>
-            <input type="number" class="fin-inp" id="tasa-monto" placeholder="500.000" min="0" step="10000" oninput="calcTasas()" />
+            <input type="number" class="fin-inp" id="rf-monto" placeholder="500.000" min="0" step="10000" oninput="calcRentaFija()" />
           </div>
         </div>
         <div>
           <label class="form-label">Plazo (días)</label>
-          <select class="form-input" id="tasa-plazo" onchange="calcTasas()">
+          <select class="form-input" id="rf-plazo" onchange="calcRentaFija()">
             <option value="30">30 días</option>
             <option value="60">60 días</option>
             <option value="90">90 días</option>
@@ -2462,40 +2474,18 @@ body.light-mode .deuda-body {
           </select>
         </div>
       </div>
-      <div id="tasas-result" style="display:none"></div>
-      <div style="font-size:11px;color:var(--t3);margin-top:10px">
-        Tasas de referencia del BCRA · Actualizadas automáticamente
+      <div id="rf-loading" style="display:none;text-align:center;padding:12px;color:var(--t3);font-size:12px">
+        <div class="loading-spinner" style="margin:0 auto 6px;width:16px;height:16px"></div>Actualizando tasas…
+      </div>
+      <div id="rf-result" style="display:none"></div>
+      <div style="font-size:11px;color:var(--t3);margin-top:10px;line-height:1.5">
+        📌 Tasas de referencia BCRA + valores orientativos de mercado. Los rendimientos reales pueden variar. Esto no constituye asesoramiento financiero.
       </div>
     </div>
   </div>
 
-  <!-- ══ F: ALERTA IPC ══ -->
-  <div class="fin-section">
-    <div class="sec-hd">
-      <div class="sec-title">🔔 Alerta IPC mensual</div>
-      <span style="font-size:11px;color:var(--t3)">Publicado por INDEC</span>
-    </div>
-    <div class="fin-card">
-      <div id="ipc-alerta-content">
-        <div style="font-size:13px;color:var(--t2);margin-bottom:14px;line-height:1.6">
-          Te avisamos cuando el INDEC publica el IPC del mes para que puedas cerrar tu canasta y comparar tu inflación personal con la oficial.
-        </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--surf2);border-radius:8px;border:1px solid var(--b1);margin-bottom:12px">
-          <div>
-            <div style="font-size:13px;font-weight:600;color:var(--t1)" id="ipc-alert-status">Verificando último IPC…</div>
-            <div style="font-size:11px;color:var(--t3);margin-top:2px" id="ipc-alert-sub">Fuente: ArgentinaDatos API</div>
-          </div>
-          <div style="font-family:var(--mono);font-size:24px;font-weight:700;color:var(--accent)" id="ipc-alert-val">—</div>
-        </div>
-        <div id="ipc-alert-banner" style="display:none;padding:12px 14px;border-radius:8px;font-size:13px;font-weight:600;margin-bottom:12px"></div>
-        <button class="btn-primary" style="width:100%" id="ipc-cerrar-mes-btn" onclick="saveMonthSnapshot()" style="display:none">
-          📅 Cerrar mi mes con este IPC
-        </button>
-      </div>
-    </div>
-  </div>
 
-  <!-- ══ H: PROYECCIÓN JUBILACIÓN ══ -->
+  <!-- ══ H:- ══ H: PROYECCIÓN JUBILACIÓN ══ -->
   <div class="fin-section">
     <div class="sec-hd">
       <div class="sec-title">🏛️ Proyección de jubilación</div>
@@ -3286,9 +3276,8 @@ const CATS = [
     ]},
   {id:"ahorro",name:"Ahorro",icon:"🏦",ipc_base:0,
     subs:[
-      {id:"ahorro_pesos",name:"Ahorro en pesos",ipc:0,w:30},
-      {id:"ahorro_dolares",name:"Ahorro en dólares",ipc:0,w:40},
-      {id:"ahorro_plazo_fijo",name:"Plazo fijo",ipc:0,w:30},
+      {id:"ahorro_pesos",name:"Ahorro en pesos",ipc:0,w:50},
+      {id:"ahorro_dolares",name:"Ahorro en dólares",ipc:0,w:50},
     ]},
   {id:"inversion",name:"Inversión",icon:"📈",ipc_base:0,
     subs:[
@@ -3599,12 +3588,37 @@ async function checkSession() {
 }
 
 function enterDemoMode() {
-  // Inicializar canasta demo con nombre genérico
-  if (!canastas.length) {
-    canastas = [{ id: 'demo', name: 'Mi canasta', state: makeEmptyState(), region: 'nacional' }];
-    activeCanastaIdx = 0;
+  currentUser = null;
+  isPremiumUser = false;
+
+  // ══ CRÍTICO: restaurar desde localStorage ANTES de cualquier otra cosa ══
+  let restored = false;
+  try {
+    const saved = localStorage.getItem('mi_inflacion_state');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed?.canastas) {
+        const savedCanastas = JSON.parse(parsed.canastas);
+        if (Array.isArray(savedCanastas) && savedCanastas.length > 0) {
+          canastas = savedCanastas;
+          activeCanastaIdx = Math.min(parsed.active_idx || 0, savedCanastas.length - 1);
+          restored = true;
+        }
+      }
+    }
+  } catch(e) { console.warn('Restore localStorage error:', e); }
+
+  // Solo crear canasta vacía si no hay nada guardado
+  if (!restored) {
+    if (!canastas.length) {
+      canastas = [{ id: 'demo', name: 'Mi canasta', state: makeEmptyState(), region: 'nacional' }];
+      activeCanastaIdx = 0;
+    }
   }
-  initState();
+
+  // Sincronizar state global desde la canasta activa
+  syncActiveAliases();
+
   // Nav: mostrar estado guest
   document.getElementById('nav-guest').style.display = 'flex';
   document.getElementById('nav-logged').style.display = 'none';
@@ -3779,7 +3793,10 @@ async function deleteSnapshotDB(key) {
 }
 
 // Auto-save cada 4 segundos
-setInterval(() => { if(currentUser) saveCurrentState(); }, 4000);
+// Guardar cada 4 segundos si hay sesión, o cada 2 segundos en localStorage
+setInterval(() => {
+  saveCurrentState();
+}, 2000);
 
 // ═══════════════════════════════════════════════
 // LIVE IPC FROM API
@@ -3943,6 +3960,14 @@ function buildCatGrid() {
     const ipc = adj(c.ipc_base);
     const contrib = ((catW/100)*catEffIpc(c)).toFixed(2);
 
+    // Separador visual antes de Ahorro e Inversión
+    if (c.id === 'ahorro') {
+      const sep = document.createElement('div');
+      sep.className = 'canasta-sep-financiero';
+      sep.innerHTML = '<span>Ahorro e Inversión</span><span style="font-size:10px;color:var(--t3)">No entra en el IPC personal</span>';
+      grid.appendChild(sep);
+    }
+
     const card = document.createElement('div');
     card.className = 'cat-card';
     card.dataset.cat = c.id;
@@ -4036,15 +4061,18 @@ function buildCatGrid() {
 
     // Money input on cat
     document.getElementById('monto-'+c.id).addEventListener('input', e => {
-      state[c.id].monto = parseFloat(e.target.value)||0;
+      state[c.id].monto = getRawValue(e.target);
       recalcSubWeightsFromMoney(c);
       recalcFromMoney();
       updatePresupuesto(c.id);
+      saveCurrentState(); // guardar inmediatamente al cargar un gasto
     });
 
     attachSubListeners(c);
     updateSubDistrib(c);
   });
+  // Inicializar formateo de números en todos los inputs recién creados
+  reinitNumInputs();
 }
 
 function buildSubItemsHTML(c) {
@@ -4259,6 +4287,11 @@ function recalcFromMoney() {
 // ═══════════════════════════════════════════════
 function updateMain() {
   pushStateToActive(); // sincronizar state global → canasta activa
+  // Guardar en localStorage inmediatamente (sin esperar el interval)
+  try {
+    const payload = { canastas: JSON.stringify(canastas), active_idx: activeCanastaIdx, version: 3 };
+    localStorage.setItem('mi_inflacion_state', JSON.stringify(payload));
+  } catch(e) {}
   const EXCLUIR_IPC = ['ahorro','inversion','banco_deudas'];
   let totW=0, miIpc=0, catsAct=0;
   CATS.forEach(c => {
@@ -4498,6 +4531,11 @@ function pieReset() {
 }
 
 function buildContrib(miIpc, totW) {
+  // Ocultar sección contrib si no hay gastos cargados
+  const contribSection = document.querySelector('.contrib-section');
+  const hasGastos = getGastosOperativos() > 0;
+  if (contribSection) contribSection.style.display = hasGastos ? 'block' : 'none';
+  if (!hasGastos) return;
   // Cargar último mes del historial para comparar
   let prevRubros = {};
   getHistorial().then(hist => {
@@ -4725,6 +4763,9 @@ async function saveMonthSnapshot() {
 
     // Navegar al historial para ver el resultado
     await renderHistorial();
+
+    // Mostrar análisis de gastos del mes cerrado
+    setTimeout(() => mostrarAnalisisMes(snapshot), 800);
 
   } catch(e) {
     console.error('saveMonthSnapshot error:', e);
@@ -6736,18 +6777,21 @@ function calcFinanzas() {
 
   // ── SEMÁFORO ──
   let color, label, desc;
-  if (score >= 75) {
-    color = '#2a7a00'; label = '🟢 Salud financiera excelente';
-    desc = 'Tus finanzas están en muy buen estado. Tenés control sobre tus gastos, deudas manejables y ahorro activo.';
-  } else if (score >= 55) {
-    color = '#C8F135'; label = '🟡 Salud financiera buena';
-    desc = 'Tu situación es estable pero hay áreas a mejorar. Revisá las recomendaciones para optimizar tu flujo de caja.';
+  if (score >= 80) {
+    color = '#2a7a00'; label = '🟢 Excelente';
+    desc = 'Tus finanzas están sólidas: flujo positivo, deuda controlada y hábito de ahorro. Enfocate en hacer crecer tus inversiones.';
+  } else if (score >= 65) {
+    color = '#5aaa00'; label = '🟢 Buena';
+    desc = 'Tu situación financiera es saludable. Hay espacio para mejorar el ahorro o reducir deudas. Revisá las recomendaciones.';
+  } else if (score >= 50) {
+    color = '#C8F135'; label = '🟡 Regular';
+    desc = 'Tu situación es manejable pero con vulnerabilidades. Priorizá reducir deudas costosas y aumentar el margen mensual.';
   } else if (score >= 35) {
-    color = '#b86000'; label = '🟠 Atención requerida';
-    desc = 'Hay señales de alerta en tus finanzas. Es importante tomar acción pronto para evitar complicaciones mayores.';
+    color = '#b86000'; label = '🟠 En riesgo';
+    desc = 'Hay señales de alerta claras. Tu flujo de caja o nivel de deuda necesitan atención. Actuá antes de que se agrave.';
   } else {
-    color = '#cc2200'; label = '🔴 Situación de riesgo';
-    desc = 'Tus finanzas requieren atención urgente. Te recomendamos revisar las recomendaciones y priorizar reducir deudas.';
+    color = '#cc2200'; label = '🔴 Crítico';
+    desc = 'Tu situación financiera requiere acción urgente. Priorizá reducir la deuda más cara y evitar nuevos gastos no esenciales.';
   }
 
   // Actualizar UI
@@ -6794,18 +6838,31 @@ function calcFinanzas() {
   // ── RECOMENDACIONES ──
   const recs = [];
 
-  if (dti > 35) recs.push({ tipo: 'bad', icon: '⚠️', texto: '<b>Deuda alta:</b> tu ratio deuda/ingreso es ' + fmtPct(dti) + '. Lo recomendado es menos del 35%. Considerá renegociar tasas o cancelar la deuda más cara primero.' });
-  else if (dti > 20) recs.push({ tipo: 'warn', icon: '📊', texto: '<b>Deuda moderada:</b> tu DTI es ' + fmtPct(dti) + '. Podés manejarlo pero evitá tomar más deuda hasta bajarlo del 20%.' });
-  else if (deudaTotal > 0) recs.push({ tipo: 'ok', icon: '✅', texto: '<b>Deuda bajo control:</b> tu ratio de endeudamiento es saludable (' + fmtPct(dti) + ').' });
+  if (dti > 35) {
+    recs.push({ tipo: 'bad', icon: '⚠️', texto: '<b>Deuda alta (' + fmtPct(dti) + ' del ingreso):</b> superás el límite recomendado del 35%. Priorizá cancelar la deuda con mayor tasa primero. Usá el panel <b>Mis Deudas</b> para ver el costo real de cada una.' });
+  } else if (dti > 20) {
+    recs.push({ tipo: 'warn', icon: '📊', texto: '<b>Deuda moderada (' + fmtPct(dti) + '):</b> manejable pero evitá tomar nuevas deudas hasta bajar del 20%.' });
+  } else if (deudaTotal > 0) {
+    recs.push({ tipo: 'ok', icon: '✅', texto: '<b>Deuda saludable (' + fmtPct(dti) + '):</b> tu nivel de endeudamiento está bajo control.' });
+  }
 
-  if (flujo < 0) recs.push({ tipo: 'bad', icon: '🚨', texto: '<b>Flujo de caja negativo:</b> gastás más de lo que ingresa. Estás usando ahorros o deuda para cubrir gastos del mes. Revisá qué gastos podés reducir.' });
-  else if (flujo < ingreso * 0.1) recs.push({ tipo: 'warn', icon: '⚡', texto: '<b>Poco margen:</b> te queda ' + fmtPeso(flujo) + ' libre por mes. Cualquier gasto imprevisto puede complicar tus finanzas. Buscá reducir al menos un gasto fijo.' });
-  else recs.push({ tipo: 'ok', icon: '✅', texto: '<b>Flujo positivo:</b> te sobran ' + fmtPeso(flujo) + ' por mes después de gastos y deudas. Usá ese margen para aumentar tu ahorro.' });
+  if (flujo < 0) {
+    recs.push({ tipo: 'bad', icon: '🚨', texto: '<b>Flujo negativo (' + fmtPeso(flujo) + '/mes):</b> gastás más de lo que ingresa. Revisá los 3 rubros de mayor gasto en tu canasta y buscá cuál podés reducir esta semana.' });
+  } else if (flujo < ingreso * 0.05) {
+    recs.push({ tipo: 'bad', icon: '⚡', texto: '<b>Margen mínimo (' + fmtPeso(flujo) + '/mes):</b> cualquier imprevisto te deja sin fondo. Priorizá armar un fondo de emergencia de al menos 1 mes de gastos.' });
+  } else if (flujo < ingreso * 0.15) {
+    recs.push({ tipo: 'warn', icon: '⚡', texto: '<b>Margen ajustado (' + fmtPeso(flujo) + '/mes):</b> podés mejorar. Apuntá a tener al menos el 15% del ingreso libre cada mes.' });
+  } else {
+    recs.push({ tipo: 'ok', icon: '✅', texto: '<b>Flujo positivo (' + fmtPeso(flujo) + '/mes):</b> buen margen. Destiná parte a ahorro o inversión para que ese dinero trabaje.' });
+  }
 
-  if (tasaAhorro < 5 && ahorroTotal > 0) recs.push({ tipo: 'bad', icon: '🏦', texto: '<b>Ahorro insuficiente:</b> estás ahorrando solo el ' + fmtPct(tasaAhorro) + ' de tu ingreso. El mínimo recomendado es 10%. Tratá de llegar a ese umbral antes de aumentar el consumo.' });
-  else if (tasaAhorro < 10) recs.push({ tipo: 'warn', icon: '💰', texto: '<b>Aumentá tu ahorro:</b> el ' + fmtPct(tasaAhorro) + ' de ahorro es un buen inicio, pero apuntá al 10-20% para tener colchón ante imprevistos.' });
-  else if (ahorroTotal > 0) recs.push({ tipo: 'ok', icon: '✅', texto: '<b>Buen hábito de ahorro:</b> estás ahorrando el ' + fmtPct(tasaAhorro) + ' de tu ingreso. Considerá diversificar en CEDEARs o dólares para protegerte de la inflación.' });
-  else recs.push({ tipo: 'warn', icon: '🏦', texto: '<b>Sin ahorro registrado:</b> cargá tus ahorros e inversiones en la sección correspondiente para obtener un diagnóstico completo.' });
+  if (ahorroTotal > 0) {
+    if (tasaAhorro < 5) recs.push({ tipo: 'bad', icon: '🏦', texto: '<b>Ahorro bajo:</b> estás ahorrando el ' + fmtPct(tasaAhorro) + ' de tu ingreso. El mínimo recomendado es 10%. Reducí algún gasto variable para aumentarlo.' });
+    else if (tasaAhorro < 10) recs.push({ tipo: 'warn', icon: '💰', texto: '<b>Ahorro moderado:</b> ' + fmtPct(tasaAhorro) + ' del ingreso. Buen inicio — apuntá al 10-20% para tener colchón ante imprevistos.' });
+    else if (tasaAhorro < 20) recs.push({ tipo: 'ok', icon: '✅', texto: '<b>Buen ahorro:</b> el ' + fmtPct(tasaAhorro) + ' del ingreso va a ahorro. Considerá diversificar en CEDEARs o dólares para proteger el poder adquisitivo.' });
+    else recs.push({ tipo: 'ok', icon: '🌟', texto: '<b>Ahorro excelente:</b> el ' + fmtPct(tasaAhorro) + ' del ingreso va a ahorro e inversión. Revisá en Herramientas qué instrumentos de renta fija convienen para tu plazo.' });
+  }
+  // Si no hay ahorro cargado, no mostramos recomendación de ahorro (el usuario puede no tenerlo en la canasta)
 
   if (ratioGasto > 80) recs.push({ tipo: 'bad', icon: '📉', texto: '<b>Gasto muy alto:</b> el ' + fmtPct(ratioGasto) + ' de tu ingreso va a gastos operativos. El límite saludable es 70%. Identificá y reducí los 3 gastos más grandes que puedas optimizar.' });
   else if (ratioGasto > 65) recs.push({ tipo: 'warn', icon: '📊', texto: '<b>Gasto elevado:</b> el ' + fmtPct(ratioGasto) + ' va a gastos. Intentá no superar el 70% para tener margen de ahorro y emergencias.' });
@@ -6960,45 +7017,67 @@ function tasaAnualEfectiva(valor, tipo) {
 
 // ── Calcular métricas de una deuda ──
 function calcDeuda(d) {
-  const tm = tasaMensual(d.tasa, d.tipoTasa);
-  const capital = d.capital || 0;
-  const cuota = d.cuota || 0;
-  const cuotasRest = d.cuotasRest || 0;
-  const ipcMensual = (ipcLastVal || 2.5) / 100; // inflación mensual actual
+  const capital = parseFloat(d.capital) || 0;
+  const cuota   = parseFloat(d.cuota)   || 0;
+  const cuotasRest = parseInt(d.cuotasRest) || 0;
+  const tasa    = parseFloat(d.tasa)    || 0;
+  const tipoTasa = d.tipoTasa || 'tna';
 
-  // Interés del primer mes (sobre el capital pendiente)
-  const interesMes = capital * tm;
+  // Tasa mensual efectiva
+  const tm = tasaMensual(tasa, tipoTasa);
 
-  // Amortización mensual (cuota - interés)
+  // Interés del mes sobre el capital pendiente actual
+  const interesMes = capital > 0 ? capital * tm : cuota * (tm / (1 + tm));
+
+  // Amortización = cuota - interés
   const amortizacion = Math.max(0, cuota - interesMes);
 
-  // Costo total restante
-  const costoTotal = cuota * cuotasRest;
+  // Costo total = cuotas restantes × monto cuota
+  const costoTotal   = cuota * cuotasRest;
+  // Interés total = costo total - capital pendiente
   const interesTotal = Math.max(0, costoTotal - capital);
 
-  // TEA
-  const tea = tasaAnualEfectiva(d.tasa, d.tipoTasa);
+  // TEA desde cualquier tipo de tasa
+  const tea = tasaAnualEfectiva(tasa, tipoTasa);
+  // TEM para mostrar
+  const tem = tm * 100;
 
-  // Tasa real vs inflación (Fisher)
-  const inflAnual = ipcMensual > 0 ? (Math.pow(1 + ipcMensual, 12) - 1) * 100 : 50;
+  // Inflación anual de referencia
+  const ipcMensual = (ipcLastVal || 2.5) / 100;
+  const inflAnual  = (Math.pow(1 + ipcMensual, 12) - 1) * 100;
+
+  // Tasa real (Fisher): si es positiva, la deuda cuesta en términos reales
+  // Si es negativa, la inflación licúa la deuda
   const tasaReal = ((1 + tea/100) / (1 + inflAnual/100) - 1) * 100;
 
-  // Fecha estimada de cancelación
+  // Cuántos pesos de interés pagás por cada $1.000 de cuota
+  const interesPorCuota = cuota > 0 ? (interesMes / cuota) * 1000 : 0;
+
+  // Fecha de cancelación
   let fechaCancelacion = '—';
   if (cuotasRest > 0) {
     const fecha = new Date();
     fecha.setMonth(fecha.getMonth() + cuotasRest);
-    fechaCancelacion = fecha.toLocaleDateString('es-AR', { month: 'short', year: 'numeric' });
+    fechaCancelacion = fecha.toLocaleDateString('es-AR', {month:'short', year:'numeric'});
   }
 
-  // Ajuste UVA
+  // Notas según tipo de ajuste
   let notaAjuste = '';
-  if (d.ajuste === 'uva') notaAjuste = 'Ajusta por CER/UVA — el capital aumenta con inflación';
-  if (d.ajuste === 'usd') notaAjuste = 'Deuda en USD — expuesta a variación del tipo de cambio';
+  if (d.ajuste === 'uva') notaAjuste = 'UVA: el capital aumenta con la inflación (CER). Usá la TEA como referencia mínima de costo.';
+  if (d.ajuste === 'usd') notaAjuste = 'Deuda en USD: el capital en pesos varía con el tipo de cambio.';
 
   return {
-    interesMes, amortizacion, costoTotal, interesTotal,
-    tea, tasaReal, fechaCancelacion, notaAjuste, inflAnual
+    interesMes,       // $ de interés este mes
+    amortizacion,     // $ que bajan la deuda este mes
+    costoTotal,       // $ total a pagar hasta cancelar
+    interesTotal,     // $ total de intereses
+    tea,              // tasa efectiva anual %
+    tem,              // tasa efectiva mensual %
+    tasaReal,         // tasa real vs inflación %
+    inflAnual,        // inflación anual de referencia %
+    interesPorCuota,  // $ de interés por cada $1.000 de cuota
+    fechaCancelacion,
+    notaAjuste
   };
 }
 
@@ -7006,6 +7085,7 @@ function calcDeuda(d) {
 function showAddDeudaForm() {
   document.getElementById('add-deuda-form').style.display = 'block';
   document.getElementById('d-nombre')?.focus();
+  reinitNumInputs();
 }
 function hideAddDeudaForm() {
   document.getElementById('add-deuda-form').style.display = 'none';
@@ -7163,28 +7243,32 @@ function renderDeudas() {
       '<div class="deuda-body">' +
         '<div class="deuda-metrics">' +
           '<div class="deuda-metric">' +
-            '<div class="deuda-metric-lbl">Interés este mes</div>' +
+            '<div class="deuda-metric-lbl">💸 Interés este mes</div>' +
             '<div class="deuda-metric-val" style="color:var(--red)">' + fmtP(c.interesMes) + '</div>' +
           '</div>' +
           '<div class="deuda-metric">' +
-            '<div class="deuda-metric-lbl">Amortización</div>' +
+            '<div class="deuda-metric-lbl">🏦 Amortización</div>' +
             '<div class="deuda-metric-val" style="color:var(--green)">' + fmtP(c.amortizacion) + '</div>' +
           '</div>' +
           '<div class="deuda-metric">' +
-            '<div class="deuda-metric-lbl">TEA efectiva</div>' +
+            '<div class="deuda-metric-lbl">📊 TEM efectiva</div>' +
+            '<div class="deuda-metric-val">' + c.tem.toFixed(2) + '%</div>' +
+          '</div>' +
+          '<div class="deuda-metric">' +
+            '<div class="deuda-metric-lbl">📈 TEA efectiva</div>' +
             '<div class="deuda-metric-val">' + c.tea.toFixed(1) + '%</div>' +
           '</div>' +
           '<div class="deuda-metric">' +
-            '<div class="deuda-metric-lbl">Tasa real</div>' +
+            '<div class="deuda-metric-lbl">🔥 Tasa real</div>' +
             '<div class="deuda-metric-val" style="color:' + tasaRealColor + '">' + (c.tasaReal > 0 ? '+' : '') + c.tasaReal.toFixed(1) + '%</div>' +
           '</div>' +
           '<div class="deuda-metric">' +
-            '<div class="deuda-metric-lbl">Interés total</div>' +
+            '<div class="deuda-metric-lbl">💰 Total intereses</div>' +
             '<div class="deuda-metric-val" style="color:var(--red)">' + fmtP(c.interesTotal) + '</div>' +
           '</div>' +
-          '<div class="deuda-metric">' +
-            '<div class="deuda-metric-lbl">Costo total</div>' +
-            '<div class="deuda-metric-val">' + fmtP(c.costoTotal) + '</div>' +
+          '<div class="deuda-metric" style="grid-column:1/-1;background:rgba(204,34,0,.06)">' +
+            '<div class="deuda-metric-lbl">Por cada $1.000 de cuota, pagás de interés</div>' +
+            '<div class="deuda-metric-val" style="color:var(--red)">' + fmtP(c.interesPorCuota) + '</div>' +
           '</div>' +
         '</div>' +
         // Barra de progreso
@@ -7316,46 +7400,85 @@ function showPresupuestoInput(catId) {
 }
 
 // ═══════════════════════════════════════════════
-// FORMATEO DE NÚMEROS — puntos de miles
+// FORMATEO DE NÚMEROS — puntos mientras se escribe
 // ═══════════════════════════════════════════════
-function formatNumInput(input) {
-  // Guarda el valor numérico real en dataset.rawValue
-  const raw = input.value.replace(/\./g, '').replace(',', '.');
-  const num = parseFloat(raw);
-  if (!isNaN(num) && input.value !== '') {
-    input.dataset.rawValue = num;
-    // Solo formatear cuando el campo pierde el foco
-  }
+
+function cleanNumStr(str) {
+  // Elimina todo excepto dígitos y coma decimal
+  return str.replace(/[^0-9,]/g, '');
 }
 
-function onFocusNumInput(input) {
-  // Al hacer foco: mostrar número sin formato para editar fácil
-  const raw = input.dataset.rawValue;
-  if (raw) input.value = raw;
+function parseNumStr(str) {
+  // Convierte "1.234.567" o "1234567" a número
+  return parseFloat(str.replace(/\./g, '').replace(',', '.')) || 0;
 }
 
-function onBlurNumInput(input) {
-  // Al perder foco: formatear con puntos de miles
-  const raw = parseFloat(input.value.replace(/\./g, '').replace(',', '.'));
-  if (!isNaN(raw) && raw > 0) {
-    input.dataset.rawValue = raw;
-    input.value = raw.toLocaleString('es-AR');
-  }
+function formatNumStr(num) {
+  if (!num || isNaN(num) || num === 0) return '';
+  return Math.round(num).toLocaleString('es-AR');
+}
+
+function onInputMoneyFormat(e) {
+  const inp = e.target;
+  const pos = inp.selectionStart;
+  const prevLen = inp.value.length;
+
+  // Obtener solo dígitos de lo que el usuario escribió
+  let raw = inp.value.replace(/[^0-9]/g, '');
+  if (!raw) { inp.value = ''; inp.dataset.rawValue = '0'; return; }
+
+  const num = parseInt(raw, 10);
+  const formatted = num.toLocaleString('es-AR');
+  inp.value = formatted;
+  inp.dataset.rawValue = num;
+
+  // Mantener cursor en posición correcta ajustando por puntos agregados/removidos
+  const newLen = formatted.length;
+  const diff = newLen - prevLen;
+  try { inp.setSelectionRange(pos + diff, pos + diff); } catch(ex) {}
 }
 
 function getRawValue(input) {
   if (!input) return 0;
-  // Si está formateado (tiene puntos), limpiar
-  const v = input.value.replace(/\./g, '').replace(',', '.');
-  return parseFloat(v) || 0;
+  if (input.dataset.rawValue) return parseFloat(input.dataset.rawValue) || 0;
+  return parseNumStr(input.value);
 }
 
-// Aplicar a todos los inputs de tipo money al inicializar
+// Aplicar a todos los inputs de tipo money
 function initNumInputs() {
-  document.querySelectorAll('.fin-inp, .money-inp, .form-input[type="number"]').forEach(inp => {
-    inp.addEventListener('focus', () => onFocusNumInput(inp));
-    inp.addEventListener('blur', () => onBlurNumInput(inp));
+  document.querySelectorAll('.fin-inp, .money-inp').forEach(inp => {
+    if (inp.dataset.moneyInit) return; // evitar doble init
+    inp.dataset.moneyInit = '1';
+    inp.setAttribute('inputmode', 'numeric');
+
+    // Formatear al escribir
+    inp.addEventListener('input', onInputMoneyFormat);
+
+    // Al focus: limpiar formato para fácil edición (opcional — puede descomentar)
+    // inp.addEventListener('focus', () => {
+    //   const raw = inp.dataset.rawValue || parseNumStr(inp.value);
+    //   inp.value = raw > 0 ? raw.toString() : '';
+    // });
+
+    // Al blur: asegurar formato correcto
+    inp.addEventListener('blur', () => {
+      const raw = getRawValue(inp);
+      inp.value = raw > 0 ? formatNumStr(raw) : '';
+      inp.dataset.rawValue = raw;
+    });
+
+    // Formatear valor inicial si ya tiene contenido
+    const initial = parseNumStr(inp.value);
+    if (initial > 0) {
+      inp.value = formatNumStr(initial);
+      inp.dataset.rawValue = initial;
+    }
   });
+}
+
+// Re-inicializar cuando se agregan inputs dinámicamente
+function reinitNumInputs() {
+  setTimeout(initNumInputs, 100);
 }
 
 // ═══════════════════════════════════════════════
@@ -7789,60 +7912,122 @@ function renderBCRAResult(data, el) {
   el.innerHTML = html;
 }
 
-// ── B: COMPARADOR DE TASAS ──
-let _tasasPF = null; // cache
+// ── B: COMPARADOR DE RENTA FIJA ARGENTINA ──
+let _tasasPF = null; // TNA plazo fijo referencia BCRA
 
-async function calcTasas() {
-  const monto = parseFloat(document.getElementById('tasa-monto')?.value) || 0;
-  const plazo = parseInt(document.getElementById('tasa-plazo')?.value) || 30;
-  const resultEl = document.getElementById('tasas-result');
-  if (!resultEl) return;
+// Instrumentos de renta fija con TNA/TIR de referencia (actualizables)
+// Lecaps y bonos CER: valores orientativos de mercado, se actualizan manualmente
+// o via API cuando esté disponible
+const RF_INSTRUMENTOS = [
+  {
+    id: 'pf_tradicional',
+    nombre: 'Plazo Fijo tradicional',
+    tipo: 'Tasa fija en $',
+    icon: '🏦',
+    getTNA: () => _tasasPF || 37,
+    plazoMin: 30, plazoMax: 365,
+    desc: (tna) => 'TNA ' + tna.toFixed(1) + '% · Ref. BCRA',
+    calcRendimiento: (monto, plazo, tna) => monto * (tna/100/365 * plazo),
+  },
+  {
+    id: 'mm_mp',
+    nombre: 'Fondo Money Market (MP)',
+    tipo: 'Renta diaria · Liquidez inmediata',
+    icon: '💰',
+    getTNA: () => (_tasasPF || 37) * 0.92, // ~92% de la tasa de pases
+    plazoMin: 1, plazoMax: 365,
+    desc: (tna) => 'TNA aprox ' + tna.toFixed(1) + '% · Retira cuando quieras',
+    calcRendimiento: (monto, plazo, tna) => monto * (tna/100/365 * plazo),
+  },
+  {
+    id: 'lecap_30',
+    nombre: 'LECAP (Letra Capitalizable)',
+    tipo: 'Tasa fija · Descuento',
+    icon: '📄',
+    getTNA: () => 45, // TIR orientativa de mercado — actualizar mensualmente
+    plazoMin: 15, plazoMax: 180,
+    desc: (tna) => 'TIR orientativa ~' + tna.toFixed(1) + '% · Vto. más cercano al plazo',
+    calcRendimiento: (monto, plazo, tna) => monto * (tna/100/365 * plazo),
+  },
+  {
+    id: 'bono_cer',
+    nombre: 'Bono CER (ajuste inflación)',
+    tipo: 'Ajuste CER + spread',
+    icon: '📈',
+    getTNA: () => null, // No aplica TNA fija
+    plazoMin: 60, plazoMax: 365,
+    desc: () => 'CER + 2% spread orientativo · Protege contra inflación',
+    calcRendimiento: (monto, plazo) => {
+      const ipcMens = (ipcLastVal || 2.5) / 100;
+      const meses = plazo / 30;
+      return monto * (Math.pow(1 + ipcMens, meses) - 1) * 1.02;
+    },
+  },
+  {
+    id: 'pf_uva',
+    nombre: 'Plazo Fijo UVA',
+    tipo: 'Ajuste CER · Mínimo 90 días',
+    icon: '🏗️',
+    getTNA: () => null,
+    plazoMin: 90, plazoMax: 365,
+    desc: () => 'CER + 1% adicional garantizado · Mínimo 90 días',
+    calcRendimiento: (monto, plazo) => {
+      const ipcMens = (ipcLastVal || 2.5) / 100;
+      const meses = plazo / 30;
+      return monto * (Math.pow(1 + ipcMens, meses) - 1) * 1.01;
+    },
+  },
+];
 
-  if (monto <= 0) { resultEl.style.display = 'none'; return; }
-
-  // Obtener tasa de PF del BCRA (o usar referencia)
-  const ipcMens = ipcLastVal || 2.5;
-  const ipcAnual = (Math.pow(1 + ipcMens/100, 12) - 1) * 100;
-
-  // TNA referencia plazo fijo 30d (BCRA publica la tasa promedio)
-  // Usamos un valor de referencia actualizable via API
-  const tnaPF = _tasasPF || 37; // TNA referencia — se actualiza via fetchTasasBCRA()
-  const tnaDolar = (((_macroCache?.dolares?.find(d=>d.casa==='oficial')?.venta || 1495) / 1200) - 1) * 12 * 100;
-
-  const rendPF    = monto * (tnaPF/100/365 * plazo);
-  const rendDolar = monto * (tnaDolar/100/365 * plazo);
-  const rendCER   = monto * (Math.pow(1+ipcMens/100, plazo/30) - 1);
-
-  const resultados = [
-    { name: 'Plazo fijo $',  sub: 'TNA ' + tnaPF + '% (ref. BCRA)',  val: tnaPF,  resultado: rendPF,    tipo: 'pesos' },
-    { name: 'Plazo fijo UVA', sub: 'Ajuste CER + 1% adicional',       val: ipcAnual + 1, resultado: rendCER * 1.01, tipo: 'real' },
-    { name: 'Dólar oficial',  sub: 'Variación proyectada al plazo',    val: tnaDolar, resultado: rendDolar, tipo: 'dolar' },
-  ].sort((a,b) => b.resultado - a.resultado);
+async function calcRentaFija() {
+  const monto = parseFloat(document.getElementById('rf-monto')?.value) || 0;
+  const plazo = parseInt(document.getElementById('rf-plazo')?.value) || 30;
+  const resultEl = document.getElementById('rf-result');
+  if (!resultEl || monto <= 0) {
+    if (resultEl) resultEl.style.display = 'none';
+    return;
+  }
 
   const fmtP = v => '$' + Math.round(v).toLocaleString('es-AR');
-  const fmtPct = v => v.toFixed(1) + '%';
-  const tasaRealPF = ((1 + tnaPF/100/12) / (1 + ipcMens/100) - 1) * 12 * 100;
+  const ipcMens = ipcLastVal || 2.5;
+  const inflPeriodo = (Math.pow(1 + ipcMens/100, plazo/30) - 1) * 100;
+
+  // Filtrar instrumentos disponibles para el plazo elegido
+  const disponibles = RF_INSTRUMENTOS.filter(i => plazo >= i.plazoMin && plazo <= i.plazoMax);
+
+  const resultados = disponibles.map(inst => {
+    const tna = inst.getTNA();
+    const rendimiento = inst.calcRendimiento(monto, plazo, tna);
+    const rendPct = (rendimiento / monto) * 100;
+    const rendReal = rendPct - inflPeriodo; // rendimiento real vs inflación del período
+    return { inst, tna, rendimiento, rendPct, rendReal };
+  }).sort((a, b) => b.rendimiento - a.rendimiento);
 
   let html = '';
+
   resultados.forEach((r, i) => {
-    const isWinner = i === 0;
+    const rendColor = r.rendReal > 0 ? 'var(--green)' : r.rendReal > -2 ? 'var(--amber)' : 'var(--red)';
     html +=
-      '<div class="tasa-row' + (isWinner ? ' tasa-row-winner' : '') + '">' +
-        '<div>' +
-          '<div class="tasa-name">' + (isWinner ? '🏆 ' : '') + r.name + '</div>' +
-          '<div class="tasa-sub">' + r.sub + '</div>' +
+      '<div class="tasa-row" style="' + (i === 0 ? 'border-color:var(--accent);background:var(--accent-bg)' : '') + '">' +
+        '<div style="flex:1">' +
+          '<div class="tasa-name">' + r.inst.icon + ' ' + r.inst.nombre + '</div>' +
+          '<div class="tasa-sub">' + r.inst.desc(r.tna) + '</div>' +
         '</div>' +
-        '<div style="text-align:right">' +
-          '<div class="tasa-val" style="color:' + (isWinner ? 'var(--accent)' : 'var(--t1)') + '">' + fmtP(r.resultado) + '</div>' +
-          '<div class="tasa-result">ganancia a ' + plazo + ' días</div>' +
+        '<div style="text-align:right;flex-shrink:0">' +
+          '<div class="tasa-val" style="color:' + (i===0?'var(--accent)':'var(--t1)') + '">' + fmtP(r.rendimiento) + '</div>' +
+          '<div style="font-size:11px;color:' + rendColor + ';margin-top:2px">' +
+            (r.rendReal > 0 ? '▲ +' : '▼ ') + r.rendReal.toFixed(1) + '% vs inflación del período' +
+          '</div>' +
         '</div>' +
       '</div>';
   });
 
+  // Referencia inflación del período
   html +=
-    '<div style="margin-top:12px;padding:10px;background:var(--surf2);border-radius:6px;font-size:12px;color:var(--t3);line-height:1.5">' +
-    '📊 <b>Tasa real del plazo fijo:</b> ' + (tasaRealPF > 0 ? '+' : '') + fmtPct(tasaRealPF) + ' anual vs inflación. ' +
-    (tasaRealPF > 0 ? 'El plazo fijo <b>gana</b> a la inflación.' : 'El plazo fijo <b>pierde</b> contra la inflación.') +
+    '<div style="margin-top:12px;padding:10px;background:var(--surf2);border-radius:6px;font-size:12px;line-height:1.5">' +
+    '<span style="color:var(--t3)">📊 Inflación estimada para ' + plazo + ' días: </span>' +
+    '<b style="color:var(--amber)">' + inflPeriodo.toFixed(1) + '%</b>' +
+    ' (' + fmtP(monto * inflPeriodo / 100) + ') · Para preservar poder adquisitivo necesitás superar este rendimiento.' +
     '</div>';
 
   resultEl.innerHTML = html;
@@ -8296,6 +8481,233 @@ function showMesCfgModal() {
 
   box.querySelector('#mes-cfg-cancel').addEventListener('click', () => overlay.remove());
   overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+}
+
+// ═══════════════════════════════════════════════
+// ANÁLISIS DE GASTOS — POST CIERRE DE MES
+// ═══════════════════════════════════════════════
+
+// Benchmarks de referencia por rubro (% del gasto total saludable)
+// Basado en la canasta básica del INDEC y estándares internacionales
+const BENCHMARK_RUBROS = {
+  alimentos:      { ideal: 25, max: 35, label: 'Alimentos' },
+  vivienda:       { ideal: 25, max: 35, label: 'Vivienda' },
+  expensas:       { ideal: 5,  max: 10, label: 'Expensas' },
+  transporte:     { ideal: 10, max: 18, label: 'Transporte' },
+  salud:          { ideal: 8,  max: 15, label: 'Salud' },
+  educacion:      { ideal: 5,  max: 12, label: 'Educación' },
+  indumentaria:   { ideal: 4,  max: 8,  label: 'Indumentaria' },
+  recreacion:     { ideal: 4,  max: 8,  label: 'Recreación' },
+  restaurantes:   { ideal: 5,  max: 10, label: 'Restaurantes y delivery' },
+  comunicaciones: { ideal: 3,  max: 6,  label: 'Comunicaciones' },
+  hogar:          { ideal: 3,  max: 7,  label: 'Equipamiento del hogar' },
+  banco_deudas:   { ideal: 15, max: 30, label: 'Banco y deudas' },
+};
+
+// Sugerencias específicas por rubro cuando está alto
+const SUGERENCIAS_RUBRO = {
+  alimentos:    ['Planificá las compras semanalmente para evitar gastos impulsivos', 'Comparar precios entre supermercados puede bajar este rubro un 15-20%', 'Reducir las compras de productos procesados suele ser el recorte más efectivo'],
+  vivienda:     ['Si alquilás, revisá si tu contrato tiene actualización por encima del IPC', 'Los servicios (gas, luz, agua) suelen tener descuento por débito automático'],
+  expensas:     ['Participá en la asamblea de tu edificio para entender en qué se gasta', 'Las mejoras en eficiencia energética del edificio bajan las expensas a largo plazo'],
+  transporte:   ['Combinar transporte público con bici o caminata puede bajar significativamente este gasto', 'Si tenés auto, calculá si el costo mensual (nafta, seguro, mantenimiento) justifica tenerlo vs taxis/remis'],
+  salud:        ['Revisá si tu prepaga ofrece planes intermedios con buena cobertura a menor costo', 'Medicamentos genéricos tienen la misma efectividad que las marcas y cuestan hasta 60% menos'],
+  indumentaria: ['Las compras de ropa en remates o liquidaciones de fin de temporada ahorran 40-60%', 'Establecer un presupuesto mensual fijo para ropa ayuda a evitar compras impulsivas'],
+  recreacion:   ['Muchos museos, parques y actividades culturales son gratuitos o de bajo costo', 'Plataformas de streaming compartidas reducen este gasto sin resignar entretenimiento'],
+  restaurantes: ['Preparar el almuerzo en casa y llevarlo al trabajo puede ahorrar $50.000-$100.000/mes', 'Limitar las salidas a restaurantes a 1-2 veces por semana tiene alto impacto en este rubro'],
+  comunicaciones:['Revisá si tu plan de celular incluye beneficios que no estás usando', 'Muchos bancos ofrecen descuentos en servicios de telecomunicaciones'],
+  hogar:        ['Para compras grandes del hogar, las cuotas sin interés en fechas especiales son una opción', 'Reparar antes de reemplazar: muchos electrodomésticos tienen arreglos económicos'],
+  banco_deudas: ['Cancelar la deuda con mayor tasa primero (método avalancha) minimiza el costo total', 'Refinanciar deudas caras por una línea de menor tasa puede reducir la cuota mensual'],
+};
+
+async function mostrarAnalisisMes(snapshot) {
+  if (!snapshot || !snapshot.rubros || snapshot.rubros.length === 0) return;
+
+  const totalGasto = snapshot.totalGasto || snapshot.rubros.reduce((a, r) => a + (r.monto || 0), 0);
+  if (totalGasto === 0) return;
+
+  // Calcular % de cada rubro sobre el total de gastos operativos
+  const EXCLUIR = ['ahorro', 'inversion', 'banco_deudas'];
+  const gastosOp = snapshot.rubros
+    .filter(r => !EXCLUIR.includes(r.id))
+    .reduce((a, r) => a + (r.monto || 0), 0);
+
+  const rubrosConPct = snapshot.rubros
+    .filter(r => r.monto > 0)
+    .map(r => ({
+      ...r,
+      pctTotal: gastosOp > 0 ? (r.monto / gastosOp) * 100 : 0,
+      benchmark: BENCHMARK_RUBROS[r.id] || null,
+    }))
+    .sort((a, b) => b.monto - a.monto);
+
+  // Historial para comparar con mes anterior
+  let mesAnterior = null;
+  try {
+    const hist = await getHistorial();
+    const idx = hist.findIndex(h => h.key === snapshot.key);
+    if (idx >= 0 && hist[idx + 1]) mesAnterior = hist[idx + 1];
+  } catch(e) {}
+
+  // Generar análisis
+  const altos = rubrosConPct.filter(r => r.benchmark && r.pctTotal > r.benchmark.max);
+  const bajos = rubrosConPct.filter(r => r.benchmark && r.pctTotal < r.benchmark.ideal * 0.5 && r.monto > 0);
+  const top3 = rubrosConPct.slice(0, 3);
+  const ipcPersonal = snapshot.ipcPersonal || 0;
+  const ipcOficial = snapshot.ipcOficial || 0;
+  const fmtP = v => '$' + Math.round(v).toLocaleString('es-AR');
+  const fmtPct = v => v.toFixed(1) + '%';
+
+  // Construir el modal
+  const overlay = document.createElement('div');
+  overlay.id = 'analisis-mes-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:950;display:flex;align-items:center;justify-content:center;padding:1rem;overflow-y:auto';
+
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--surf);border:1px solid var(--b2);border-radius:20px;max-width:560px;width:100%;max-height:90vh;overflow-y:auto;position:relative';
+
+  // Header
+  const headerHtml =
+    '<div style="background:linear-gradient(135deg,var(--surf2),var(--surf));padding:24px 24px 16px;border-bottom:1px solid var(--b1);position:sticky;top:0;z-index:1">' +
+      '<div style="display:flex;justify-content:space-between;align-items:start">' +
+        '<div>' +
+          '<div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:4px">Análisis · ' + snapshot.label + '</div>' +
+          '<div style="font-size:22px;font-weight:800;color:var(--t1)">Tu resumen mensual</div>' +
+        '</div>' +
+        '<button id="analisis-close-btn" style="background:none;border:1px solid var(--b2);border-radius:8px;padding:6px 10px;cursor:pointer;color:var(--t2);font-size:13px">✕ Cerrar</button>' +
+      '</div>' +
+    '</div>';
+
+  // KPIs del mes
+  const ipcDiff = ipcPersonal - ipcOficial;
+  const ipcColor = ipcDiff > 0 ? 'var(--red)' : 'var(--green)';
+  const ipcArrow = ipcDiff > 0 ? '↑' : '↓';
+  const kpisHtml =
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:16px 24px;border-bottom:1px solid var(--b1)">' +
+      '<div style="text-align:center">' +
+        '<div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Tu IPC</div>' +
+        '<div style="font-family:var(--mono);font-size:24px;font-weight:800;color:' + ipcColor + '">' + fmtPct(ipcPersonal) + '</div>' +
+        '<div style="font-size:11px;color:var(--t3);margin-top:2px">' + ipcArrow + ' ' + Math.abs(ipcDiff).toFixed(1) + ' pp vs INDEC</div>' +
+      '</div>' +
+      '<div style="text-align:center;border-left:1px solid var(--b1);border-right:1px solid var(--b1)">' +
+        '<div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Gasto total</div>' +
+        '<div style="font-family:var(--mono);font-size:24px;font-weight:800">' + fmtP(totalGasto) + '</div>' +
+        '<div style="font-size:11px;color:var(--t3);margin-top:2px">' + snapshot.rubros.filter(r=>r.monto>0).length + ' rubros activos</div>' +
+      '</div>' +
+      '<div style="text-align:center">' +
+        '<div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">IPC INDEC</div>' +
+        '<div style="font-family:var(--mono);font-size:24px;font-weight:800;color:var(--accent)">' + fmtPct(ipcOficial) + '</div>' +
+        '<div style="font-size:11px;color:var(--t3);margin-top:2px">' + (snapshot.region || 'Nacional') + '</div>' +
+      '</div>' +
+    '</div>';
+
+  // Top gastos
+  const topHtml =
+    '<div style="padding:16px 24px;border-bottom:1px solid var(--b1)">' +
+      '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:12px">📊 En qué gastaste más</div>' +
+      top3.map((r, i) => {
+        const barColor = i === 0 ? 'var(--accent)' : i === 1 ? 'var(--t2)' : 'var(--t3)';
+        const bchk = r.benchmark;
+        const statusIcon = bchk ? (r.pctTotal > bchk.max ? '🔴' : r.pctTotal > bchk.ideal ? '🟡' : '🟢') : '';
+        const vsComp = mesAnterior ? (() => {
+          const prev = mesAnterior.rubros?.find(pr => pr.id === r.id);
+          if (!prev || !prev.monto) return '';
+          const diff = r.monto - prev.monto;
+          const pct = Math.abs(diff / prev.monto * 100);
+          return diff > 0
+            ? ' <span style="font-size:10px;color:var(--red)">↑ +' + pct.toFixed(0) + '% vs mes ant.</span>'
+            : ' <span style="font-size:10px;color:var(--green)">↓ -' + pct.toFixed(0) + '% vs mes ant.</span>';
+        })() : '';
+        return '<div style="margin-bottom:10px">' +
+          '<div style="display:flex;justify-content:space-between;margin-bottom:4px">' +
+            '<span style="font-size:13px;color:var(--t1)">' + statusIcon + ' ' + r.name + vsComp + '</span>' +
+            '<span style="font-family:var(--mono);font-size:13px;font-weight:700">' + fmtP(r.monto) + ' <span style="color:var(--t3);font-weight:400;font-size:11px">(' + fmtPct(r.pctTotal) + ')</span></span>' +
+          '</div>' +
+          '<div style="height:5px;background:var(--b2);border-radius:3px;overflow:hidden">' +
+            '<div style="height:100%;width:' + Math.min(r.pctTotal * 2, 100) + '%;background:' + barColor + ';border-radius:3px"></div>' +
+          '</div>' +
+        '</div>';
+      }).join('') +
+    '</div>';
+
+  // Rubros altos (por encima del benchmark)
+  let alertasHtml = '';
+  if (altos.length > 0) {
+    alertasHtml =
+      '<div style="padding:16px 24px;border-bottom:1px solid var(--b1)">' +
+        '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:12px">🔴 Donde podrías recortar</div>' +
+        altos.map(r => {
+          const exceso = r.pctTotal - r.benchmark.max;
+          const montoExceso = (exceso / 100) * gastosOp;
+          const sugs = SUGERENCIAS_RUBRO[r.id] || [];
+          const sug = sugs[Math.floor(Math.random() * sugs.length)] || '';
+          return '<div style="background:rgba(204,34,0,.06);border:1px solid rgba(204,34,0,.15);border-radius:8px;padding:12px 14px;margin-bottom:8px">' +
+            '<div style="display:flex;justify-content:space-between;margin-bottom:6px">' +
+              '<span style="font-size:13px;font-weight:700;color:var(--t1)">' + r.name + '</span>' +
+              '<span style="font-family:var(--mono);font-size:12px;color:var(--red)">' + fmtPct(r.pctTotal) + ' del gasto (' + fmtPct(r.benchmark.max) + '% max.)</span>' +
+            '</div>' +
+            '<div style="font-size:12px;color:var(--t2);margin-bottom:4px">Exceso estimado: <b>' + fmtP(montoExceso) + '/mes</b></div>' +
+            (sug ? '<div style="font-size:12px;color:var(--t3);line-height:1.5">💡 ' + sug + '</div>' : '') +
+          '</div>';
+        }).join('') +
+      '</div>';
+  }
+
+  // Observación positiva si algo está bien
+  let positivoHtml = '';
+  const muBuenos = rubrosConPct.filter(r => r.benchmark && r.pctTotal <= r.benchmark.ideal && r.monto > 0);
+  if (muBuenos.length >= 2) {
+    positivoHtml =
+      '<div style="padding:16px 24px;border-bottom:1px solid var(--b1)">' +
+        '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:10px">🟢 Lo que estás haciendo bien</div>' +
+        '<div style="background:rgba(42,122,0,.08);border:1px solid rgba(42,122,0,.15);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--t2);line-height:1.6">' +
+          'Los rubros <b>' + muBuenos.slice(0,3).map(r=>r.name).join(', ') + '</b> están dentro de los rangos saludables. Mantené esos hábitos.' +
+        '</div>' +
+      '</div>';
+  }
+
+  // Comparativa vs mes anterior
+  let compHtml = '';
+  if (mesAnterior && mesAnterior.totalGasto > 0) {
+    const diffTotal = totalGasto - mesAnterior.totalGasto;
+    const diffPct = (diffTotal / mesAnterior.totalGasto) * 100;
+    const diffColor = diffTotal > 0 ? 'var(--red)' : 'var(--green)';
+    compHtml =
+      '<div style="padding:16px 24px;border-bottom:1px solid var(--b1)">' +
+        '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:10px">📅 Vs. mes anterior</div>' +
+        '<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surf2);border-radius:8px">' +
+          '<div style="flex:1">' +
+            '<div style="font-size:13px;color:var(--t2)">Gasto de ' + mesAnterior.label + ': <b>' + fmtP(mesAnterior.totalGasto) + '</b></div>' +
+            '<div style="font-size:12px;color:' + diffColor + ';margin-top:3px">' +
+              (diffTotal > 0 ? '▲ Gastaste ' + fmtP(Math.abs(diffTotal)) + ' más' : '▼ Gastaste ' + fmtP(Math.abs(diffTotal)) + ' menos') +
+              ' (' + (diffTotal > 0 ? '+' : '') + fmtPct(diffPct) + ')' +
+            '</div>' +
+          '</div>' +
+          '<div style="font-family:var(--mono);font-size:20px;font-weight:700;color:' + diffColor + '">' +
+            (diffTotal > 0 ? '+' : '') + fmtPct(diffPct) +
+          '</div>' +
+        '</div>' +
+      '</div>';
+  }
+
+  // Footer
+  const footerHtml =
+    '<div style="padding:16px 24px">' +
+      '<div style="font-size:12px;color:var(--t3);text-align:center;line-height:1.6">' +
+        'Este análisis se basa en benchmarks orientativos de consumo para Argentina. ' +
+        'No sustituye el asesoramiento de un profesional financiero.' +
+      '</div>' +
+      '<button id="analisis-ok-btn" class="btn-primary" style="width:100%;margin-top:14px">Entendido</button>' +
+    '</div>';
+
+  box.innerHTML = headerHtml + kpisHtml + topHtml + alertasHtml + positivoHtml + compHtml + footerHtml;
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+
+  // Cerrar
+  const close = () => overlay.remove();
+  box.querySelector('#analisis-close-btn')?.addEventListener('click', close);
+  box.querySelector('#analisis-ok-btn')?.addEventListener('click', close);
+  overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
 }
 
 // Boot
