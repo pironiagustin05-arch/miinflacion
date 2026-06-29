@@ -1086,6 +1086,80 @@ body.light-mode .hero-box {
 @media(max-width:768px){
   .fin-metrics-grid { grid-template-columns: 1fr; }
 }
+
+/* ══════════ MIS DEUDAS ══════════ */
+.deuda-card {
+  background: var(--surf); border: 1px solid var(--b1);
+  border-radius: var(--rl); overflow: hidden;
+  margin-bottom: 10px; transition: border-color .15s;
+}
+.deuda-card:hover { border-color: var(--b2); }
+.deuda-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px; cursor: pointer;
+}
+.deuda-tipo-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  background: var(--accent-bg); display: flex;
+  align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.deuda-info { flex: 1; min-width: 0; }
+.deuda-nombre {
+  font-size: 14px; font-weight: 600; color: var(--t1);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.deuda-meta { font-size: 11px; color: var(--t3); margin-top: 2px; }
+.deuda-cuota {
+  font-family: var(--mono); font-size: 16px;
+  font-weight: 700; color: var(--t1); flex-shrink: 0;
+}
+.deuda-del-btn {
+  background: none; border: none; color: var(--t3);
+  cursor: pointer; font-size: 14px; padding: 4px;
+  border-radius: 4px; transition: color .15s; flex-shrink: 0;
+}
+.deuda-del-btn:hover { color: var(--red); }
+.deuda-body {
+  display: none; border-top: 1px solid var(--b1);
+  padding: 16px; background: var(--surf2);
+}
+.deuda-body.open { display: block; }
+.deuda-metrics {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr));
+  gap: 10px; margin-bottom: 14px;
+}
+.deuda-metric {
+  background: var(--surf); border-radius: 7px;
+  padding: 10px 12px; border: 1px solid var(--b1);
+}
+.deuda-metric-lbl {
+  font-size: 9px; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--t3); margin-bottom: 4px;
+}
+.deuda-metric-val {
+  font-family: var(--mono); font-size: 16px;
+  font-weight: 700; line-height: 1;
+}
+.deuda-progress-wrap { margin-top: 10px; }
+.deuda-progress-lbl {
+  display: flex; justify-content: space-between;
+  font-size: 11px; color: var(--t3); margin-bottom: 4px;
+}
+.deuda-progress-bar {
+  height: 6px; background: var(--b2);
+  border-radius: 3px; overflow: hidden;
+}
+.deuda-progress-fill {
+  height: 100%; border-radius: 3px;
+  transition: width .4s;
+}
+.tasa-real-positiva { color: var(--red); }
+.tasa-real-negativa { color: var(--green); }
+
+@media(max-width:768px){
+  .deuda-metrics { grid-template-columns: 1fr 1fr; }
+}
 </style>
 </head>
 <body>
@@ -1241,6 +1315,10 @@ body.light-mode .hero-box {
     <button class="nav-tab" data-panel="finanzas">
       <span class="tab-icon">💡</span>
       <span class="tab-label">Mis Finanzas</span>
+    </button>
+    <button class="nav-tab" data-panel="deudas">
+      <span class="tab-icon">💳</span>
+      <span class="tab-label">Mis Deudas</span>
     </button>
     <button class="nav-tab" data-panel="planes">
       <span class="tab-icon">⭐</span>
@@ -1820,7 +1898,7 @@ body.light-mode .hero-box {
   <!-- SCORE DE DEUDA -->
   <div class="fin-section">
     <div class="sec-hd"><div class="sec-title">Score de salud financiera</div>
-      <a href="https://tirr.com" target="_blank" rel="noopener"
+      <a href="https://tirr.com.ar" target="_blank" rel="noopener"
         style="font-size:11px;color:var(--accent);text-decoration:none;display:flex;align-items:center;gap:4px">
         Ver score oficial en TIRR ↗
       </a>
@@ -1893,7 +1971,7 @@ body.light-mode .hero-box {
             <div style="font-size:12px;font-weight:600;color:var(--t1);margin-bottom:2px">¿Querés saber tu score crediticio oficial?</div>
             <div style="font-size:11px;color:var(--t3)">TIRR.com es la plataforma argentina que muestra tu historial y scoring de deuda real</div>
           </div>
-          <a href="https://tirr.com" target="_blank" rel="noopener"
+          <a href="https://tirr.com.ar" target="_blank" rel="noopener"
             style="background:var(--accent);color:#000;padding:8px 16px;border-radius:7px;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;flex-shrink:0">
             Ver en TIRR →
           </a>
@@ -1903,6 +1981,135 @@ body.light-mode .hero-box {
   </div>
 
 </div><!-- /panel-finanzas -->
+
+<!-- ── PANEL: MIS DEUDAS ── -->
+<div class="panel container" id="panel-deudas" style="padding-bottom:5rem">
+
+  <div class="how-hero" style="margin-bottom:1.6rem">
+    <div class="hero-eyebrow">Gestión de deudas</div>
+    <div style="font-size:24px;font-weight:700;color:var(--t1);margin-bottom:4px">Mis Deudas</div>
+    <div style="font-size:13px;color:var(--t2)">Costo financiero real · Tasa efectiva vs inflación · Proyección de cancelación</div>
+  </div>
+
+  <!-- RESUMEN GENERAL -->
+  <div class="sec-hd"><div class="sec-title">Resumen de carga de deuda</div></div>
+  <div id="deudas-resumen-wrap">
+    <div style="background:var(--surf);border:1px solid var(--b1);border-radius:var(--rl);padding:20px;margin-bottom:1.4rem">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px">
+        <div class="fin-metric">
+          <div class="fin-metric-lbl">Deuda total</div>
+          <div class="fin-metric-val" id="d-total-capital">$0</div>
+          <div class="fin-metric-ref">Capital pendiente</div>
+        </div>
+        <div class="fin-metric">
+          <div class="fin-metric-lbl">Cuota total mensual</div>
+          <div class="fin-metric-val" id="d-total-cuota">$0</div>
+          <div class="fin-metric-ref">Lo que pagás por mes</div>
+        </div>
+        <div class="fin-metric">
+          <div class="fin-metric-lbl">Interés mensual</div>
+          <div class="fin-metric-val" id="d-total-interes" style="color:var(--red)">$0</div>
+          <div class="fin-metric-ref">Costo financiero real</div>
+        </div>
+        <div class="fin-metric">
+          <div class="fin-metric-lbl">Costo total proyectado</div>
+          <div class="fin-metric-val" id="d-total-costo">$0</div>
+          <div class="fin-metric-ref">Capital + intereses totales</div>
+        </div>
+      </div>
+      <!-- Semáforo de carga -->
+      <div id="d-semaforo" style="display:none;padding:10px 14px;border-radius:8px;font-size:13px;line-height:1.5"></div>
+    </div>
+  </div>
+
+  <!-- AGREGAR DEUDA -->
+  <div class="sec-hd">
+    <div class="sec-title">Mis deudas</div>
+    <button class="arg-add-btn" onclick="showAddDeudaForm()">+ Agregar deuda</button>
+  </div>
+
+  <!-- Formulario nueva deuda -->
+  <div id="add-deuda-form" style="display:none;background:var(--surf);border:1px solid var(--accent);border-radius:var(--rl);padding:20px;margin-bottom:1.4rem">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+      <div class="form-group" style="grid-column:1/-1">
+        <label class="form-label">Nombre de la deuda</label>
+        <input class="form-input" type="text" id="d-nombre" placeholder="Ej: Tarjeta Visa, Préstamo personal, Cuotas TV..." maxlength="60" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tipo</label>
+        <select class="form-input" id="d-tipo">
+          <option value="tarjeta">💳 Tarjeta de crédito</option>
+          <option value="prestamo">🏦 Préstamo bancario</option>
+          <option value="cuotas">🛒 Compra en cuotas</option>
+          <option value="personal">👤 Préstamo personal</option>
+          <option value="hipoteca">🏠 Hipoteca / UVA</option>
+          <option value="otro">📋 Otro</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Capital pendiente $</label>
+        <div class="fin-input-wrap">
+          <span class="fin-prefix">$</span>
+          <input type="number" class="fin-inp" id="d-capital" placeholder="500.000" min="0" step="1000" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Cuota mensual $</label>
+        <div class="fin-input-wrap">
+          <span class="fin-prefix">$</span>
+          <input type="number" class="fin-inp" id="d-cuota" placeholder="45.000" min="0" step="100" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tipo de tasa</label>
+        <select class="form-input" id="d-tipo-tasa" onchange="updateTasaLabel()">
+          <option value="tna">TNA — Tasa Nominal Anual</option>
+          <option value="tea">TEA — Tasa Efectiva Anual</option>
+          <option value="mensual">Tasa mensual directa</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label" id="d-tasa-label">TNA %</label>
+        <div class="fin-input-wrap">
+          <input type="number" class="fin-inp" id="d-tasa" placeholder="Ej: 120" min="0" step="0.1"
+            style="padding-left:14px" />
+          <span style="padding:0 14px;color:var(--t3);font-size:14px">%</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Cuotas restantes</label>
+        <input class="form-input" type="number" id="d-cuotas-rest" placeholder="Ej: 18" min="1" max="360" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Ajuste por inflación</label>
+        <select class="form-input" id="d-ajuste">
+          <option value="no">Sin ajuste (tasa fija en $)</option>
+          <option value="uva">UVA (ajuste por CER)</option>
+          <option value="usd">En dólares</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn-primary" style="flex:1" onclick="agregarDeuda()">Agregar deuda</button>
+      <button class="btn-logout" onclick="hideAddDeudaForm()">Cancelar</button>
+    </div>
+    <div class="auth-error" id="d-error" style="margin-top:8px"></div>
+  </div>
+
+  <!-- Lista de deudas -->
+  <div id="deudas-lista">
+    <div style="text-align:center;padding:40px;color:var(--t3);font-size:13px" id="deudas-empty">
+      <div style="font-size:28px;margin-bottom:8px">💳</div>
+      No tenés deudas registradas. Agregá una para ver el costo financiero real.
+    </div>
+  </div>
+
+  <!-- Info educativa -->
+  <div style="background:var(--surf2);border-radius:var(--r);padding:14px 16px;margin-top:1rem;font-size:12px;color:var(--t3);line-height:1.6">
+    <b style="color:var(--t2)">¿Qué es la tasa real?</b> En Argentina, si tu deuda tiene TNA 80% y la inflación anual es 50%, tu tasa real es aproximadamente 20%. Eso significa que en términos de poder adquisitivo, la deuda se "licúa" parcialmente. Pero si la tasa supera la inflación, estás pagando más en términos reales.
+  </div>
+
+</div><!-- /panel-deudas -->
 
 <!-- ── PANEL: LEGAL ── -->
 <div class="panel container" id="panel-legal" style="padding-bottom:5rem">
@@ -5714,21 +5921,46 @@ async function applyPromoCode() {
     msg.style.display = 'block';
   }
 
-  const { error } = await _sb.from('user_state').upsert({
-    user_id: currentUser.id,
-    is_premium: true,
-    premium_since: new Date().toISOString()
-  }, { onConflict: 'user_id' });
+  // Primero intentar actualizar, si no existe la fila, insertarla
+  let error = null;
+
+  // Verificar si existe la fila
+  const { data: existing } = await _sb
+    .from('user_state')
+    .select('user_id')
+    .eq('user_id', currentUser.id)
+    .single();
+
+  if (existing) {
+    // Actualizar fila existente
+    const { error: updErr } = await _sb
+      .from('user_state')
+      .update({ is_premium: true, premium_since: new Date().toISOString() })
+      .eq('user_id', currentUser.id);
+    error = updErr;
+  } else {
+    // Insertar fila nueva con premium
+    const { error: insErr } = await _sb
+      .from('user_state')
+      .insert({
+        user_id: currentUser.id,
+        is_premium: true,
+        premium_since: new Date().toISOString(),
+        version: 3
+      });
+    error = insErr;
+  }
 
   if (error) {
+    console.error('Error activando premium:', error);
     if (msg) {
-      msg.textContent = 'Error al activar. Intentá de nuevo.';
+      msg.textContent = 'Error: ' + (error.message || 'Intentá de nuevo');
       msg.style.color = 'var(--red)';
     }
     return;
   }
 
-  // Actualizar estado local
+  // Actualizar estado local inmediatamente sin esperar loadUserState
   isPremiumUser = true;
   await loadUserState();
 
@@ -5846,32 +6078,29 @@ function calcFinanzas() {
 
   // Obtener gastos de la canasta
   const totalGastos = getTotalMoney();
+  const sinDatos = totalGastos === 0;
 
   // Separar deudas de gastos operativos
+  // Calcular deuda total desde subrubros de banco_deudas
   const deudaTotal = (() => {
-    let d = 0;
-    const catDeudas = CATS.find(c => c.id === 'banco_deudas');
-    if (catDeudas) {
-      catDeudas.subs.forEach(s => { d += state['banco_deudas_' + s.id]?.monto || 0; });
-      // También el monto del padre
-      d = Math.max(d, state['banco_deudas']?.monto || 0);
-    }
-    return d;
+    const cat = CATS.find(c => c.id === 'banco_deudas');
+    if (!cat) return 0;
+    // Sumar montos de subrubros
+    const subSum = cat.subs.reduce((a, s) => a + (state[cat.id + '_' + s.id]?.monto || 0), 0);
+    // Si no hay subrubros cargados, usar el monto del rubro padre
+    return subSum > 0 ? subSum : (state['banco_deudas']?.monto || 0);
   })();
 
+  // Calcular ahorro + inversión
   const ahorroTotal = (() => {
-    let a = 0;
-    const catAhorro = CATS.find(c => c.id === 'ahorro');
-    if (catAhorro) {
-      catAhorro.subs.forEach(s => { a += state['ahorro_' + s.id]?.monto || 0; });
-      a = Math.max(a, state['ahorro']?.monto || 0);
-    }
-    const catInv = CATS.find(c => c.id === 'inversion');
-    if (catInv) {
-      catInv.subs.forEach(s => { a += state['inversion_' + s.id]?.monto || 0; });
-      a = Math.max(a, a, state['inversion']?.monto || 0);
-    }
-    return a;
+    let total = 0;
+    ['ahorro', 'inversion'].forEach(catId => {
+      const cat = CATS.find(c => c.id === catId);
+      if (!cat) return;
+      const subSum = cat.subs.reduce((a, s) => a + (state[cat.id + '_' + s.id]?.monto || 0), 0);
+      total += subSum > 0 ? subSum : (state[catId]?.monto || 0);
+    });
+    return total;
   })();
 
   const gastosOperativos = Math.max(0, totalGastos - deudaTotal - ahorroTotal);
@@ -5983,7 +6212,21 @@ function calcFinanzas() {
   if (ratioGasto > 80) recs.push({ tipo: 'bad', icon: '📉', texto: '<b>Gasto muy alto:</b> el ' + fmtPct(ratioGasto) + ' de tu ingreso va a gastos operativos. El límite saludable es 70%. Identificá y reducí los 3 gastos más grandes que puedas optimizar.' });
   else if (ratioGasto > 65) recs.push({ tipo: 'warn', icon: '📊', texto: '<b>Gasto elevado:</b> el ' + fmtPct(ratioGasto) + ' va a gastos. Intentá no superar el 70% para tener margen de ahorro y emergencias.' });
 
-  if (totalGastos === 0) recs.push({ tipo: 'warn', icon: '📝', texto: '<b>Cargá tus gastos:</b> para obtener un diagnóstico preciso, completá tu canasta de gastos en el panel "Mi canasta". Así la calculadora puede analizar tu situación real.' });
+  if (sinDatos) {
+    recs.unshift({ tipo: 'warn', icon: '📝', texto: '<b>Sin gastos cargados:</b> para obtener tu score real, andá al panel "Mi canasta" y cargá tus gastos mensuales por rubro. La calculadora usará esos datos para analizar tu situación financiera completa.' });
+  } else {
+    // Análisis de dónde se va el dinero
+    const topGastos = CATS
+      .map(c => ({ name: c.name, monto: state[c.id]?.monto || c.subs.reduce((a,s) => a+(state[c.id+'_'+s.id]?.monto||0),0), icon: c.icon }))
+      .filter(c => c.monto > 0 && c.id !== 'banco_deudas' && c.id !== 'ahorro' && c.id !== 'inversion')
+      .sort((a,b) => b.monto - a.monto)
+      .slice(0, 3);
+    const fmtP = v => '$' + Math.round(v).toLocaleString('es-AR');
+    if (topGastos.length > 0 && ingreso > 0) {
+      const topStr = topGastos.map(g => g.icon + ' ' + g.name.split(' y ')[0] + ' (' + fmtP(g.monto) + ')').join(', ');
+      recs.push({ tipo: 'warn', icon: '📊', texto: '<b>Tus mayores gastos:</b> ' + topStr + '. Representan el ' + Math.round((topGastos.reduce((a,g)=>a+g.monto,0)/ingreso)*100) + '% de tu ingreso.' });
+    }
+  }
 
   const recsEl = document.getElementById('fin-recomendaciones');
   if (recsEl) {
@@ -6077,6 +6320,303 @@ function loadFinanzasData() {
   if (selMono && f.monoCat) selMono.value = f.monoCat;
   if (inpFact && f.facturacion) inpFact.value = f.facturacion;
   if (f.ingreso) calcFinanzas();
+}
+
+// ═══════════════════════════════════════════════
+// MIS DEUDAS — GESTIÓN Y CÁLCULO FINANCIERO
+// ═══════════════════════════════════════════════
+
+// Almacenamiento en la canasta activa
+function getDeudas() {
+  const ac = getActiveCanasta();
+  return ac?.deudas || [];
+}
+function saveDeudas(deudas) {
+  const ac = getActiveCanasta();
+  if (!ac) return;
+  ac.deudas = deudas;
+  saveCurrentState();
+}
+
+// Iconos por tipo
+const DEUDA_ICONS = {
+  tarjeta: '💳', prestamo: '🏦', cuotas: '🛒',
+  personal: '👤', hipoteca: '🏠', otro: '📋'
+};
+
+// ── Conversión de tasas ──
+function tasaMensual(valor, tipo) {
+  if (!valor || valor <= 0) return 0;
+  switch(tipo) {
+    case 'tna':     return valor / 12 / 100;
+    case 'tea':     return Math.pow(1 + valor/100, 1/12) - 1;
+    case 'mensual': return valor / 100;
+    default:        return valor / 12 / 100;
+  }
+}
+
+function tasaAnualEfectiva(valor, tipo) {
+  const tm = tasaMensual(valor, tipo);
+  return (Math.pow(1 + tm, 12) - 1) * 100;
+}
+
+// ── Calcular métricas de una deuda ──
+function calcDeuda(d) {
+  const tm = tasaMensual(d.tasa, d.tipoTasa);
+  const capital = d.capital || 0;
+  const cuota = d.cuota || 0;
+  const cuotasRest = d.cuotasRest || 0;
+  const ipcMensual = (ipcLastVal || 2.5) / 100; // inflación mensual actual
+
+  // Interés del primer mes (sobre el capital pendiente)
+  const interesMes = capital * tm;
+
+  // Amortización mensual (cuota - interés)
+  const amortizacion = Math.max(0, cuota - interesMes);
+
+  // Costo total restante
+  const costoTotal = cuota * cuotasRest;
+  const interesTotal = Math.max(0, costoTotal - capital);
+
+  // TEA
+  const tea = tasaAnualEfectiva(d.tasa, d.tipoTasa);
+
+  // Tasa real vs inflación (Fisher)
+  const inflAnual = ipcMensual > 0 ? (Math.pow(1 + ipcMensual, 12) - 1) * 100 : 50;
+  const tasaReal = ((1 + tea/100) / (1 + inflAnual/100) - 1) * 100;
+
+  // Fecha estimada de cancelación
+  let fechaCancelacion = '—';
+  if (cuotasRest > 0) {
+    const fecha = new Date();
+    fecha.setMonth(fecha.getMonth() + cuotasRest);
+    fechaCancelacion = fecha.toLocaleDateString('es-AR', { month: 'short', year: 'numeric' });
+  }
+
+  // Ajuste UVA
+  let notaAjuste = '';
+  if (d.ajuste === 'uva') notaAjuste = 'Ajusta por CER/UVA — el capital aumenta con inflación';
+  if (d.ajuste === 'usd') notaAjuste = 'Deuda en USD — expuesta a variación del tipo de cambio';
+
+  return {
+    interesMes, amortizacion, costoTotal, interesTotal,
+    tea, tasaReal, fechaCancelacion, notaAjuste, inflAnual
+  };
+}
+
+// ── UI ──
+function showAddDeudaForm() {
+  document.getElementById('add-deuda-form').style.display = 'block';
+  document.getElementById('d-nombre')?.focus();
+}
+function hideAddDeudaForm() {
+  document.getElementById('add-deuda-form').style.display = 'none';
+  ['d-nombre','d-capital','d-cuota','d-tasa','d-cuotas-rest'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const errEl = document.getElementById('d-error');
+  if (errEl) errEl.classList.remove('show');
+}
+
+function updateTasaLabel() {
+  const tipo = document.getElementById('d-tipo-tasa')?.value;
+  const lbl = document.getElementById('d-tasa-label');
+  if (!lbl) return;
+  const labels = { tna: 'TNA %', tea: 'TEA %', mensual: 'Tasa mensual %' };
+  lbl.textContent = labels[tipo] || 'Tasa %';
+}
+
+function agregarDeuda() {
+  const nombre = document.getElementById('d-nombre')?.value.trim();
+  const tipo = document.getElementById('d-tipo')?.value;
+  const capital = parseFloat(document.getElementById('d-capital')?.value) || 0;
+  const cuota = parseFloat(document.getElementById('d-cuota')?.value) || 0;
+  const tipoTasa = document.getElementById('d-tipo-tasa')?.value;
+  const tasa = parseFloat(document.getElementById('d-tasa')?.value) || 0;
+  const cuotasRest = parseInt(document.getElementById('d-cuotas-rest')?.value) || 0;
+  const ajuste = document.getElementById('d-ajuste')?.value;
+  const errEl = document.getElementById('d-error');
+
+  if (!nombre) {
+    if (errEl) { errEl.textContent = 'Ingresá un nombre para la deuda'; errEl.classList.add('show'); }
+    return;
+  }
+  if (cuota <= 0) {
+    if (errEl) { errEl.textContent = 'Ingresá el monto de la cuota mensual'; errEl.classList.add('show'); }
+    return;
+  }
+
+  const nuevaDeuda = {
+    id: 'd' + Date.now(),
+    nombre, tipo, capital, cuota,
+    tipoTasa, tasa, cuotasRest, ajuste,
+    fechaAlta: new Date().toISOString()
+  };
+
+  const deudas = getDeudas();
+  deudas.push(nuevaDeuda);
+  saveDeudas(deudas);
+  hideAddDeudaForm();
+  renderDeudas();
+}
+
+function eliminarDeuda(btn) {
+  // btn puede ser el elemento botón (via onclick this) o un string id
+  const id = (typeof btn === 'string') ? btn : btn?.dataset?.delDeuda;
+  if (!id) return;
+  if (!confirm('¿Eliminar esta deuda?')) return;
+  const deudas = getDeudas().filter(d => d.id !== id);
+  saveDeudas(deudas);
+  renderDeudas();
+}
+
+function renderDeudas() {
+  const lista = document.getElementById('deudas-lista');
+  const empty = document.getElementById('deudas-empty');
+  if (!lista) return;
+
+  const deudas = getDeudas();
+
+  if (deudas.length === 0) {
+    if (empty) empty.style.display = 'block';
+    lista.innerHTML = '';
+    lista.appendChild(empty || document.createElement('div'));
+    // Reset resumen
+    ['d-total-capital','d-total-cuota','d-total-interes','d-total-costo'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = '$0';
+    });
+    document.getElementById('d-semaforo').style.display = 'none';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+
+  // Calcular totales
+  let totalCapital = 0, totalCuota = 0, totalInteres = 0, totalCosto = 0;
+  const calculos = deudas.map(d => {
+    const c = calcDeuda(d);
+    totalCapital += d.capital || 0;
+    totalCuota += d.cuota || 0;
+    totalInteres += c.interesMes;
+    totalCosto += c.costoTotal;
+    return { d, c };
+  });
+
+  // Actualizar resumen
+  const fmtP = v => '$' + Math.round(v).toLocaleString('es-AR');
+  const setEl = (id, val, color) => {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = val; if (color) el.style.color = color; }
+  };
+  setEl('d-total-capital', fmtP(totalCapital));
+  setEl('d-total-cuota', fmtP(totalCuota));
+  setEl('d-total-interes', fmtP(totalInteres), '#cc2200');
+  setEl('d-total-costo', fmtP(totalCosto));
+
+  // Semáforo de carga
+  const ingreso = parseFloat(document.getElementById('fin-ingreso')?.value) || 0;
+  const sem = document.getElementById('d-semaforo');
+  if (sem && ingreso > 0) {
+    const dti = (totalCuota / ingreso) * 100;
+    sem.style.display = 'block';
+    if (dti > 40) {
+      sem.style.cssText = 'display:block;padding:10px 14px;border-radius:8px;font-size:13px;background:rgba(204,34,0,.08);border:1px solid rgba(204,34,0,.2);color:var(--red)';
+      sem.innerHTML = '🔴 <b>Carga de deuda crítica:</b> tus cuotas representan el ' + dti.toFixed(1) + '% de tu ingreso. Lo máximo recomendado es 35%. Considerá refinanciar o cancelar las deudas más caras primero.';
+    } else if (dti > 25) {
+      sem.style.cssText = 'display:block;padding:10px 14px;border-radius:8px;font-size:13px;background:rgba(184,96,0,.08);border:1px solid rgba(184,96,0,.2);color:var(--amber)';
+      sem.innerHTML = '🟠 <b>Carga moderada:</b> tus cuotas son el ' + dti.toFixed(1) + '% de tu ingreso. Manejable, pero evitá tomar más deuda hasta reducirlo al 20%.';
+    } else {
+      sem.style.cssText = 'display:block;padding:10px 14px;border-radius:8px;font-size:13px;background:rgba(42,122,0,.08);border:1px solid rgba(42,122,0,.2);color:var(--green)';
+      sem.innerHTML = '🟢 <b>Carga saludable:</b> tus cuotas representan el ' + dti.toFixed(1) + '% de tu ingreso. Estás dentro del límite recomendado.';
+    }
+  } else if (sem) {
+    sem.style.display = 'none';
+  }
+
+  // Render cards
+  lista.innerHTML = '';
+  calculos.forEach(({ d, c }) => {
+    const card = document.createElement('div');
+    card.className = 'deuda-card';
+
+    const tasaRealColor = c.tasaReal > 0 ? 'var(--red)' : 'var(--green)';
+    const tasaRealTxt = c.tasaReal > 0
+      ? '+' + c.tasaReal.toFixed(1) + '% real (te cuesta en términos reales)'
+      : c.tasaReal.toFixed(1) + '% real (la inflación licúa la deuda)';
+
+    const pctPagado = d.capital > 0 && c.costoTotal > 0
+      ? Math.max(0, Math.min(100, (1 - (d.capital / (d.capital + c.interesTotal))) * 100))
+      : 0;
+
+    card.innerHTML =
+      '<div class="deuda-header" onclick="toggleDeudaBody(this)">' +
+        '<div class="deuda-tipo-icon">' + (DEUDA_ICONS[d.tipo] || '📋') + '</div>' +
+        '<div class="deuda-info">' +
+          '<div class="deuda-nombre">' + d.nombre + '</div>' +
+          '<div class="deuda-meta">' +
+            (d.cuotasRest ? d.cuotasRest + ' cuotas restantes · ' : '') +
+            'Cancela: ' + c.fechaCancelacion +
+          '</div>' +
+        '</div>' +
+        '<div class="deuda-cuota">' + fmtP(d.cuota) + '/mes</div>' +
+        '<button class="deuda-del-btn" data-del-deuda="' + d.id + '" onclick="event.stopPropagation();eliminarDeuda(this)">✕</button>' +
+      '</div>' +
+      '<div class="deuda-body">' +
+        '<div class="deuda-metrics">' +
+          '<div class="deuda-metric">' +
+            '<div class="deuda-metric-lbl">Interés este mes</div>' +
+            '<div class="deuda-metric-val" style="color:var(--red)">' + fmtP(c.interesMes) + '</div>' +
+          '</div>' +
+          '<div class="deuda-metric">' +
+            '<div class="deuda-metric-lbl">Amortización</div>' +
+            '<div class="deuda-metric-val" style="color:var(--green)">' + fmtP(c.amortizacion) + '</div>' +
+          '</div>' +
+          '<div class="deuda-metric">' +
+            '<div class="deuda-metric-lbl">TEA efectiva</div>' +
+            '<div class="deuda-metric-val">' + c.tea.toFixed(1) + '%</div>' +
+          '</div>' +
+          '<div class="deuda-metric">' +
+            '<div class="deuda-metric-lbl">Tasa real</div>' +
+            '<div class="deuda-metric-val" style="color:' + tasaRealColor + '">' + (c.tasaReal > 0 ? '+' : '') + c.tasaReal.toFixed(1) + '%</div>' +
+          '</div>' +
+          '<div class="deuda-metric">' +
+            '<div class="deuda-metric-lbl">Interés total</div>' +
+            '<div class="deuda-metric-val" style="color:var(--red)">' + fmtP(c.interesTotal) + '</div>' +
+          '</div>' +
+          '<div class="deuda-metric">' +
+            '<div class="deuda-metric-lbl">Costo total</div>' +
+            '<div class="deuda-metric-val">' + fmtP(c.costoTotal) + '</div>' +
+          '</div>' +
+        '</div>' +
+        // Barra de progreso
+        '<div class="deuda-progress-wrap">' +
+          '<div class="deuda-progress-lbl">' +
+            '<span>Capital pendiente: ' + fmtP(d.capital) + '</span>' +
+            '<span>' + pctPagado.toFixed(0) + '% pagado</span>' +
+          '</div>' +
+          '<div class="deuda-progress-bar">' +
+            '<div class="deuda-progress-fill" style="width:' + pctPagado + '%;background:var(--accent)"></div>' +
+          '</div>' +
+        '</div>' +
+        // Nota tasa real
+        '<div style="margin-top:10px;font-size:11px;color:' + tasaRealColor + ';padding:6px 10px;background:var(--surf);border-radius:5px">' +
+          '📊 ' + tasaRealTxt + ' (vs inflación anual ~' + c.inflAnual.toFixed(0) + '%)' +
+        '</div>' +
+        (c.notaAjuste ? '<div style="margin-top:6px;font-size:11px;color:var(--amber);padding:6px 10px;background:var(--surf);border-radius:5px">⚠️ ' + c.notaAjuste + '</div>' : '') +
+      '</div>';
+
+    lista.appendChild(card);
+  });
+}
+
+function toggleDeudaBody(header) {
+  const body = header.nextElementSibling;
+  if (body) body.classList.toggle('open');
+}
+
+function initDeudas() {
+  renderDeudas();
 }
 
 // Boot
