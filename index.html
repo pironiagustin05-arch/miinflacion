@@ -2131,7 +2131,7 @@ body.light-mode .deuda-body {
           <label class="form-label">Facturación mensual estimada $</label>
           <div class="fin-input-wrap">
             <span class="fin-prefix">$</span>
-            <input type="number" id="fin-facturacion" class="fin-inp" placeholder="Ej: 700.000"
+            <input type="text" id="fin-facturacion" class="fin-inp" placeholder="Ej: 700.000"
               min="0" step="10000" inputmode="numeric" oninput="calcFinanzas()" />
           </div>
         </div>
@@ -2236,13 +2236,11 @@ body.light-mode .deuda-body {
             <div class="fin-metric-lbl">Tasa de ahorro</div>
             <div class="fin-metric-val" id="met-ahorro">—</div>
             <div class="fin-metric-bar"><div id="bar-ahorro" class="fin-metric-fill"></div></div>
-            <div class="fin-metric-ref">Recomendado: mínimo 10%</div>
           </div>
           <div class="fin-metric">
             <div class="fin-metric-lbl">Gasto vs ingreso</div>
             <div class="fin-metric-val" id="met-gasto">—</div>
             <div class="fin-metric-bar"><div id="bar-gasto" class="fin-metric-fill"></div></div>
-            <div class="fin-metric-ref">Recomendado: máximo 70%</div>
           </div>
         </div>
 
@@ -2337,14 +2335,14 @@ body.light-mode .deuda-body {
         <label class="form-label">Capital pendiente $</label>
         <div class="fin-input-wrap">
           <span class="fin-prefix">$</span>
-          <input type="number" class="fin-inp" id="d-capital" placeholder="500.000" min="0" step="1000" />
+          <input type="text" class="fin-inp" id="d-capital" placeholder="500.000" min="0" step="1000" inputmode="numeric" />
         </div>
       </div>
       <div class="form-group">
         <label class="form-label">Cuota mensual $</label>
         <div class="fin-input-wrap">
           <span class="fin-prefix">$</span>
-          <input type="number" class="fin-inp" id="d-cuota" placeholder="45.000" min="0" step="100" />
+          <input type="text" class="fin-inp" id="d-cuota" placeholder="45.000" min="0" step="100" inputmode="numeric" />
         </div>
       </div>
       <div class="form-group">
@@ -2358,7 +2356,7 @@ body.light-mode .deuda-body {
       <div class="form-group">
         <label class="form-label" id="d-tasa-label">TNA %</label>
         <div class="fin-input-wrap">
-          <input type="number" class="fin-inp" id="d-tasa" placeholder="Ej: 120" min="0" step="0.1"
+          <input type="number" class="fin-inp" id="d-tasa" data-no-money-format="1" placeholder="Ej: 120" min="0" step="0.1"
             style="padding-left:14px" />
           <span style="padding:0 14px;color:var(--t3);font-size:14px">%</span>
         </div>
@@ -2420,7 +2418,7 @@ body.light-mode .deuda-body {
       <div style="display:flex;gap:8px;margin-bottom:12px">
         <div class="fin-input-wrap" style="flex:1">
           <span class="fin-prefix" style="font-size:13px">CUIT</span>
-          <input type="text" class="fin-inp" id="bcra-cuit-inp"
+          <input type="text" class="fin-inp" id="bcra-cuit-inp" data-no-money-format="1"
             placeholder="20123456789" maxlength="11" inputmode="numeric"
             style="font-size:16px;letter-spacing:.08em"
             onkeydown="if(event.key==='Enter')consultarBCRA()" />
@@ -2455,7 +2453,7 @@ body.light-mode .deuda-body {
           <label class="form-label">Monto original en UVA o $</label>
           <div class="fin-input-wrap">
             <span class="fin-prefix">$</span>
-            <input type="number" class="fin-inp" id="uva-monto" placeholder="1.000.000" min="0" step="1000" oninput="calcUVA()" />
+            <input type="text" class="fin-inp" id="uva-monto" placeholder="1.000.000" min="0" step="1000" inputmode="numeric" oninput="calcUVA()" />
           </div>
         </div>
         <div>
@@ -2472,7 +2470,7 @@ body.light-mode .deuda-body {
         </div>
         <div id="uva-cantidad-wrap" style="display:none">
           <label class="form-label">Cantidad de UVAs</label>
-          <input type="number" class="fin-inp" id="uva-cantidad" placeholder="500" min="0" oninput="calcUVA()" />
+          <input type="text" class="fin-inp" id="uva-cantidad" placeholder="500" min="0" inputmode="numeric" oninput="calcUVA()" />
         </div>
       </div>
       <div id="uva-result" style="display:none;padding:14px;background:var(--surf2);border-radius:8px;border:1px solid var(--b1)"></div>
@@ -2492,7 +2490,7 @@ body.light-mode .deuda-body {
           <label class="form-label">Monto a invertir $</label>
           <div class="fin-input-wrap">
             <span class="fin-prefix">$</span>
-            <input type="number" class="fin-inp" id="rf-monto" placeholder="500.000" min="0" step="10000" oninput="calcRentaFija()" />
+            <input type="text" class="fin-inp" id="rf-monto" placeholder="500.000" min="0" step="10000" inputmode="numeric" oninput="calcRentaFija()" />
           </div>
         </div>
         <div>
@@ -2511,7 +2509,7 @@ body.light-mode .deuda-body {
       </div>
       <div id="rf-result" style="display:none"></div>
       <div style="font-size:11px;color:var(--t3);margin-top:10px;line-height:1.5">
-        📌 Tasas de referencia BCRA + valores orientativos de mercado. Los rendimientos reales pueden variar. Esto no constituye asesoramiento financiero.
+        📌 LECAP/BONCAP: cotización real vía IOL. Resto: tasas de referencia BCRA + valores orientativos. Los rendimientos reales pueden variar. Esto no constituye asesoramiento financiero.
       </div>
     </div>
   </div>
@@ -2532,7 +2530,7 @@ body.light-mode .deuda-body {
           <label class="form-label">Sueldo bruto promedio $</label>
           <div class="fin-input-wrap">
             <span class="fin-prefix">$</span>
-            <input type="number" class="fin-inp" id="jub-sueldo" placeholder="1.200.000" min="0" step="10000" oninput="calcJubilacion()" />
+            <input type="text" class="fin-inp" id="jub-sueldo" placeholder="1.200.000" min="0" step="10000" inputmode="numeric" oninput="calcJubilacion()" />
           </div>
         </div>
         <div>
@@ -2921,7 +2919,7 @@ body.light-mode .deuda-body {
 </div><!-- /app-layout -->
 
 <footer>
-  <div class="footer-left"><span>MIINFLACIÓN</span> · Calculadora personal Argentina · Datos: INDEC + ArgentinaDatos API · <a href="#" onclick="document.querySelector('[data-panel=legal]').click();return false" style="color:var(--t3);text-decoration:none">Privacidad</a> · <a href="#" onclick="document.querySelector('[data-panel=legal]').click();switchLegalTab('tyc');return false" style="color:var(--t3);text-decoration:none">Términos</a> · <a href="https://forms.gle/sugerencias-miinflacion" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;font-weight:600">💬 Sugerencias y errores</a></div>
+  <div class="footer-left"><span>MIINFLACIÓN</span> · Calculadora personal Argentina · Datos: INDEC + ArgentinaDatos API · <a href="#" onclick="document.querySelector('[data-panel=legal]').click();return false" style="color:var(--t3);text-decoration:none">Privacidad</a> · <a href="#" onclick="document.querySelector('[data-panel=legal]').click();switchLegalTab('tyc');return false" style="color:var(--t3);text-decoration:none">Términos</a> · <a href="https://forms.gle/L3ubboA8b51r2dFA8" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;font-weight:600">💬 Sugerencias y errores</a></div>
   <div class="footer-center">
     <a href="https://www.indec.gob.ar" target="_blank">indec.gob.ar</a> ·
     <a href="https://argentinadatos.com" target="_blank">argentinadatos.com</a> ·
@@ -3839,7 +3837,14 @@ let ipcLastMes = 'Mayo 2026';
 
 async function fetchIPC() {
   try {
-    const r = await fetch('https://argentinadatos.com/api/v1/finanzas/indices/inflacion');
+    const ctrl = new AbortController();
+    const timeoutId = setTimeout(() => ctrl.abort(), 8000); // no dejar el spinner colgado si la API tarda
+    let r;
+    try {
+      r = await fetch('https://argentinadatos.com/api/v1/finanzas/indices/inflacion', { signal: ctrl.signal });
+    } finally {
+      clearTimeout(timeoutId);
+    }
     if (!r.ok) throw new Error('API error');
     const data = await r.json();
     if (!Array.isArray(data) || data.length === 0) throw new Error('empty');
@@ -4026,7 +4031,7 @@ function buildCatGrid() {
           <div class="money-prefix">$</div>
           <div class="money-inner">
             <span class="money-label-sm">Total gastado en este rubro por mes</span>
-            <input type="number" class="money-inp" id="monto-${c.id}" placeholder="0" value="${monto||''}" min="0" step="100" />
+            <input type="text" class="money-inp" id="monto-${c.id}" placeholder="0" value="${monto||''}" min="0" step="100" inputmode="numeric" />
           </div>
           <div class="money-sep"></div>
           <div class="money-pct-box">
@@ -6025,6 +6030,12 @@ function renderEvolucionChart(hist) {
 
   const dpr = window.devicePixelRatio || 1;
   const W = canvas.parentElement.offsetWidth - 2;
+  if (W < 100) {
+    // El panel todavía no tiene ancho real (recién se mostró) — reintentar
+    // en el próximo frame en vez de dibujar un gráfico aplastado/roto.
+    requestAnimationFrame(() => renderEvolucionChart(hist));
+    return;
+  }
   const H = 240;
   canvas.width = W * dpr;
   canvas.height = H * dpr;
@@ -6156,6 +6167,7 @@ let _macroCache = null;
 let _macroCacheTime = 0;
 const MACRO_CACHE_TTL = 5 * 60 * 1000;
 const MACRO_PROXY = 'https://jpmphuqutcwqbcqdaayk.supabase.co/functions/v1/bright-responder';
+const IOL_PROXY = 'https://jpmphuqutcwqbcqdaayk.supabase.co/functions/v1/iol-renta-fija';
 
 async function fetchMacro() {
   const now = Date.now();
@@ -7486,6 +7498,7 @@ function getRawValue(input) {
 function initNumInputs() {
   document.querySelectorAll('.fin-inp, .money-inp').forEach(inp => {
     if (inp.dataset.moneyInit) return; // evitar doble init
+    if (inp.dataset.noMoneyFormat) return; // ej: CUIT, no es un monto
     inp.dataset.moneyInit = '1';
     inp.setAttribute('inputmode', 'numeric');
 
@@ -7980,16 +7993,6 @@ const RF_INSTRUMENTOS = [
     calcRendimiento: (monto, plazo, tna) => monto * (tna/100/365 * plazo),
   },
   {
-    id: 'lecap_30',
-    nombre: 'LECAP (Letra Capitalizable)',
-    tipo: 'Tasa fija · Descuento',
-    icon: '📄',
-    getTNA: () => 45, // TIR orientativa de mercado — actualizar mensualmente
-    plazoMin: 15, plazoMax: 180,
-    desc: (tna) => 'TIR orientativa ~' + tna.toFixed(1) + '% · Vto. más cercano al plazo',
-    calcRendimiento: (monto, plazo, tna) => monto * (tna/100/365 * plazo),
-  },
-  {
     id: 'bono_cer',
     nombre: 'Bono CER (ajuste inflación)',
     tipo: 'Ajuste CER + spread',
@@ -8019,6 +8022,63 @@ const RF_INSTRUMENTOS = [
   },
 ];
 
+// ── Cotizaciones en vivo de LECAP/BONCAP/BONCER vía IOL ──
+let _iolCotizaciones = null;   // resultado crudo de la Edge Function
+let _iolFetchedAt = null;
+let _iolError = null;
+
+async function fetchRentaFijaIOL() {
+  try {
+    _iolError = null;
+    const res = await fetch(IOL_PROXY);
+    const data = await res.json();
+    if (!data.ok) { _iolError = data.error || 'Error desconocido'; return; }
+    _iolCotizaciones = data.resultados || [];
+    _iolFetchedAt = data.actualizado;
+  } catch (e) {
+    _iolError = 'No se pudo conectar con IOL';
+  } finally {
+    calcRentaFija();
+  }
+}
+
+// Para tasa fija (LECAP/BONCAP): elige, dentro de un tipo, el instrumento
+// cuyo vencimiento está más cerca del plazo que pidió el usuario.
+function _mejorInstrumentoIOL(tipo, plazoDias) {
+  if (!_iolCotizaciones) return null;
+  const candidatos = _iolCotizaciones.filter(c =>
+    c.tipo === tipo && c.diasAlVencimiento > 0 && c.ultimoPrecio && c.tea != null
+  );
+  if (!candidatos.length) return null;
+  candidatos.sort((a, b) =>
+    Math.abs(a.diasAlVencimiento - plazoDias) - Math.abs(b.diasAlVencimiento - plazoDias)
+  );
+  return candidatos[0];
+}
+
+function _instrumentosIOLDinamicos(plazo) {
+  const out = [];
+  [['LECAP', '📄', 'LECAP'], ['BONCAP', '📑', 'BONCAP']].forEach(([tipo, icon, label]) => {
+    const c = _mejorInstrumentoIOL(tipo, plazo);
+    if (!c) return;
+    out.push({
+      id: 'iol_' + c.simbolo,
+      nombre: label + ' ' + c.simbolo,
+      tipo: 'Tasa fija · Cotización IOL en vivo',
+      icon,
+      plazoMin: 1, plazoMax: 9999,
+      desc: () => 'TIR ' + c.tea.toFixed(1) + '% · Vence en ' + c.diasAlVencimiento + ' días (' +
+        new Date(c.vencimiento + 'T00:00:00').toLocaleDateString('es-AR') + ')',
+      // El rendimiento se proyecta a los días reales hasta el vencimiento
+      // de ESTE instrumento (no exactamente al plazo tipeado, que es lo
+      // que se usó para elegir cuál mostrar).
+      calcRendimiento: (monto) => monto * (100 / c.ultimoPrecio - 1),
+      _diasReales: c.diasAlVencimiento,
+    });
+  });
+  return out;
+}
+
 async function calcRentaFija() {
   const monto = getRawValue(document.getElementById('rf-monto')) || 0;
   const plazo = parseInt(document.getElementById('rf-plazo')?.value) || 30;
@@ -8032,8 +8092,10 @@ async function calcRentaFija() {
   const ipcMens = ipcLastVal || 2.5;
   const inflPeriodo = (Math.pow(1 + ipcMens/100, plazo/30) - 1) * 100;
 
-  // Filtrar instrumentos disponibles para el plazo elegido
-  const disponibles = RF_INSTRUMENTOS.filter(i => plazo >= i.plazoMin && plazo <= i.plazoMax);
+  // Filtrar instrumentos disponibles para el plazo elegido + agregar
+  // LECAP/BONCAP con cotización real de IOL para este plazo
+  const disponibles = RF_INSTRUMENTOS.filter(i => plazo >= i.plazoMin && plazo <= i.plazoMax)
+    .concat(_instrumentosIOLDinamicos(plazo));
 
   const resultados = disponibles.map(inst => {
     const tna = inst.getTNA();
@@ -8069,6 +8131,15 @@ async function calcRentaFija() {
     '<b style="color:var(--amber)">' + inflPeriodo.toFixed(1) + '%</b>' +
     ' (' + fmtP(monto * inflPeriodo / 100) + ') · Para preservar poder adquisitivo necesitás superar este rendimiento.' +
     '</div>';
+
+  // Estado de la cotización IOL
+  if (_iolError) {
+    html += '<div style="margin-top:8px;font-size:11px;color:var(--amber)">⚠️ No se pudo actualizar LECAP/BONCAP en vivo (' + _iolError + ') · mostrando el resto de instrumentos igual</div>';
+  } else if (_iolFetchedAt) {
+    html += '<div style="margin-top:8px;font-size:11px;color:var(--t3)">🔄 LECAP/BONCAP: cotización IOL actualizada ' + new Date(_iolFetchedAt).toLocaleTimeString('es-AR', {hour:'2-digit',minute:'2-digit'}) + '</div>';
+  } else if (!_iolCotizaciones) {
+    html += '<div style="margin-top:8px;font-size:11px;color:var(--t3)">🔄 Buscando cotización LECAP/BONCAP en vivo…</div>';
+  }
 
   resultEl.innerHTML = html;
   resultEl.style.display = 'block';
@@ -8309,6 +8380,7 @@ function calcJubilacion() {
 function initHerramientas() {
   fetchUVAActual();
   fetchTasasBCRA();
+  fetchRentaFijaIOL();
   initIPCAlerta();
 }
 
