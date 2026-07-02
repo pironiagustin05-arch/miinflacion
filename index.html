@@ -2159,6 +2159,38 @@ body.light-mode .deuda-body {
       </a>
     </div>
     <div class="fin-card" id="fin-score-card">
+      <!-- Configuración de umbrales personalizados -->
+      <div id="fin-umbrales-cfg" style="margin-bottom:16px;padding:12px 14px;background:var(--surf2);border-radius:8px;border:1px solid var(--b1)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <span style="font-size:12px;font-weight:700;color:var(--t2)">⚙️ Umbrales personalizados</span>
+          <button onclick="toggleUmbralesCfg()" id="umbrales-toggle-btn" style="font-size:11px;color:var(--accent);background:none;border:none;cursor:pointer;padding:0">Configurar</button>
+        </div>
+        <div id="umbrales-cfg-body" style="display:none">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">
+            <div>
+              <label class="form-label">Gasto máximo recomendado</label>
+              <div style="display:flex;gap:6px;align-items:center">
+                <input type="number" id="cfg-gasto-amarillo" class="form-input" style="width:70px;text-align:center" value="85" min="50" /> <span style="font-size:12px;color:var(--amber)">% 🟡</span>
+                <input type="number" id="cfg-gasto-naranja" class="form-input" style="width:70px;text-align:center" value="90" min="50" /> <span style="font-size:12px;color:var(--red)">% 🟠</span>
+              </div>
+              <div style="font-size:10px;color:var(--t3);margin-top:4px">% del ingreso en gastos</div>
+            </div>
+            <div>
+              <label class="form-label">Ahorro mínimo recomendado</label>
+              <div style="display:flex;gap:6px;align-items:center">
+                <input type="number" id="cfg-ahorro-min" class="form-input" style="width:70px;text-align:center" value="5" min="0" /> <span style="font-size:12px;color:var(--amber)">% 🟡</span>
+                <input type="number" id="cfg-ahorro-verde" class="form-input" style="width:70px;text-align:center" value="10" min="0" /> <span style="font-size:12px;color:var(--green)">% 🟢</span>
+              </div>
+              <div style="font-size:10px;color:var(--t3);margin-top:4px">% del ingreso en ahorro</div>
+            </div>
+          </div>
+          <button onclick="guardarUmbrales()" class="btn-primary" style="width:100%;padding:8px;font-size:12px">Guardar y recalcular</button>
+        </div>
+        <div id="umbrales-resumen" style="font-size:11px;color:var(--t3)">
+          Gasto: 🟡 &lt;85% · 🟠 &lt;90% · Ahorro: 🟡 &gt;5% · 🟢 &gt;10%
+        </div>
+      </div>
+
       <div id="fin-score-empty" style="text-align:center;padding:20px;color:var(--t3);font-size:13px">
         Ingresá tu ingreso mensual para calcular tu score
       </div>
@@ -2333,7 +2365,7 @@ body.light-mode .deuda-body {
       </div>
       <div class="form-group">
         <label class="form-label">Cuotas restantes</label>
-        <input class="form-input" type="number" id="d-cuotas-rest" placeholder="Ej: 18" min="1" max="360" />
+        <input class="form-input" type="number" id="d-cuotas-rest" placeholder="Ej: 18" min="1" />
       </div>
       <div class="form-group">
         <label class="form-label">Ajuste por inflación</label>
@@ -2505,7 +2537,7 @@ body.light-mode .deuda-body {
         </div>
         <div>
           <label class="form-label">Años de aportes actuales</label>
-          <input type="number" class="form-input" id="jub-años" placeholder="Ej: 15" min="0" max="45" oninput="calcJubilacion()" />
+          <input type="number" class="form-input" id="jub-años" placeholder="Ej: 15" min="0" oninput="calcJubilacion()" />
         </div>
         <div>
           <label class="form-label">Edad actual</label>
@@ -6699,7 +6731,7 @@ const MONO_CATS = {
 };
 
 function calcFinanzas() {
-  const ingreso = parseFloat(document.getElementById('fin-ingreso')?.value) || 0;
+  const ingreso = getRawValue(document.getElementById('fin-ingreso')) || 0;
   const monoCat = document.getElementById('fin-mono-cat')?.value || '';
   const facturacion = parseFloat(document.getElementById('fin-facturacion')?.value) || 0;
 
@@ -6761,8 +6793,9 @@ function calcFinanzas() {
   // Ponderación: DTI 35%, Flujo 30%, Ahorro 20%, Gasto 15%
   let scoreDTI    = dti <= 10 ? 100 : dti <= 20 ? 90 : dti <= 30 ? 70 : dti <= 40 ? 45 : dti <= 50 ? 25 : 10;
   let scoreFlujo  = flujo >= ingreso * 0.3 ? 100 : flujo >= ingreso * 0.15 ? 80 : flujo >= ingreso * 0.05 ? 60 : flujo >= 0 ? 40 : flujo >= -ingreso * 0.1 ? 20 : 5;
-  let scoreAhorro = tasaAhorro >= 20 ? 100 : tasaAhorro >= 15 ? 85 : tasaAhorro >= 10 ? 70 : tasaAhorro >= 5 ? 50 : tasaAhorro > 0 ? 30 : 0;
-  let scoreGasto  = ratioGasto <= 40 ? 100 : ratioGasto <= 55 ? 80 : ratioGasto <= 70 ? 60 : ratioGasto <= 85 ? 35 : 15;
+  let scoreAhorro = tasaAhorro >= _u.ahorroVerde * 2 ? 100 : tasaAhorro >= _u.ahorroVerde ? 75 : tasaAhorro >= _u.ahorroMin ? 50 : tasaAhorro > 0 ? 25 : (ahorroTotal === 0 ? 50 : 0);
+  const _u = getUmbrales();
+  let scoreGasto  = ratioGasto <= 55 ? 100 : ratioGasto <= _u.gastoAmarillo ? 80 : ratioGasto <= _u.gastoNaranja ? 50 : 15;
 
   // Si no hay datos de deuda/ahorro, no penalizar
   if (deudaTotal === 0) scoreDTI = 75;
@@ -6857,12 +6890,11 @@ function calcFinanzas() {
   }
 
   if (ahorroTotal > 0) {
-    if (tasaAhorro < 5) recs.push({ tipo: 'bad', icon: '🏦', texto: '<b>Ahorro bajo:</b> estás ahorrando el ' + fmtPct(tasaAhorro) + ' de tu ingreso. El mínimo recomendado es 10%. Reducí algún gasto variable para aumentarlo.' });
-    else if (tasaAhorro < 10) recs.push({ tipo: 'warn', icon: '💰', texto: '<b>Ahorro moderado:</b> ' + fmtPct(tasaAhorro) + ' del ingreso. Buen inicio — apuntá al 10-20% para tener colchón ante imprevistos.' });
-    else if (tasaAhorro < 20) recs.push({ tipo: 'ok', icon: '✅', texto: '<b>Buen ahorro:</b> el ' + fmtPct(tasaAhorro) + ' del ingreso va a ahorro. Considerá diversificar en CEDEARs o dólares para proteger el poder adquisitivo.' });
-    else recs.push({ tipo: 'ok', icon: '🌟', texto: '<b>Ahorro excelente:</b> el ' + fmtPct(tasaAhorro) + ' del ingreso va a ahorro e inversión. Revisá en Herramientas qué instrumentos de renta fija convienen para tu plazo.' });
+    if (tasaAhorro < _u.ahorroMin) recs.push({ tipo: 'bad', icon: '🏦', texto: '<b>Ahorro bajo (' + fmtPct(tasaAhorro) + '):</b> por debajo de tu mínimo configurado de ' + _u.ahorroMin + '%. Reducí algún gasto variable para aumentarlo.' });
+    else if (tasaAhorro < _u.ahorroVerde) recs.push({ tipo: 'warn', icon: '💰', texto: '<b>Ahorro moderado (' + fmtPct(tasaAhorro) + '):</b> buen inicio — apuntá al ' + _u.ahorroVerde + '% para tener colchón ante imprevistos.' });
+    else if (tasaAhorro < _u.ahorroVerde * 2) recs.push({ tipo: 'ok', icon: '✅', texto: '<b>Buen ahorro (' + fmtPct(tasaAhorro) + '):</b> superás tu meta. Diversificá en CEDEARs o dólares para proteger el poder adquisitivo.' });
+    else recs.push({ tipo: 'ok', icon: '🌟', texto: '<b>Ahorro excelente (' + fmtPct(tasaAhorro) + '):</b> muy por encima de tu meta. Revisá Herramientas para ver qué instrumentos convienen.' });
   }
-  // Si no hay ahorro cargado, no mostramos recomendación de ahorro (el usuario puede no tenerlo en la canasta)
 
   if (ratioGasto > 80) recs.push({ tipo: 'bad', icon: '📉', texto: '<b>Gasto muy alto:</b> el ' + fmtPct(ratioGasto) + ' de tu ingreso va a gastos operativos. El límite saludable es 70%. Identificá y reducí los 3 gastos más grandes que puedas optimizar.' });
   else if (ratioGasto > 65) recs.push({ tipo: 'warn', icon: '📊', texto: '<b>Gasto elevado:</b> el ' + fmtPct(ratioGasto) + ' va a gastos. Intentá no superar el 70% para tener margen de ahorro y emergencias.' });
@@ -7108,10 +7140,11 @@ function updateTasaLabel() {
 function agregarDeuda() {
   const nombre = document.getElementById('d-nombre')?.value.trim();
   const tipo = document.getElementById('d-tipo')?.value;
-  const capital = parseFloat(document.getElementById('d-capital')?.value) || 0;
-  const cuota = parseFloat(document.getElementById('d-cuota')?.value) || 0;
+  // getRawValue maneja correctamente "45.000" → 45000
+  const capital = getRawValue(document.getElementById('d-capital'));
+  const cuota   = getRawValue(document.getElementById('d-cuota'));
   const tipoTasa = document.getElementById('d-tipo-tasa')?.value;
-  const tasa = parseFloat(document.getElementById('d-tasa')?.value) || 0;
+  const tasa = parseFloat(document.getElementById('d-tasa')?.value?.replace(',','.')) || 0;
   const cuotasRest = parseInt(document.getElementById('d-cuotas-rest')?.value) || 0;
   const ajuste = document.getElementById('d-ajuste')?.value;
   const errEl = document.getElementById('d-error');
@@ -7193,7 +7226,7 @@ function renderDeudas() {
   setEl('d-total-costo', fmtP(totalCosto));
 
   // Semáforo de carga
-  const ingreso = parseFloat(document.getElementById('fin-ingreso')?.value) || 0;
+  const ingreso = getRawValue(document.getElementById('fin-ingreso')) || 0;
   const sem = document.getElementById('d-semaforo');
   if (sem && ingreso > 0) {
     const dti = (totalCuota / ingreso) * 100;
@@ -7440,8 +7473,13 @@ function onInputMoneyFormat(e) {
 
 function getRawValue(input) {
   if (!input) return 0;
-  if (input.dataset.rawValue) return parseFloat(input.dataset.rawValue) || 0;
-  return parseNumStr(input.value);
+  // Priorizar el rawValue guardado por el formateador
+  if (input.dataset.rawValue !== undefined && input.dataset.rawValue !== '') {
+    return parseFloat(input.dataset.rawValue) || 0;
+  }
+  // Fallback: parsear el string eliminando puntos de miles (formato es-AR)
+  const raw = (input.value || '').replace(/\./g, '').replace(',', '.');
+  return parseFloat(raw) || 0;
 }
 
 // Aplicar a todos los inputs de tipo money
@@ -7584,7 +7622,9 @@ function renderFuentesIngreso() {
       inp.value = raw > 0 ? raw.toLocaleString('es-AR') : '';
     });
     inp.addEventListener('input', () => {
-      const raw = parseFloat(inp.value.replace(/\./g, '').replace(',', '.')) || 0;
+      // Limpiar puntos de miles del formato es-AR antes de parsear
+      const raw = parseFloat((inp.value || '').replace(/\./g, '').replace(',', '.')) || 0;
+      inp.dataset.rawValue = raw;
       const id = inp.closest('[data-fuente-id]').dataset.fuenteId;
       const fuentes = getFuentesIngreso();
       const f = fuentes.find(x => x.id === id);
@@ -7980,7 +8020,7 @@ const RF_INSTRUMENTOS = [
 ];
 
 async function calcRentaFija() {
-  const monto = parseFloat(document.getElementById('rf-monto')?.value) || 0;
+  const monto = getRawValue(document.getElementById('rf-monto')) || 0;
   const plazo = parseInt(document.getElementById('rf-plazo')?.value) || 30;
   const resultEl = document.getElementById('rf-result');
   if (!resultEl || monto <= 0) {
@@ -8072,7 +8112,7 @@ async function fetchUVAActual() {
 }
 
 function calcUVA() {
-  const monto = parseFloat(document.getElementById('uva-monto')?.value) || 0;
+  const monto = getRawValue(document.getElementById('uva-monto')) || 0;
   const tipo = document.getElementById('uva-tipo')?.value;
   const resultEl = document.getElementById('uva-result');
   if (!resultEl || !monto) { resultEl.style.display = 'none'; return; }
@@ -8199,7 +8239,7 @@ async function initIPCAlerta() {
 
 // ── H: PROYECCIÓN JUBILACIÓN ──
 function calcJubilacion() {
-  const sueldo = parseFloat(document.getElementById('jub-sueldo')?.value) || 0;
+  const sueldo = getRawValue(document.getElementById('jub-sueldo')) || 0;
   const años = parseInt(document.getElementById('jub-años')?.value) || 0;
   const edad = parseInt(document.getElementById('jub-edad')?.value) || 0;
   const genero = document.getElementById('jub-genero')?.value || 'm';
@@ -8708,6 +8748,64 @@ async function mostrarAnalisisMes(snapshot) {
   box.querySelector('#analisis-close-btn')?.addEventListener('click', close);
   box.querySelector('#analisis-ok-btn')?.addEventListener('click', close);
   overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+}
+
+// ═══════════════════════════════════════════════
+// UMBRALES PERSONALIZADOS — Mis Finanzas
+// ═══════════════════════════════════════════════
+function getUmbrales() {
+  try {
+    const saved = localStorage.getItem('fin_umbrales');
+    if (saved) return JSON.parse(saved);
+  } catch(e) {}
+  return { gastoAmarillo: 85, gastoNaranja: 90, ahorroMin: 5, ahorroVerde: 10 };
+}
+
+function guardarUmbrales() {
+  const u = {
+    gastoAmarillo: parseFloat(document.getElementById('cfg-gasto-amarillo')?.value) || 85,
+    gastoNaranja:  parseFloat(document.getElementById('cfg-gasto-naranja')?.value)  || 90,
+    ahorroMin:     parseFloat(document.getElementById('cfg-ahorro-min')?.value)    || 5,
+    ahorroVerde:   parseFloat(document.getElementById('cfg-ahorro-verde')?.value)  || 10,
+  };
+  localStorage.setItem('fin_umbrales', JSON.stringify(u));
+  actualizarResumenUmbrales(u);
+  toggleUmbralesCfg();
+  calcFinanzas();
+  showToast('Umbrales guardados', 'success');
+}
+
+function actualizarResumenUmbrales(u) {
+  const el = document.getElementById('umbrales-resumen');
+  if (el) el.innerHTML =
+    'Gasto: 🟡 &lt;' + u.gastoAmarillo + '% · 🟠 &lt;' + u.gastoNaranja +
+    '% · Ahorro: 🟡 &gt;' + u.ahorroMin + '% · 🟢 &gt;' + u.ahorroVerde + '%';
+}
+
+function toggleUmbralesCfg() {
+  const body = document.getElementById('umbrales-cfg-body');
+  const btn = document.getElementById('umbrales-toggle-btn');
+  const resumen = document.getElementById('umbrales-resumen');
+  if (!body) return;
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  if (btn) btn.textContent = isOpen ? 'Configurar' : 'Ocultar';
+  if (resumen) resumen.style.display = isOpen ? 'block' : 'none';
+
+  if (!isOpen) {
+    // Cargar valores guardados en los inputs
+    const u = getUmbrales();
+    const setVal = (id, v) => { const el = document.getElementById(id); if(el) el.value = v; };
+    setVal('cfg-gasto-amarillo', u.gastoAmarillo);
+    setVal('cfg-gasto-naranja',  u.gastoNaranja);
+    setVal('cfg-ahorro-min',     u.ahorroMin);
+    setVal('cfg-ahorro-verde',   u.ahorroVerde);
+  }
+}
+
+function initUmbrales() {
+  const u = getUmbrales();
+  actualizarResumenUmbrales(u);
 }
 
 // Boot
